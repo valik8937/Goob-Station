@@ -1,0 +1,158 @@
+- type: marking
+  id: StockingsClassicRight
+  bodyPart: RLeg
+  markingCategory: RightLeg
+  speciesRestriction: [Human, Dwarf, Oni, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: classic_r
+
+- type: marking
+  id: StockingsStripedOddRight
+  bodyPart: RLeg
+  markingCategory: RightLeg
+  speciesRestriction: [Human, Dwarf, Oni, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: striped_odd_r
+
+- type: marking
+  id: StockingsStripedEvenRight
+  bodyPart: RLeg
+  markingCategory: RightLeg
+  speciesRestriction: [Human, Dwarf, Oni, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: striped_even_r
+
+- type: marking
+  id: StockingsFishnetRight
+  bodyPart: RLeg
+  markingCategory: RightLeg
+  speciesRestriction: [Human, Dwarf, Oni, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: fishnet_r
+
+- type: marking
+  id: StockingsThighRight
+  bodyPart: RLeg
+  markingCategory: RightLeg
+  speciesRestriction: [Human, Dwarf, Oni, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: thigh_r
+
+- type: marking
+  id: StockingsKneeRight
+  bodyPart: RLeg
+  markingCategory: RightLeg
+  speciesRestriction: [Human, Dwarf, Oni, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: knee_r
+
+# Left Leg Stockings
+
+- type: marking
+  id: StockingsClassicLeft
+  bodyPart: LLeg
+  markingCategory: LeftLeg
+  speciesRestriction: [Human, Dwarf, Oni, Reptilian, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: classic_l
+
+- type: marking
+  id: StockingsStripedOddLeft
+  bodyPart: LLeg
+  markingCategory: LeftLeg
+  speciesRestriction: [Human, Dwarf, Oni, Reptilian, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: striped_odd_l
+
+- type: marking
+  id: StockingsStripedEvenLeft
+  bodyPart: LLeg
+  markingCategory: LeftLeg
+  speciesRestriction: [Human, Dwarf, Oni, Reptilian, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: striped_even_l
+
+- type: marking
+  id: StockingsFishnetLeft
+  bodyPart: LLeg
+  markingCategory: LeftLeg
+  speciesRestriction: [Human, Dwarf, Oni, Reptilian, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: fishnet_l
+
+- type: marking
+  id: StockingsThighLeft
+  bodyPart: LLeg
+  markingCategory: LeftLeg
+  speciesRestriction: [Human, Dwarf, Oni, Reptilian, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: thigh_l
+
+- type: marking
+  id: StockingsKneeLeft
+  bodyPart: LLeg
+  markingCategory: LeftLeg
+  speciesRestriction: [Human, Dwarf, Oni, Reptilian, SlimePerson, Arachnid, Tajaran, Shadowkin, Vulpkanin, Rodentia]
+  coloring:
+    default:
+      type:
+        !type:SimpleColoring
+  sprites:
+  - sprite: _Pirate/Mobs/Customization/stockings.rsi
+    state: knee_l
+
