@@ -1,14 +1,14 @@
 - type: entity
   id: AutoFulton
-  name: fulton-on-trigger-item-name
-  description: fulton-on-trigger-item-desc
+  name: Автоматичний Фултон
+  description: Спеціальний пристрій, який автоматично активується та евакуює ціль, коли вона переходить у критичний стан.
   parent: BaseItem
   suffix: Full, JustDecor
   components:
   - type: FultonOnTrigger
     targetState: Critical
     fultonDuration: 5
-    removeable: true
+    removable: true
   - type: Stack
     stackType: AutoFultonStack
     count: 48

@@ -33,8 +33,8 @@ public sealed partial class FultonOnTriggerComponent : Component
     /// <summary>
     /// Whether the fulton can be removed by others.
     /// </summary>
-    [ViewVariables(VVAccess.ReadWrite), DataField("removeable"), AutoNetworkedField]
-    public bool Removeable = true;
+    [ViewVariables(VVAccess.ReadWrite), DataField("removable"), AutoNetworkedField]
+    public bool Removable = true;
 
     /// <summary>
     /// Sound that gets played when fulton is launched.

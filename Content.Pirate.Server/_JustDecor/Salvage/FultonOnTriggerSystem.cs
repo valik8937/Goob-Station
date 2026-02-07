@@ -21,6 +21,7 @@ public sealed class FultonOnTriggerSystem : EntitySystem
     {
         base.Initialize();
         SubscribeLocalEvent<FultonOnTriggerComponent, MobStateChangedEvent>(OnMobStateChanged);
+        SubscribeLocalEvent<FultonOnTriggerComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<FultonOnTriggerComponent, ExaminedEvent>(OnExamined);
         SubscribeLocalEvent<FultonOnTriggerComponent, AfterInteractEvent>(OnAfterInteract);
     }
@@ -36,6 +37,7 @@ public sealed class FultonOnTriggerSystem : EntitySystem
         if (HasComp<FultonBeaconComponent>(target))
         {
             component.Beacon = target;
+            Dirty(uid, component);
             _popup.PopupEntity(Loc.GetString("fulton-on-trigger-linked"), target, args.User);
             args.Handled = true;
             return;
@@ -44,7 +46,7 @@ public sealed class FultonOnTriggerSystem : EntitySystem
         if (!HasComp<MobStateComponent>(target))
             return;
 
-        if (component.Beacon == null)
+        if (component.Beacon == null || Deleted(component.Beacon))
         {
             _popup.PopupEntity(Loc.GetString("fulton-on-trigger-no-beacon"), target, args.User);
             return;
@@ -60,11 +62,13 @@ public sealed class FultonOnTriggerSystem : EntitySystem
         newComp.TargetState = component.TargetState;
         newComp.FultonDuration = component.FultonDuration;
         newComp.Beacon = component.Beacon;
-        newComp.Removeable = component.Removeable;
+        newComp.Removable = component.Removable;
         newComp.Sound = component.Sound;
         newComp.Enabled = true;
+        Dirty(target, newComp);
 
         _popup.PopupEntity(Loc.GetString("fulton-on-trigger-applied"), target, args.User);
+        TryActivateCurrentState(target, newComp);
 
         // Handle stack consumption
         if (TryComp<StackComponent>(uid, out var stack))
@@ -84,12 +88,34 @@ public sealed class FultonOnTriggerSystem : EntitySystem
         if (!component.Enabled)
             return;
 
-        args.PushMarkup(Loc.GetString("fulton-on-trigger-examine", ("state", component.TargetState.ToString())));
+        var stateText = GetMobStateDisplay(component.TargetState);
+        args.PushMarkup(Loc.GetString("fulton-on-trigger-examine", ("state", stateText)));
     }
 
     private void OnMobStateChanged(EntityUid uid, FultonOnTriggerComponent component, MobStateChangedEvent args)
     {
-        if (!component.Enabled || args.NewMobState != component.TargetState)
+        TryActivate(uid, component, args.NewMobState);
+    }
+
+    private void OnMapInit(EntityUid uid, FultonOnTriggerComponent component, MapInitEvent args)
+    {
+        TryActivateCurrentState(uid, component);
+    }
+
+    private void TryActivateCurrentState(EntityUid uid, FultonOnTriggerComponent component)
+    {
+        if (!component.Enabled)
+            return;
+
+        if (!TryComp<MobStateComponent>(uid, out var mobState))
+            return;
+
+        TryActivate(uid, component, mobState.CurrentState);
+    }
+
+    private void TryActivate(EntityUid uid, FultonOnTriggerComponent component, MobState newState)
+    {
+        if (!component.Enabled || newState != component.TargetState)
             return;
 
         if (HasComp<FultonedComponent>(uid))
@@ -110,12 +136,19 @@ public sealed class FultonOnTriggerSystem : EntitySystem
         fultoned.Beacon = beacon;
         fultoned.FultonDuration = component.FultonDuration;
         fultoned.NextFulton = _timing.CurTime + component.FultonDuration;
-        fultoned.Removeable = component.Removeable;
+        fultoned.Removable = component.Removable;
         fultoned.Sound = component.Sound;
+        Dirty(uid, fultoned);
 
         _popup.PopupEntity(Loc.GetString("fulton-on-trigger-popup"), uid, uid);
 
         // Remove the trigger component after use (one-shot)
         RemComp<FultonOnTriggerComponent>(uid);
+    }
+
+    private string GetMobStateDisplay(MobState state)
+    {
+        var key = $"mob-state-{state}";
+        return Loc.TryGetString(key, out var localized) ? localized : state.ToString();
     }
 }
