@@ -313,7 +313,6 @@ public sealed partial class BorgSystem : SharedBorgSystem
 
         _container.EmptyContainer(component.BrainContainer);
         _container.EmptyContainer(component.ModuleContainer);
-        _audio.PlayPvs(new SoundPathSpecifier("/Audio/Effects/Gasp/borg_deathgasp.ogg"), uid);
     }
 
     private void OnPowerCellChanged(EntityUid uid, BorgChassisComponent component, PowerCellChangedEvent args)
