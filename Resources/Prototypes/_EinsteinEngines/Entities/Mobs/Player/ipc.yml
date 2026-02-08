@@ -66,6 +66,7 @@
         requireInputValidation: false
       enum.SurgeryUIKey.Key: # Shitmed
         type: SurgeryBui
+  - type: ScreenSaver # DOWNSTREAM-TPirates: IPC screens
   # Goobstation Start - Energycrit
   # - type: PowerCellSlot
   #   cellSlotId: cell_slot
