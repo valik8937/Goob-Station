@@ -10,6 +10,10 @@ using Robust.Shared.Map;
 using Robust.Shared.Maths;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
+using Content.Shared.Body.Part;
+using Content.Shared.Damage;
+using Content.Shared.Mobs.Systems;
+using Robust.Shared.Random;
 
 namespace Content.Server.Silicons.IPC;
 
@@ -17,6 +21,8 @@ public sealed class ScreenSaverSystem : SharedScreenSaverSystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
 
     public override void Initialize()
     {
@@ -25,6 +31,7 @@ public sealed class ScreenSaverSystem : SharedScreenSaverSystem
         SubscribeLocalEvent<ScreenSaverComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<ScreenSaverComponent, ComponentShutdown>(OnShutdown);
         SubscribeNetworkEvent<SelectScreenSaverMessage>(OnSelectScreen);
+        SubscribeLocalEvent<BodyPartComponent, DamageChangedEvent>(OnBodyPartDamage);
     }
 
     private void OnMapInit(EntityUid uid, ScreenSaverComponent component, MapInitEvent args)
@@ -98,5 +105,52 @@ public sealed class ScreenSaverSystem : SharedScreenSaverSystem
 
         if (sync)
             Dirty(uid, humanoid);
+    }
+    
+    private void OnBodyPartDamage(EntityUid uid, BodyPartComponent component, DamageChangedEvent args)
+    {
+        if (!args.DamageIncreased || component.PartType != BodyPartType.Head || component.Body is not { } body)
+            return;
+
+        if (!TryComp<ScreenSaverComponent>(body, out var screenSaver)
+            || !TryComp<HumanoidAppearanceComponent>(body, out var humanoid)
+            || !_mobState.IsAlive(body))
+            return;
+
+        var markings = MarkingManager.Markings.Values.Where(m =>
+            m.MarkingCategory == MarkingCategories.Face &&
+            m.SpeciesRestrictions != null &&
+            m.SpeciesRestrictions.Contains("IPC")).ToList();
+
+        if (markings.Count == 0)
+            return;
+
+        var randomMarking = _random.Pick(markings);
+
+        // Preserve color if possible
+        var color = Color.White;
+        if (humanoid.MarkingSet.Markings.TryGetValue(MarkingCategories.Face, out var faceMarkings))
+        {
+            var lastMarking = faceMarkings.LastOrDefault();
+            if (lastMarking != null && lastMarking.MarkingColors.Count > 0)
+            {
+                color = lastMarking.MarkingColors[0];
+            }
+        }
+
+        // Remove old markings
+        if (humanoid.MarkingSet.Markings.ContainsKey(MarkingCategories.Face))
+        {
+            var toRemove = new List<Marking>(humanoid.MarkingSet.Markings[MarkingCategories.Face]);
+            foreach (var m in toRemove)
+            {
+                RemoveMarking(body, m.MarkingId);
+            }
+        }
+
+        Humanoid.AddMarking(body, randomMarking.ID, color);
+        screenSaver.CurrentScreen = randomMarking.ID;
+        UpdateVisuals(body, screenSaver);
+        Dirty(body, screenSaver);
     }
 }
