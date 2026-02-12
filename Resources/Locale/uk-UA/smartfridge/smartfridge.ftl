@@ -4,3 +4,5 @@ smart-fridge-component-try-eject-access-denied = Доступ заборонен
 smart-fridge-component-search-filter = Пошук...
 smart-fridge-component-title = Розумний холодильник
 smart-fridge-list-item = {$item} [{$amount}]
+smart-fridge-request-generic = Усі продажі остаточні
+smart-fridge-request-chemistry = Запросити поповнення з хімії

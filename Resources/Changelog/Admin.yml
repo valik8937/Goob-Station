@@ -1274,7 +1274,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/38384
 - author: perryprog
   changes:
-  - message: Rejuvenate тепер знімає сонливість, примусовий сон і ефект «веселкових
+  - message: Реджувенейт тепер знімає сонливість, примусовий сон і ефект «веселкових
       галюцинацій».
     type: Add
   id: 156
@@ -1282,7 +1282,8 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39025
 - author: slarticodefast, beck-thompson
   changes:
-  - message: Додано адмін-дію "Open Camera" і консольну команду "camera", що дозволяють
+  - message: Додано адмін-дію "Відкрити камеру" і консольну команду "camera", що
+      дозволяють
       спостерігати за сутностями в окремому вікні через віддалену камеру.
     type: Add
   id: 157
@@ -1312,7 +1313,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39424
 - author: slarticodefast
   changes:
-  - message: Призупинені мапи від cryostorage та polymorphing тепер мають назви,
+  - message: Призупинені мапи від кріостореджа та поліморфінгу тепер мають назви,
       щоб їх було легше знаходити під час налагодження.
     type: Tweak
   id: 161
@@ -1320,7 +1321,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39453
 - author: K-Dynamic
   changes:
-  - message: Centcomm Official тепер починає з адміністративними окулярами.
+  - message: Офіційний представник Центкому тепер починає з адміністративними окулярами.
     type: Tweak
   id: 162
   time: '2025-08-08T19:00:41.0000000+00:00'

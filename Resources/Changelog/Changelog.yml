@@ -3378,14 +3378,14 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/36881
 - author: Princess-Cheeseballs
   changes:
-  - message: Турелі та NPC тепер можуть стріляти по повалених цілях.
+  - message: Турелі та НПС тепер можуть стріляти по повалених цілях.
     type: Tweak
   id: 8796
   time: '2025-07-20T21:23:25.0000000+00:00'
   url: https://github.com/space-wizards/space-station-14/pull/39085
 - author: sowelipililimute
   changes:
-  - message: SmartFridge тепер реалізовано. У них можна зберігати великі обсяги
+  - message: Смартфриджі тепер реалізовано. У них можна зберігати великі обсяги
       хімікатів і рослин для загального доступу.
     type: Add
   id: 8797
@@ -3393,24 +3393,24 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/38648
 - author: ArtisticRoomba
   changes:
-  - message: Осколкові гранати China-lake тепер розкидають уламки в усі боки
+  - message: Осколкові гранати «Чайна-лейк» тепер розкидають уламки в усі боки
       при ударі. Їхню вибухову шкоду зменшено.
     type: Tweak
-  - message: Фугасні гранати China-lake більше не спричиняють розгерметизацію.
+  - message: Фугасні гранати «Чайна-лейк» більше не спричиняють розгерметизацію.
     type: Tweak
   id: 8798
   time: '2025-07-22T15:05:46.0000000+00:00'
   url: https://github.com/space-wizards/space-station-14/pull/39106
 - author: perryprog
   changes:
-  - message: Void applause знову має працювати як очікується.
+  - message: «Войд-аплодисменти» знову мають працювати як очікується.
     type: Fix
   id: 8799
   time: '2025-07-22T19:34:39.0000000+00:00'
   url: https://github.com/space-wizards/space-station-14/pull/38731
 - author: treytipton
   changes:
-  - message: Оголошення про ліквідацію NukeOps зроблено менш багатослівним.
+  - message: Оголошення про ліквідацію НюкОпс зроблено менш багатослівним.
     type: Tweak
   id: 8800
   time: '2025-07-23T02:58:07.0000000+00:00'
@@ -3425,7 +3425,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39137
 - author: FairlySadPanda
   changes:
-  - message: Майже всі інструменти оновлено на новий soundfont (GeneralUser-GS),
+  - message: Майже всі інструменти оновлено на новий саундфонт (GeneralUser-GS),
       що уніфікує звучання на всіх ОС і значно покращує звук деяких інструментів.
     type: Add
   id: 8802
@@ -3433,7 +3433,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39142
 - author: slarticodefast
   changes:
-  - message: Увімкнено команди "showrot", "showvel" і "showangvel" для debug-дозволів.
+  - message: Увімкнено команди "showrot", "showvel" і "showangvel" для дебаг-дозволів.
     type: Tweak
   - message: Виправлено дозволи для команди "showplayervelocity".
     type: Tweak
@@ -3505,7 +3505,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39257
 - author: lzk228
   changes:
-  - message: Janibelt тепер може містити золотий вантуз.
+  - message: Джанібелт тепер може містити золотий вантуз.
     type: Fix
   id: 8813
   time: '2025-07-28T12:59:41.0000000+00:00'
@@ -3519,7 +3519,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39254
 - author: TrixxedHeart
   changes:
-  - message: Виправлено кілька дивних проблем зі спрайтами у Vox, зокрема перекриття
+  - message: Виправлено кілька дивних проблем зі спрайтами у Вокс, зокрема перекриття
       обличчя комбінезонами та багатьма предметами на шиї, а також проблему
       шарів, коли їхній балон відображався поверх волосся.
     type: Fix
@@ -3528,7 +3528,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39219
 - author: K-Dynamic
   changes:
-  - message: Іконки посади та ID квартирмейстера тепер базуються на іконках вантажних
+  - message: Іконки посади та айді квартирмейстера тепер базуються на іконках вантажних
       техніків.
     type: Tweak
   id: 8816
@@ -3537,7 +3537,7 @@ Entries:
 - author: Alkheemist
   changes:
   - message: Захищені сітки тепер знову можна ремонтувати по корпусу та плитках
-      (Evac, ATS тощо).
+      (Евак, АТС тощо).
     type: Fix
   - message: Захищені сітки більше не можна розширювати за межі їхнього початкового
       розміру.
@@ -3551,18 +3551,18 @@ Entries:
       порогами передозування і зменшеною шкодою від передозування. Лікування
       за одиницю лишається майже тим самим.
     type: Tweak
-  - message: Bicaradine більше не утворює razorium при змішуванні з просунутими
-      brute-хімікатами. Просунуті brute-хімікати все ще змішуються між собою
-      й утворюють razorium.
+  - message: Бікарадин більше не утворює разоріум при змішуванні з просунутими
+      брут-хімікатами. Просунуті брут-хімікати все ще змішуються між собою
+      й утворюють разоріум.
     type: Tweak
   id: 8818
   time: '2025-07-29T18:52:42.0000000+00:00'
   url: https://github.com/space-wizards/space-station-14/pull/38811
 - author: aada
   changes:
-  - message: Lipolicide тепер продовжує отруювати на 0 голоду.
+  - message: Ліполіцид тепер продовжує отруювати на 0 голоду.
     type: Fix
-  - message: Tricordrazine тепер лікує і рівно на 50 шкоди, а не лише нижче 50.
+  - message: Трикордразин тепер лікує і рівно на 50 шкоди, а не лише нижче 50.
       Аналогічні пороги на інших реагентах також підкориговано.
     type: Tweak
   id: 8819
@@ -3607,7 +3607,8 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/38881
 - author: DrSmugleaf
   changes:
-  - message: Виправлено затримку дієслів повороту та стрибання UI правої кнопки
+  - message: Виправлено затримку дієслів повороту та стрибання інтерфейсу правої
+      кнопки
       миші, коли вони з'являлися з малою затримкою.
     type: Fix
   id: 8825
@@ -3686,7 +3687,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39379
 - author: Thinbug0
   changes:
-  - message: Додано нову мутацію цибулі Bloonions, цибулини, що плавають як повітряні
+  - message: Додано нову мутацію цибулі Блуніонс, цибулини, що плавають як повітряні
       кульки.
     type: Add
   id: 8835
@@ -3720,7 +3721,7 @@ Entries:
 - author: K-Dynamic
   changes:
   - message: Капітан і голова персоналу тепер починають відповідно з адміністративними
-      окулярами та HUD.
+      окулярами та HUD-інтерфейсом.
     type: Add
   id: 8839
   time: '2025-08-08T19:00:41.0000000+00:00'
@@ -3734,7 +3735,7 @@ Entries:
   url: https://github.com/space-wizards/space-station-14/pull/39481
 - author: Flareguy
   changes:
-  - message: Оновлено displacement-мапи молей, виправлено відсутні пікселі та
+  - message: Оновлено дисплейсмент-мапи молей, виправлено відсутні пікселі та
       інші різні проблеми.
     type: Fix
   id: 8841
