@@ -1,4 +1,3 @@
-#region DOWNSTREAM-TPirates: ghost follow menu update
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -6,7 +5,7 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Maths;
 
-namespace Content.Client.UserInterface.Controls;
+namespace Content.Client._Pirate.UserInterface.Controls;
 
 /// <summary>
 /// Lays out children in rows: left-to-right, wrapping to the next row when the next child
@@ -82,4 +81,3 @@ public class WrapContainer : Container
         return finalSize;
     }
 }
-#endregion

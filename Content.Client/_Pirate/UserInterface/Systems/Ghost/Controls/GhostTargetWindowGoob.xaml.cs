@@ -1,8 +1,7 @@
-#region DOWNSTREAM-TPirates: ghost follow menu update
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Content.Client.UserInterface.Controls;
+using Content.Client._Pirate.UserInterface.Controls;
 using Content.Shared.Ghost;
 using Content.Shared.Mobs;
 using Content.Shared.Radio;
@@ -17,7 +16,7 @@ using Robust.Client.UserInterface.XAML;
 using Robust.Shared.IoC;
 using Robust.Shared.Prototypes;
 
-namespace Content.Client.UserInterface.Systems.Ghost.Controls
+namespace Content.Client._Pirate.UserInterface.Systems.Ghost.Controls
 {
     [GenerateTypedNameReferences]
     public sealed partial class GhostTargetWindowGoob : DefaultWindow
@@ -27,6 +26,7 @@ namespace Content.Client.UserInterface.Systems.Ghost.Controls
 
         private sealed record ChipState(ContainerButton Chip, StyleBoxFlat StyleBox, Label NameLabel, BoxContainer ObserverBlock, Label ObserverCountLabel, string ProfessionTitle, GhostWarpHealthState HealthState, string DepartmentId, string JobIconId);
         private string _searchText = string.Empty;
+        private readonly Dictionary<GhostWarpType, bool> _sectionExpandedState = new();
 
         private enum ViewMode { Health, Department }
         private ViewMode _viewMode = ViewMode.Health;
@@ -45,13 +45,14 @@ namespace Content.Client.UserInterface.Systems.Ghost.Controls
             "ghost-target-window-filter-ghosts",
             "ghost-target-window-filter-mobs"
         };
+        private static readonly GhostWarpType[] SectionOrder = new[] { GhostWarpType.Player, GhostWarpType.Dead, GhostWarpType.Ghost, GhostWarpType.Mob, GhostWarpType.Location };
 
         public event Action<NetEntity>? WarpClicked;
         public event Action? OnGhostnadoClicked;
         public event Action? RefreshPressed;
 
         private const string RefreshIconPath = "/Textures/Interface/VerbIcons/refresh.svg.192dpi.png";
-        private const string ObserverIconPath = "/Textures/Interface/VerbIcons/ghost.svg.192dpi.png";
+        private const string ObserverIconPath = "/Textures/_Pirate/Interface/VerbIcons/ghost.svg.192dpi.png";
         private const float IconSize = 20f;
         private const string JobIconBorgId = "JobIconBorg";
         private static readonly Color SiliconColorFallback = new(0x5e / 255f, 0xd7 / 255f, 0xaa / 255f);
@@ -178,23 +179,30 @@ namespace Content.Client.UserInterface.Systems.Ghost.Controls
 
         public void Populate()
         {
+            if (SearchBar.Text != _searchText)
+                SearchBar.SetText(_searchText);
+
             _entityToChip.Clear();
             SectionsContainer.DisposeAllChildren();
 
-            foreach (var type in new[] { GhostWarpType.Player, GhostWarpType.Dead, GhostWarpType.Ghost, GhostWarpType.Mob, GhostWarpType.Location })
+            foreach (var type in SectionOrder)
             {
                 var titleKey = SectionTitleKeys[(int) type];
                 var count = _warps.Count(w => w.Type == type);
-                var body = new CollapsibleBody();
                 var wrap = new WrapContainer { SeparationOverride = 6, HorizontalExpand = true };
-                body.AddChild(wrap);
 
                 var headingText = $"{Loc.GetString(titleKey)} - ({count})";
-                var collapsible = new Collapsible(
-                    new CollapsibleHeading(headingText),
-                    body);
-                collapsible.BodyVisible = true;
-                SectionsContainer.AddChild(collapsible);
+                var section = new FramedCollapsible(headingText)
+                {
+                    Expanded = _sectionExpandedState.GetValueOrDefault(type, true),
+                    IsEmptySection = count == 0,
+                };
+                section.OnToggled += expanded =>
+                {
+                    _sectionExpandedState[type] = expanded;
+                };
+                section.Body.AddChild(wrap);
+                SectionsContainer.AddChild(section);
 
                 foreach (var (rawName, warpTarget, warpType, observerCount, jobIconId, mobState, professionTitle, healthState, departmentId) in _warps)
                 {
@@ -342,4 +350,3 @@ namespace Content.Client.UserInterface.Systems.Ghost.Controls
         }
     }
 }
-#endregion
