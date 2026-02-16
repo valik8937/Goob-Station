@@ -8,6 +8,7 @@ using Content.Shared._Shitmed.Medical.Surgery.Wounds.Components;
 using Content.Shared._Shitmed.Medical.Surgery.Wounds.Systems;
 using Content.Shared._Shitmed.Medical.Surgery.Traumas.Systems;
 using Content.Shared._Shitmed.Targeting;
+using Content.Shared.Armor;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
@@ -36,6 +37,7 @@ public sealed partial class PullingSystem
     /// prevent infinite loop after attacking the body part
     /// </summary>
     private readonly Dictionary<EntityUid, GrabFollowupSuppression> _followupSuppressions = new();
+    private readonly List<EntityUid> _expiredFollowups = new();
     private static readonly TimeSpan suppressionDuration = TimeSpan.FromSeconds(1);
     private TimeSpan _nextFollowupSuppressionPrune;
 
@@ -356,11 +358,16 @@ public sealed partial class PullingSystem
 
         while (containerSlotEnumerator.MoveNext(out var containerSlot))
         {
-            if (containerSlot.ContainedEntity.HasValue)
-            {
-                coveringItem = containerSlot.ContainedEntity.Value;
-                return true;
-            }
+            if (!containerSlot.ContainedEntity.HasValue)
+                continue;
+
+            var item = containerSlot.ContainedEntity.Value;
+            if (!TryComp<ArmorComponent>(item, out var armor)
+                || !armor.ArmorCoverage.Contains(BodyPartType.Head))
+                continue;
+
+            coveringItem = item;
+            return true;
         }
 
         return false;
@@ -577,15 +584,15 @@ public sealed partial class PullingSystem
     private void PruneExpiredFollowupSuppressions()
     {
         var now = _timing.CurTime;
-        var expired = new List<EntityUid>();
+        _expiredFollowups.Clear();
 
         foreach (var (uid, suppression) in _followupSuppressions)
         {
             if (suppression.ExpiresAt < now)
-                expired.Add(uid);
+                _expiredFollowups.Add(uid);
         }
 
-        foreach (var uid in expired)
+        foreach (var uid in _expiredFollowups)
         {
             _followupSuppressions.Remove(uid);
         }
