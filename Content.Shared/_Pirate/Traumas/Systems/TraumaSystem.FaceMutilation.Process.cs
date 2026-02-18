@@ -39,7 +39,7 @@ public sealed partial class TraumaSystem
             TraumaType.FaceMutilation,
             BodyPartType.Head);
 
-        if (deduction == 1)
+        if (deduction >= 1)
             return false;
 
         if (target.Comp.IntegrityCap <= 0)
