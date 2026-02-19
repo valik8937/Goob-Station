@@ -27,16 +27,6 @@
   - ContractorBaton
 
 - type: selectableSet
-  id: IPESword
-  name: Енергитичний меч
-  description: Смертельне та стильне знешкодження порушників
-  sprite:
-    sprite: Objects/Weapons/Melee/e_sword.rsi
-    state: icon
-  content:
-  - EnergySword
-
-- type: selectableSet
   id: IPAdvancedProtect
   name: Покращений захист
   description: Непоганий броньований жилет, з ним ви проживете трішки більше часу
@@ -92,7 +82,7 @@
 - type: selectableSet
   id: IPSurgeon
   name: Набір хірургічних інструментів
-  description: В комплект також йде компактний дефібрилятор інтердайну!
+  description: В комплект також йде компактний дефібрилятор інтердайну! Рекомендується вибрати "Набір хірургічні інструменти" або "Набір бойових аптечок та медіпенів різних типів" но не беріть обидва набори
   sprite:
     sprite: Clothing/Back/Duffels/syndicate.rsi
     state: icon-med
@@ -121,14 +111,34 @@
   
 # Interdyne ENG
 - type: selectableSet
-  id: IPClothingBeltCE
-  name: Пояс з просунутими інструмментами
-  description: Пояс СЕ
+  id: IPBeltCE
+  name: Пояс інструментів
+  description: Пояс просунутих інструментів
   sprite:
-    sprite: Clothing/Belt/ce.rsi
+    sprite: Clothing/belt/ce.rsi
     state: icon
   content:
   - ClothingBeltChiefEngineerFilled
+  
+- type: selectableSet
+  id: IPJetpackVoid
+  name: Реактивний ранець Void
+  description: Реактивний ранець для поясу, працюйте в космосі без страху відлетіти від станції чи шатлу
+  sprite:
+    sprite: Objects/Tanks/Jetpacks/void.rsi
+    state: icon
+  content:
+  - JetpackVoidFilled
+  
+- type: selectableSet
+  id: IPRCD
+  name: Interdyne RCD
+  description: Унікальний РЦД Інтердайну, розроблений Cybersun, краще вам не губити його
+  sprite:
+    sprite: _Pirate/Objects/Tools/rcd_dark.rsi
+    state: icon
+  content:
+  - RCDInterdyne
   
 # Interdyne Pilot
 - type: selectableSet
@@ -284,7 +294,7 @@
     sprite: Objects/Weapons/Guns/Pistols/N1984.rsi
     state: icon
   content:
-  - WeaponSubMachineGunWt550
+  - WeaponEnergyShotgun
   - ClothingBeltSheathFilledNavyOfficer
   - ClothingEyesGlassesBSO
   - WeaponPistolN1984
@@ -294,7 +304,6 @@
   - TelescopicBaton
   - ClothingBeltChemBagSyndiFilled
   - CQCManual
-  - ClothingOuterArmourInvisibleSyndie
   
 - type: selectableSet
   id: IPCyberpunk
@@ -319,11 +328,16 @@
     sprite: Clothing/Belt/sheath.rsi
     state: sheath-sabre
   content:
-  - ClothingBackpackDuffelSyndicateFilledWSPR
+  - WeaponSubMachineSmart
+  - MagazineSmart
+  - MagazineSmart
+  - MagazineSmart
   - TelescopicBaton
   - ClothingEyesGlassesBSO
-  - ClothingBeltSheathFilledNavyOfficer
+  - EnergySword
   - TelescopicShield
   - ClothingBeltChemBagSyndiFilled
   - CQCManual
-  - ClothingOuterArmourInvisibleSyndie
+  - CigPackSyndicate
+  - CigPackSyndicate
+  - InterdyneFlippo

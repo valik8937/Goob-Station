@@ -2,9 +2,40 @@
   id: CaptainInterdyne
   name: job-name-captain-interdyne
   description: job-description-captain-interdyne
-  icon: "JobIconCaptainInterdyne"
-  canBeAntag: false
   playTimeTracker: JobCaptainInterdyne
+  requirements:
+    - !type:DepartmentTimeRequirement
+      department: Engineering
+      time: 10800 # 3 hours
+    - !type:DepartmentTimeRequirement
+      department: Cargo
+      time: 10800 # 3 hours
+    - !type:DepartmentTimeRequirement
+      department: Medical
+      time: 10800 # 3 hours
+    - !type:DepartmentTimeRequirement
+      department: Civilian
+      time: 10800 # 3 hours
+    - !type:DepartmentTimeRequirement
+      department: Security
+      time: 10800 # 3 hours
+    - !type:DepartmentTimeRequirement
+      department: Science
+      time: 10800 # 3 hours
+    - !type:CharacterEmployerRequirement
+      employers:
+      - Interdyne
+    - !type:CharacterLifepathRequirement
+      inverted: true
+      lifepaths:
+      - Cultist
+      - Smuggler
+      - Enforcer
+      - ConArtist
+  startingGear: InterdyneOfficerGear
+  icon: "JobIconCaptainInterdyne"
+  goobcoins: 10 #Goob content (PvE content)
+  canBeAntag: false
   access:
     - Maintenance
     - External
@@ -13,3 +44,14 @@
     - Interdyne
     - InterdyneCommand
     - InterdyneOfficer
+  special:
+  # Shitmed Change
+  - !type:AddComponentSpecial
+    components:
+    - type: SurgerySpeedModifier
+      speedModifier: 2
+      
+- type: startingGear
+  id: InterdyneOfficerGear
+  equipment:
+    id: CaptainInterdyneIDCard

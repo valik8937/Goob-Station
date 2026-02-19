@@ -45,4 +45,45 @@
 
 # Wildcards
 
+# Interdyne
+- type: roleLoadout
+  id: JobCaptainInterdyne
+  groups:
+  - GroupTankHarness
+  - InterdyneOfficerHead
+  - MedicalMask
+  - InterdyneCommandHeadset
+  - SyndicateSuit
+  - InterdyneBack
+  - InterdyneClothing
+  - InterdyneSurgery
+  - InterdyneOfficerGloves
+  - InterdyneShoes
+  - InterdyneOfficerStamp
+  - SecurityMelee # Goobstation
+  - SeniorSecurityWeapon # Pirate
+  - SurvivalSecurity
+  - Animals
+  - GroupSpeciesBreathTool
+  
+- type: roleLoadout
+  id: JobInterdyneDeputy
+  groups:
+  - GroupTankHarness
+  - InterdyneHead
+  - MedicalMask
+  - InterdyneCommandHeadset
+  - SyndicateSuit
+  - InterdyneBack
+  - InterdyneClothing
+  - InterdyneSurgery
+  - InterdyneOfficerGloves
+  - InterdyneShoes
+  - InterdyneDeputyStamp
+  - SecurityMelee # Goobstation
+  - SeniorSecurityWeapon # Pirate
+  - SurvivalSecurity
+  - Animals
+  - GroupSpeciesBreathTool
+
 # Other

@@ -1,6 +1,6 @@
 - type: entity
   parent: VendingMachine
-  id: VendingMachineInterdyne
+  id: VendingMachineInterDrobe
   name: Автомат видачі спорядження Інтердайну
   description: Містить одяг та особливі трав'яні лікарські цигарки власного виробництва
   components:
