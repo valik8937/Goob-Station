@@ -50,10 +50,10 @@ public sealed class RattleOnTriggerSystem : EntitySystem
         // Sends a message to the radio channel specified by the implant
         _radio.SendRadioMessage(ent.Owner, message, _prototypeManager.Index(ent.Comp.RadioChannel), ent.Owner);
         #region DOWNSTREAM-TPirates: death rattle update
-        if (!ent.Comp.RelayToStationMedicalWhenOffStation || _station.GetOwningStation(target.Value) != null)
+        if (!ent.Comp.RelayToStationWhenOffStation || _station.GetOwningStation(target.Value) != null)
             return;
 
-        if (TryGetRelaySourceGrid(out var relaySource))
+        if (TryGetRelaySourceGrid(target.Value, out var relaySource))
             _radio.SendRadioMessage(ent.Owner, message, _prototypeManager.Index(ent.Comp.OffStationRelayChannel), relaySource);
         #endregion
     }
@@ -77,14 +77,21 @@ public sealed class RattleOnTriggerSystem : EntitySystem
 
     private static string CapitalizeFirst(string text, string fallback)
     {
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrWhiteSpace(text))
             return fallback;
 
         return char.ToUpperInvariant(text[0]) + text[1..];
     }
 
-    private bool TryGetRelaySourceGrid(out EntityUid relaySource)
+    private bool TryGetRelaySourceGrid(EntityUid target, out EntityUid relaySource)
     {
+        var owningStation = _station.GetOwningStation(target);
+        if (owningStation != null && _station.GetLargestGrid(owningStation.Value) is { } homeGrid)
+        {
+            relaySource = homeGrid;
+            return true;
+        }
+
         foreach (var station in _station.GetStations())
         {
             if (_station.GetLargestGrid(station) is { } grid)

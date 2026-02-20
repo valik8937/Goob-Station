@@ -26,7 +26,7 @@
         Dead: lavaland-deathrattle-implant-dead-message # DOWNSTREAM-TPirates: death rattle update
         Critical: lavaland-deathrattle-implant-critical-message # DOWNSTREAM-TPirates: death rattle update
       reportCoordinates: true
-      relayToStationMedicalWhenOffStation: true # DOWNSTREAM-TPirates: death rattle update
+      relayToStationWhenOffStation: true # DOWNSTREAM-TPirates: death rattle update
       offStationRelayChannel: Medical # DOWNSTREAM-TPirates: death rattle update
 
 - type: entity
