@@ -44,7 +44,8 @@ public sealed class RattleOnTriggerSystem : EntitySystem
             return;
 
         // Gets the location of the user
-        var posText = GetPositionText(target.Value, ent.Comp.ReportCoordinates); // DOWNSTREAM-TPirates: death rattle update
+        var pos = _transform.GetMapCoordinates(target.Value); // DOWNSTREAM-TPirates: death rattle update
+        var posText = GetPositionText(pos, ent.Comp.ReportCoordinates); // DOWNSTREAM-TPirates: death rattle update
 
         var message = Loc.GetString(messageId, ("user", target.Value), ("position", posText));
         // Sends a message to the radio channel specified by the implant
@@ -58,15 +59,14 @@ public sealed class RattleOnTriggerSystem : EntitySystem
         #endregion
     }
     #region DOWNSTREAM-TPirates: death rattle update
-    private string GetPositionText(EntityUid target, bool reportCoordinates)
+    private string GetPositionText(MapCoordinates pos, bool reportCoordinates)
     {
         var location = CapitalizeFirst(
-            FormattedMessage.RemoveMarkupOrThrow(_navMap.GetNearestBeaconString(target)),
+            FormattedMessage.RemoveMarkupOrThrow(_navMap.GetNearestBeaconString(pos)),
             Loc.GetString("rattle-on-trigger-unknown-position"));
         if (!reportCoordinates)
             return location;
 
-        var pos = _transform.GetMapCoordinates(target);
         if (pos.MapId == MapId.Nullspace)
             return location;
 
