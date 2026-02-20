@@ -68,7 +68,7 @@
     cost: 650
   - id: DeathRattleLavalandImplanter
     cost: 700
-    overrideName: shop-listing-deathrattle-implant-lavaland # stupid implanter structure raagh
+    overrideName: shop-listing-deathrattle-implant-lavaland-pirate # DOWNSTREAM-TPirates: death rattle override-name locale key split
   - id: ClothingMaskWeldingGas
     cost: 750
   - id: LavalandJaunter

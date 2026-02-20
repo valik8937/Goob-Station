@@ -53,7 +53,7 @@ public sealed class RattleOnTriggerSystem : EntitySystem
         if (!ent.Comp.RelayToStationWhenOffStation || _station.GetOwningStation(target.Value) != null)
             return;
 
-        if (TryGetRelaySourceGrid(target.Value, out var relaySource))
+        if (TryGetRelaySourceGrid(out var relaySource))
             _radio.SendRadioMessage(ent.Owner, message, _prototypeManager.Index(ent.Comp.OffStationRelayChannel), relaySource);
         #endregion
     }
@@ -83,15 +83,8 @@ public sealed class RattleOnTriggerSystem : EntitySystem
         return char.ToUpperInvariant(text[0]) + text[1..];
     }
 
-    private bool TryGetRelaySourceGrid(EntityUid target, out EntityUid relaySource)
+    private bool TryGetRelaySourceGrid(out EntityUid relaySource)
     {
-        var owningStation = _station.GetOwningStation(target);
-        if (owningStation != null && _station.GetLargestGrid(owningStation.Value) is { } homeGrid)
-        {
-            relaySource = homeGrid;
-            return true;
-        }
-
         foreach (var station in _station.GetStations())
         {
             if (_station.GetLargestGrid(station) is { } grid)

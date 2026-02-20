@@ -1,4 +1,4 @@
-shop-listing-deathrattle-implant-lavaland = "Last Breath" implanter
+shop-listing-deathrattle-implant-lavaland-pirate = "Last Breath" implanter
 ent-DeathRattleLavalandImplant = Last Breath
     .desc = This implant notifies the local Supply channel and the station Medical department when the carrier dies or becomes critically injured. When death occurs, the signal reaches the station and transmits exact death coordinates.
 ent-DeathRattleLavalandImplanter = "Last Breath" implanter
