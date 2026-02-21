@@ -77,8 +77,8 @@
 - type: entity
   parent: ClothingOuterCoatAMG
   id: ClothingOuterCoatBrigMedic
-  name: "халат брігмедика"
-  description: "Халат брігмедика, зроблений з міцної і легкої тканини, що забезпечує базовий захист. Ідеально підходе до сукні."
+  name: "халат бригмедика"
+  description: "Халат бригмедика, зроблений з міцної і легкої тканини, що забезпечує базовий захист. Ідеально підходе до сукні."
   components:
   - type: Sprite
     sprite: _Pirate/Clothing/OuterClothing/Coats/brigmedic.rsi

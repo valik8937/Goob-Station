@@ -224,7 +224,7 @@
   name: IK-60 laser carbine
   parent: [BaseWeaponBattery, BaseSecurityContraband, BaseGunWieldable]
   id: WeaponGunLaserCarbineAutomatic
-  description: "Напівавтоматичний лазерний карабін, який широко використовується штурмовими загонами міліції Республіки Бізель."
+  description: "Напівавтоматичний лазерний карабін, який широко використовується штурмовими загонами поліції Республіки Бізель."
   components:
   - type: Sprite
     sprite: _Pirate/Objects/Weapons/Guns/Battery/energygun_carbine.rsi
@@ -246,18 +246,17 @@
     soundEmpty:
       path: /Audio/_DV/Weapons/Guns/Empty/dry_fire.ogg
     selectedMode: SemiAuto
-    fireRate: 3
+    fireRate: 3.5
     availableModes:
       - SemiAuto
   - type: Battery
-    maxCharge: 2000
-    startingCharge: 2000
+    maxCharge: 4000
+    startingCharge: 4000
   - type: ProjectileBatteryAmmoProvider
     proto: BulletEnergyGunLaser
     fireCost: 100
   - type: AmmoSelector
     prototypes:
-      - BulletDisabler
       - BulletEnergyGunLaser
       - BulletEnergyGunIon
   - type: UserInterface
@@ -284,7 +283,7 @@
   name: PDW-9 Energy Pistol
   parent: [BaseWeaponBatterySmall, BaseSecurityContraband]
   id: WeaponEnergyGunPistol
-  description: "Військовий пістолет, який широко використовується загонами міліції Республіки Бізель."
+  description: "Військовий пістолет, який широко використовується загонами поліції Республіки Бізель."
   components:
   - type: Sprite
     sprite: _Pirate/Objects/Weapons/Guns/Battery/energygun_pistol.rsi
@@ -346,3 +345,13 @@
   - type: StaticPrice
     price: 750
   - type: Multishot
+
+- type: entity
+  name: PDW-9 Energy Pistol
+  parent: WeaponEnergyGunPistol
+  id: WeaponEnergyGunPistolSecurity
+  description: "Військовий пістолет, який широко використовується загонами поліції Республіки Бізель. Символ на ручці вказує, що ця зброя належить до офіцера безпеки SCC."
+  suffix: Security Loadouts
+  components:
+  - type: AccessReader
+    access: [["Security"]]
