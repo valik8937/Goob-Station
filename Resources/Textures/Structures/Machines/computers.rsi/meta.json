@@ -456,6 +456,28 @@
             ]
         },
         {
+            "name": "commSAN",
+            "directions": 4,
+            "delays": [
+                [
+                    0.5,
+                    0.5
+                ],
+                [
+                    0.5,
+                    0.5
+                ],
+                [
+                    0.5,
+                    0.5
+                ],
+                [
+                    0.5,
+                    0.5
+                ]
+            ]
+        },
+        {
             "name": "computer",
             "directions": 4
         },
