@@ -19,3 +19,9 @@ Entries:
       message: повернено обмеження щодо гравців до хвоста "VulpQueenTail"
   id: 3
   time: '2026-02-22T22:22:06.0000000+00:00'
+- author: v0idRift
+  changes:
+    - type: Fix
+      message: тест
+  id: 4
+  time: '2026-02-22T23:13:26.0000000+00:00'
