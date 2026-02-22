@@ -12,6 +12,8 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-0
       map: ["enum.GunVisualLayers.Mag"]
+  - type: GunFlashlightAttachment
+    offset: "0.125, 0.1875"
   - type: Clothing
     sprite: _Pirate/Objects/Weapons/Guns/Pistols/universal.rsi
   - type: Gun
@@ -26,6 +28,14 @@
       path: /Audio/_Pirate/Weapons/Guns/Gunshots/universal.ogg
   - type: ItemSlots
     slots:
+      flashlight:
+        name: weapon-upgrade-slot-name-flashlight
+        priority: 5
+        ejectOnBreak: true
+        occludesLight: false
+        whitelist:
+          components:
+          - GunUpgradeFlashlight
       gun_magazine:
         name: Magazine
         startingItem: MagazineUniversalMagnum
@@ -42,8 +52,10 @@
         whitelist:
           tags:
             - CartridgeMagnum
+  - type: UpgradeableWeapon
   - type: ContainerContainer
     containers:
+      flashlight: !type:ContainerSlot
       gun_magazine: !type:ContainerSlot
       gun_chamber: !type:ContainerSlot
 
@@ -69,6 +81,8 @@
       map: ["enum.GunVisualLayers.Base"]
     - state: mag-0
       map: ["enum.GunVisualLayers.Mag"]
+  - type: GunFlashlightAttachment
+    offset: "0.03125, 0.15625"
   - type: Clothing
     sprite: _Pirate/Objects/Weapons/Guns/Pistols/sol_pistol.rsi
   - type: Gun
@@ -77,3 +91,36 @@
     - SemiAuto
     soundGunshot:
       path: /Audio/_Pirate/Weapons/Guns/Gunshots/pistol.ogg
+  - type: UpgradeableWeapon
+  - type: ItemSlots
+    slots:
+      flashlight:
+        name: weapon-upgrade-slot-name-flashlight
+        priority: 5
+        ejectOnBreak: true
+        occludesLight: false
+        whitelist:
+          components:
+          - GunUpgradeFlashlight
+      gun_magazine:
+        name: Magazine
+        startingItem: MagazinePistol
+        insertSound: /Audio/Weapons/Guns/MagIn/pistol_magin.ogg
+        ejectSound: /Audio/Weapons/Guns/MagOut/pistol_magout.ogg
+        priority: 2
+        whitelist:
+          tags:
+            - MagazinePistol
+        whitelistFailPopup: gun-magazine-whitelist-fail
+      gun_chamber:
+        name: Chamber
+        startingItem: CartridgePistol
+        priority: 1
+        whitelist:
+          tags:
+            - CartridgePistol
+  - type: ContainerContainer
+    containers:
+      flashlight: !type:ContainerSlot
+      gun_magazine: !type:ContainerSlot
+      gun_chamber: !type:ContainerSlot
