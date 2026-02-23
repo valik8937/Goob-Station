@@ -298,6 +298,7 @@ public abstract class SharedNanoChatSystem : EntitySystem
         if (!Resolve(card, ref card.Comp))
             return false;
 
+        var changed = false; // Pirates: track whether recipient/message state changed before calling Dirty().
         if (!card.Comp.Recipients.ContainsKey(recipientNumber))
         {
             // Only add if we have recipient info
@@ -305,15 +306,40 @@ public abstract class SharedNanoChatSystem : EntitySystem
                 return false;
 
             card.Comp.Recipients[recipientNumber] = recipientInfo.Value;
+            changed = true; // Pirates: recipient entry created.
+        }
+        else if (recipientInfo is { } info) // Pirates: enrich existing recipient data when additional metadata becomes available.
+        {
+            // Enrich existing recipient data when we learn missing fields later.
+            var existing = card.Comp.Recipients[recipientNumber]; // Pirates: current cached recipient snapshot.
+            var updated = existing; // Pirates: mutable copy used to apply enrichment deltas.
+
+            if (string.IsNullOrWhiteSpace(existing.Name) && !string.IsNullOrWhiteSpace(info.Name)) // Pirates: backfill missing recipient name.
+                updated = updated with { Name = info.Name };
+
+            if (string.IsNullOrWhiteSpace(existing.JobTitle) && !string.IsNullOrWhiteSpace(info.JobTitle)) // Pirates: backfill missing recipient job title.
+                updated = updated with { JobTitle = info.JobTitle };
+
+            if (!updated.Equals(existing)) // Pirates: only write back when enrichment actually changed the value.
+            {
+                card.Comp.Recipients[recipientNumber] = updated; // Pirates: persist enriched recipient metadata.
+                changed = true; // Pirates: recipient metadata mutation occurred.
+            }
         }
 
         // Ensure message list exists for this recipient
         if (!card.Comp.Messages.ContainsKey(recipientNumber))
-            card.Comp.Messages[recipientNumber] = new List<NanoChatMessage>();
+        {
+            card.Comp.Messages[recipientNumber] = new List<NanoChatMessage>(); // Pirates: initialize recipient message bucket on first contact creation/enrichment path.
+            changed = true; // Pirates: message dictionary mutated.
+        }
 
-        Dirty(card);
+        if (changed) // Pirates: skip Dirty() when no state mutation happened.
+            Dirty(card);
+
         return true;
     }
 
     #endregion
 }
+

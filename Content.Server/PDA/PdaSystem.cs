@@ -252,7 +252,9 @@ namespace Content.Server.PDA
 
         private void OnNotification(Entity<PdaComponent> ent, ref CartridgeLoaderNotificationSentEvent args)
         {
-            _ringer.RingerPlayRingtone(ent.Owner);
+            // Pirates: cartridges can suppress ringtone while keeping notification text.
+            if (args.PlayRingtone) // Pirates: only ring when notification explicitly requests ringtone playback.
+                _ringer.RingerPlayRingtone(ent.Owner); // Pirates: honor notification ringtone preference.
 
             if (!_containerSystem.TryGetContainingContainer((ent, null, null), out var container)
                 || !TryComp<ActorComponent>(container.Owner, out var actor))
@@ -421,3 +423,4 @@ namespace Content.Server.PDA
         }
     }
 }
+
