@@ -33,11 +33,10 @@ public sealed partial class NanoChatMessageBubblePirate : BoxContainer
 
     public void SetMessage(NanoChatMessage message, bool isOwnMessage)
     {
-        if (MessagePanel.PanelOverride is not StyleBoxFlat)
+        if (MessagePanel.PanelOverride is not StyleBoxFlat style)
             return;
 
         // Configure message appearance
-        var style = (StyleBoxFlat)MessagePanel.PanelOverride;
         style.BackgroundColor = isOwnMessage ? OwnMessageColor : OtherMessageColor;
         style.BorderColor = BorderColor;
         style.BorderThickness = new Thickness(0);
