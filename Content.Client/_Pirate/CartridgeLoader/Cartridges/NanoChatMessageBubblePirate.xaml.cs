@@ -25,6 +25,7 @@ public sealed partial class NanoChatMessageBubblePirate : BoxContainer
     public static readonly Color BorderColor = Color.FromHex("#00000000");
     public static readonly Color TextColor = Color.FromHex("#e1e6f0");
     public static readonly Color ErrorColor = Color.FromHex("#cc3333");
+    private bool? _previousIsOwnMessage;
 
     public NanoChatMessageBubblePirate()
     {
@@ -51,24 +52,27 @@ public sealed partial class NanoChatMessageBubblePirate : BoxContainer
         if (DeliveryFailedLabel.Visible)
             DeliveryFailedLabel.Modulate = ErrorColor;
 
-        // For own messages: FlexSpace -> MessagePanel -> RightSpacer
-        // For other messages: LeftSpacer -> MessagePanel -> FlexSpace
-        MessageContainer.RemoveAllChildren();
-
-        // Detach before re-parenting to avoid duplicate parent ownership in the visual tree.
-        MessageBox.Parent?.RemoveChild(MessageBox);
-
-        if (isOwnMessage)
+        // Reorder children only when the message side changes.
+        if (_previousIsOwnMessage != isOwnMessage)
         {
-            MessageContainer.AddChild(FlexSpace);
-            MessageContainer.AddChild(MessageBox);
-            MessageContainer.AddChild(RightSpacer);
-        }
-        else
-        {
-            MessageContainer.AddChild(LeftSpacer);
-            MessageContainer.AddChild(MessageBox);
-            MessageContainer.AddChild(FlexSpace);
+            // For own messages: FlexSpace -> MessagePanel -> RightSpacer
+            // For other messages: LeftSpacer -> MessagePanel -> FlexSpace
+            MessageContainer.RemoveAllChildren();
+
+            if (isOwnMessage)
+            {
+                MessageContainer.AddChild(FlexSpace);
+                MessageContainer.AddChild(MessageBox);
+                MessageContainer.AddChild(RightSpacer);
+            }
+            else
+            {
+                MessageContainer.AddChild(LeftSpacer);
+                MessageContainer.AddChild(MessageBox);
+                MessageContainer.AddChild(FlexSpace);
+            }
+
+            _previousIsOwnMessage = isOwnMessage;
         }
     }
 }

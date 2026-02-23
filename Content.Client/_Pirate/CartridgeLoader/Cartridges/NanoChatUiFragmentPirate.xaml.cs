@@ -306,8 +306,8 @@ public sealed partial class NanoChatUiFragmentPirate : BoxContainer
         MessageList.InvalidateMeasure();
         MessagesScroll.InvalidateMeasure();
 
-        if (MessageList.Parent is ScrollContainer scroll)
-            scroll.SetScrollValue(new Vector2(0, float.MaxValue));
+        if (MessagesScroll != null)
+            MessagesScroll.SetScrollValue(new Vector2(0, float.MaxValue));
     }
 
     private TimeSpan GetStationTime(TimeSpan messageTimestamp)
@@ -457,10 +457,7 @@ public sealed partial class NanoChatUiFragmentPirate : BoxContainer
             : Loc.GetString("nano-chat-new-chat");
 
         // Clear any local prediction once server state arrives.
-        if (_pendingChat != null)
-        {
-            _pendingChat = null; // Clear pending either way
-        }
+        _pendingChat = null;
 
         // Server state is authoritative for selected chat.
         _currentChat = state.CurrentChat;
