@@ -25,6 +25,8 @@ namespace Content.Shared.Chemistry
     public sealed class SharedReagentDispenser
     {
         public const string OutputSlotName = "beakerSlot";
+        public const string RecipeDiskSlotName = "recipeDiskSlot";
+        public const int RecipeNameMaxLength = 16;
     }
 
     [Serializable, NetSerializable]
@@ -109,6 +111,98 @@ namespace Content.Shared.Chemistry
 
     }
 
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserStartRecipeRecordingMessage : BoundUserInterfaceMessage
+    {
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserCancelRecipeRecordingMessage : BoundUserInterfaceMessage
+    {
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserSaveRecipeMessage : BoundUserInterfaceMessage
+    {
+        public readonly string Name;
+
+        public ReagentDispenserSaveRecipeMessage(string name)
+        {
+            Name = name;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserDispenseRecipeMessage : BoundUserInterfaceMessage
+    {
+        public readonly string Name;
+
+        public ReagentDispenserDispenseRecipeMessage(string name)
+        {
+            Name = name;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserDeleteRecipeMessage : BoundUserInterfaceMessage
+    {
+        public readonly string Name;
+
+        public ReagentDispenserDeleteRecipeMessage(string name)
+        {
+            Name = name;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserClearRecipesMessage : BoundUserInterfaceMessage
+    {
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserSaveRecipeToDiskMessage : BoundUserInterfaceMessage
+    {
+        public readonly string Name;
+
+        public ReagentDispenserSaveRecipeToDiskMessage(string name)
+        {
+            Name = name;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserCopyDiskRecipeMessage : BoundUserInterfaceMessage
+    {
+        public readonly string Name;
+
+        public ReagentDispenserCopyDiskRecipeMessage(string name)
+        {
+            Name = name;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserDispenseDiskRecipeMessage : BoundUserInterfaceMessage
+    {
+        public readonly string Name;
+
+        public ReagentDispenserDispenseDiskRecipeMessage(string name)
+        {
+            Name = name;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public sealed class ReagentDispenserDeleteDiskRecipeMessage : BoundUserInterfaceMessage
+    {
+        public readonly string Name;
+
+        public ReagentDispenserDeleteDiskRecipeMessage(string name)
+        {
+            Name = name;
+        }
+    }
+
     public enum ReagentDispenserDispenseAmount
     {
         U1 = 1,
@@ -132,6 +226,13 @@ namespace Content.Shared.Chemistry
     }
 
     [Serializable, NetSerializable]
+    public sealed class ReagentDispenserRecipeItem(string name, Color color)
+    {
+        public string Name = name;
+        public Color Color = color;
+    }
+
+    [Serializable, NetSerializable]
     public sealed class ReagentDispenserBoundUserInterfaceState : BoundUserInterfaceState
     {
         public readonly ContainerInfo? OutputContainer;
@@ -144,13 +245,32 @@ namespace Content.Shared.Chemistry
         public readonly List<ReagentInventoryItem> Inventory;
 
         public readonly ReagentDispenserDispenseAmount SelectedDispenseAmount;
+        public readonly List<ReagentDispenserRecipeItem> SavedRecipes;
+        public readonly bool HasRecipeDisk;
+        public readonly List<ReagentDispenserRecipeItem> DiskRecipes;
+        public readonly bool IsRecordingRecipe;
+        public readonly List<ReagentQuantity> RecordingRecipeReagents;
 
-        public ReagentDispenserBoundUserInterfaceState(ContainerInfo? outputContainer, NetEntity? outputContainerEntity, List<ReagentInventoryItem> inventory, ReagentDispenserDispenseAmount selectedDispenseAmount)
+        public ReagentDispenserBoundUserInterfaceState(
+            ContainerInfo? outputContainer,
+            NetEntity? outputContainerEntity,
+            List<ReagentInventoryItem> inventory,
+            ReagentDispenserDispenseAmount selectedDispenseAmount,
+            List<ReagentDispenserRecipeItem> savedRecipes,
+            bool hasRecipeDisk,
+            List<ReagentDispenserRecipeItem> diskRecipes,
+            bool isRecordingRecipe,
+            List<ReagentQuantity> recordingRecipeReagents)
         {
             OutputContainer = outputContainer;
             OutputContainerEntity = outputContainerEntity;
             Inventory = inventory;
             SelectedDispenseAmount = selectedDispenseAmount;
+            SavedRecipes = savedRecipes;
+            HasRecipeDisk = hasRecipeDisk;
+            DiskRecipes = diskRecipes;
+            IsRecordingRecipe = isRecordingRecipe;
+            RecordingRecipeReagents = recordingRecipeReagents;
         }
     }
 

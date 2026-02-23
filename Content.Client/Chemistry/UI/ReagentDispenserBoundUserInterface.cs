@@ -70,6 +70,17 @@ namespace Content.Client.Chemistry.UI
 
             _window.OnDispenseReagentButtonPressed += (location) => SendMessage(new ReagentDispenserDispenseReagentMessage(location));
             _window.OnEjectJugButtonPressed += (location) => SendMessage(new ReagentDispenserEjectContainerMessage(location));
+            _window.OnStartRecipeRecordingPressed += () => SendMessage(new ReagentDispenserStartRecipeRecordingMessage());
+            _window.OnCancelRecipeRecordingPressed += () => SendMessage(new ReagentDispenserCancelRecipeRecordingMessage());
+            _window.OnSaveRecipePressed += name => SendMessage(new ReagentDispenserSaveRecipeMessage(name));
+            _window.OnClearRecipesPressed += () => SendMessage(new ReagentDispenserClearRecipesMessage());
+            _window.OnDispenseRecipePressed += name => SendMessage(new ReagentDispenserDispenseRecipeMessage(name));
+            _window.OnDeleteRecipePressed += name => SendMessage(new ReagentDispenserDeleteRecipeMessage(name));
+            _window.OnSaveRecipeToDiskPressed += name => SendMessage(new ReagentDispenserSaveRecipeToDiskMessage(name));
+            _window.OnCopyDiskRecipePressed += name => SendMessage(new ReagentDispenserCopyDiskRecipeMessage(name));
+            _window.OnDispenseDiskRecipePressed += name => SendMessage(new ReagentDispenserDispenseDiskRecipeMessage(name));
+            _window.OnDeleteDiskRecipePressed += name => SendMessage(new ReagentDispenserDeleteDiskRecipeMessage(name));
+            _window.OnEjectRecipeDiskPressed += () => SendMessage(new ItemSlotButtonPressedEvent(SharedReagentDispenser.RecipeDiskSlotName));
         }
 
         /// <summary>
