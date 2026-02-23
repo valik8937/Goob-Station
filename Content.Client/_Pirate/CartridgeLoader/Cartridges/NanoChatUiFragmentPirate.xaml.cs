@@ -209,11 +209,8 @@ public sealed partial class NanoChatUiFragmentPirate : BoxContainer
         _recipients = recipients;
 
         NoChatsLabel.Visible = recipients.Count == 0;
-        if (NoChatsLabel.Parent != ChatList)
-        {
-            NoChatsLabel.Parent?.RemoveChild(NoChatsLabel);
-            ChatList.AddChild(NoChatsLabel);
-        }
+        NoChatsLabel.Parent?.RemoveChild(NoChatsLabel);
+        ChatList.AddChild(NoChatsLabel);
 
         foreach (var (number, recipient) in recipients.OrderBy(r => r.Value.Name))
         {
@@ -418,6 +415,8 @@ public sealed partial class NanoChatUiFragmentPirate : BoxContainer
         return (topGap, separatorRow, bottomGap);
     }
 
+    // RenderedMessageRow invariant: Bubble and Spacing are assigned in AddRenderedMessage
+    // before the row is inserted into _renderedRows, so these default! fields are non-null at runtime.
     private sealed class RenderedMessageRow
     {
         public Control? SeparatorTopGap;
