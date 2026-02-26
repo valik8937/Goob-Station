@@ -486,7 +486,7 @@ namespace Content.Server.Chemistry.EntitySystems
                     srcDrainable,
                     outputContainer.Value,
                     dstRefillable.Value,
-                    quantity.Int());
+                    quantity);
 
                 if (transferred < quantity)
                 {
