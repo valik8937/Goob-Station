@@ -482,7 +482,7 @@ namespace Content.Server.Chemistry.EntitySystems
                     srcSoln.Value,
                     outputContainer.Value,
                     dstRefillable.Value,
-                    quantity.Int());
+                    quantity);
 
                 if (transferred < quantity)
                 {
