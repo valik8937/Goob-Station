@@ -245,14 +245,9 @@ namespace Content.Server.Chemistry.EntitySystems
 
             if (reagentDispenser.Comp.RecordingRecipe != null)
             {
-                if (TryGetPrimaryReagentId(storedContainer, out var reagentId))
+                var amount = FixedPoint2.New((int)reagentDispenser.Comp.DispenseAmount);
+                if (TryRecordDispensedMixture(storedContainer, amount, reagentDispenser.Comp.RecordingRecipe))
                 {
-                    var amount = FixedPoint2.New((int)reagentDispenser.Comp.DispenseAmount);
-                    if (reagentDispenser.Comp.RecordingRecipe.TryGetValue(reagentId, out var existing))
-                        reagentDispenser.Comp.RecordingRecipe[reagentId] = existing + amount;
-                    else
-                        reagentDispenser.Comp.RecordingRecipe.Add(reagentId, amount);
-
                     UpdateUiState(reagentDispenser);
                     ClickSound(reagentDispenser);
                 }
@@ -570,18 +565,40 @@ namespace Content.Server.Chemistry.EntitySystems
                    validatedName.Length <= SharedReagentDispenser.RecipeNameMaxLength;
         }
 
-        private bool TryGetPrimaryReagentId(EntityUid container, [NotNullWhen(true)] out string? reagentId)
+
+        private bool TryRecordDispensedMixture(EntityUid container, FixedPoint2 requestedAmount, Dictionary<string, FixedPoint2> recordingRecipe)
         {
-            reagentId = null;
-            if (!_solutionContainerSystem.TryGetDrainableSolution(container, out _, out var sol))
+            if (!_solutionContainerSystem.TryGetDrainableSolution(container, out _, out var sol) ||
+                sol.Volume <= FixedPoint2.Zero)
+            {
+                return false;
+            }
+
+            var transferredAmount = FixedPoint2.Min(requestedAmount, sol.Volume);
+            if (transferredAmount <= FixedPoint2.Zero)
                 return false;
 
-            var primary = sol.Contents.OrderByDescending(x => x.Quantity).FirstOrDefault();
-            if (primary.Reagent.Prototype is not { } id)
-                return false;
+            var transferRatio = transferredAmount / sol.Volume;
+            var recordedAny = false;
 
-            reagentId = id;
-            return true;
+            foreach (var reagent in sol.Contents)
+            {
+                if (reagent.Reagent.Prototype is not { } reagentId)
+                    continue;
+
+                var recordedAmount = reagent.Quantity * transferRatio;
+                if (recordedAmount <= FixedPoint2.Zero)
+                    continue;
+
+                if (recordingRecipe.TryGetValue(reagentId, out var existing))
+                    recordingRecipe[reagentId] = existing + recordedAmount;
+                else
+                    recordingRecipe.Add(reagentId, recordedAmount);
+
+                recordedAny = true;
+            }
+
+            return recordedAny;
         }
 
         private bool TryGetStoredContainerForReagentId(EntityUid dispenser, string reagentId, [NotNullWhen(true)] out EntityUid container)
