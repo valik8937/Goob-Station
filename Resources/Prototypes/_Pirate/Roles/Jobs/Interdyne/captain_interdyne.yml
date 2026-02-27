@@ -22,6 +22,9 @@
     - !type:DepartmentTimeRequirement
       department: Science
       time: 10800 # 3 hours
+    - !type:DepartmentTimeRequirement
+      department: Interdyne
+      time: 50400 # 14 hours
     - !type:CharacterEmployerRequirement
       employers:
       - Interdyne

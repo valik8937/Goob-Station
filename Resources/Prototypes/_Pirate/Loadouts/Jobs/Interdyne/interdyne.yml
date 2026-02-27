@@ -7,6 +7,10 @@
   id: LoadoutInterdyneOfficer
   equipment:
     head: ClothingHeadHatInterdyneOfficer
+- type: loadout
+  id: LoadoutInterdyneBeret
+  equipment:
+    head: ClothingHeadHatBeretInterdyneWhite
 # Neck
 # Ears
 - type: loadout

@@ -389,7 +389,7 @@
   id: InterdyneHead
   name: loadout-group-interdyne-head
   loadouts:
-  - ClothingHeadHatBeretInterdyneWhite
+  - LoadoutInterdyneBeret
 
 #Headset
 - type: loadoutGroup
