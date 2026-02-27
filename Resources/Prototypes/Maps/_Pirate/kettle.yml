@@ -37,7 +37,7 @@
   id: KettleTP
   mapName: 'Чайник ТП'
   mapPath: /Maps/_Pirate/kettle.yml
-  minPlayers: 1
+  minPlayers: 35
   stations:
     Kettle:
       stationProto: StandardNanotrasenStation
