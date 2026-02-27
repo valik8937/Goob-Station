@@ -1,6 +1,7 @@
 using Content.Shared.Input;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Popups;
+using Content.Shared.Movement.Components;
 using Robust.Shared.Configuration;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Player;
@@ -94,6 +95,9 @@ public class SharedCrawlUnderSystem : EntitySystem
 
     private void UpdatePhysicsState(EntityUid uid, StandingStateComponent standing)
     {
+        if (HasComp<WormComponent>(uid))
+            return;
+
         if (!TryComp<FixturesComponent>(uid, out var fixtures) || !TryComp<PhysicsComponent>(uid, out var physics))
             return;
 
