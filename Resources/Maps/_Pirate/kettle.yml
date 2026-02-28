@@ -15205,20 +15205,12 @@ entities:
     - type: Transform
       pos: -55.5,-26.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
-      deviceLists:
-      - 50
   - uid: 590
     components:
     - type: Transform
       rot: 1.5707963267948966 rad
       pos: -0.5,-46.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 84
   - uid: 591
@@ -15226,9 +15218,6 @@ entities:
     - type: Transform
       pos: 27.5,69.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 85
       - 12308
@@ -70969,9 +70958,6 @@ entities:
     - type: Transform
       pos: 12.5,62.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
 - proto: CrowbarRed
   entities:
   - uid: 10557
@@ -82953,9 +82939,6 @@ entities:
       rot: -1.5707963267948966 rad
       pos: 26.5,69.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 12308
   - uid: 12438
@@ -85246,54 +85229,6 @@ entities:
     - type: Transform
       pos: -11.463221,7.6793966
       parent: 2
-  - uid: 12856
-    components:
-    - type: Transform
-      pos: -46.971657,23.208248
-      parent: 2
-    - type: Physics
-      bodyStatus: InAir
-    - type: Fixtures
-      fixtures:
-        fix1:
-          shape: !type:PolygonShape
-            radius: 0.01
-            vertices:
-            - -0.25,-0.25
-            - 0.25,-0.25
-            - 0.25,0.25
-            - -0.25,0.25
-          mask:
-          - Impassable
-          - HighImpassable
-          layer: []
-          density: 20
-          hard: True
-          restitution: 0.3
-          friction: 0.2
-        throw-fixture:
-          shape: !type:PolygonShape
-            radius: 0.01
-            vertices:
-            - -0.25,-0.25
-            - 0.25,-0.25
-            - 0.25,0.25
-            - -0.25,0.25
-          mask:
-          - Impassable
-          - HighImpassable
-          - BulletImpassable
-          - BlobImpassable
-          layer: []
-          density: 1
-          hard: False
-          restitution: 0
-          friction: 0.4
-    - type: ThrownItem
-      playLandSound: True
-      landTime: 5112.0623326
-      thrownTime: 5111.994888
-      thrower: invalid
 - proto: FoodTinPeachesMaintOpen
   entities:
   - uid: 12857
@@ -108235,12 +108170,6 @@ entities:
       rot: -1.5707963267948966 rad
       pos: 28.5,69.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
-      deviceLists:
-      - 85
-      - 12308
     - type: AtmosPipeColor
       color: '#0055CCFF'
   - uid: 15870
@@ -109402,11 +109331,6 @@ entities:
     - type: Transform
       pos: -1.5,-46.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
-      deviceLists:
-      - 84
     - type: AtmosPipeColor
       color: '#0055CCFF'
   - uid: 27486
@@ -109422,12 +109346,6 @@ entities:
       rot: -1.5707963267948966 rad
       pos: 28.5,70.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
-      deviceLists:
-      - 85
-      - 12308
     - type: AtmosPipeColor
       color: '#990000FF'
   - uid: 16017
@@ -110644,11 +110562,6 @@ entities:
       rot: -1.5707963267948966 rad
       pos: 0.5,-46.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
-      deviceLists:
-      - 84
     - type: AtmosPipeColor
       color: '#990000FF'
 - proto: GasVolumePump
@@ -175711,21 +175624,11 @@ entities:
       rot: 3.141592653589793 rad
       pos: 50.5,-19.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
-      deviceLists:
-      - 26878
   - uid: 26877
     components:
     - type: Transform
       pos: 50.5,-14.5
       parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
-      deviceLists:
-      - 26878
 - proto: WeaponEnergyTurretSecurityControlPanel
   entities:
   - uid: 26878
