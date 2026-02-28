@@ -78,7 +78,6 @@ namespace Content.Goobstation.Server.Chemistry.Components
     {
         [DataField]
         public ItemSlot EnergyBeakerSlot = new();
-
         [DataField]
         public ItemSlot RecipeDiskSlot = new(); // Pirate: chem recipes
 
