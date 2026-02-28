@@ -159,6 +159,7 @@
     - ActionAIViewLaws
     - ActionOpenRemoteDevicesMenu # Corvax-Next-AiRemoteControl
     - ActionOpenCameraWarpMenu # Goobstation-Ai-Camera-Jumping
+    - ActionAIRedPhone # Pirate-AI-RedPhone
   - type: UserInterface
     interfaces:
       enum.RadarConsoleUiKey.Key:
@@ -431,6 +432,7 @@
     group: StationAi
   - type: SpeechSynthesis # Corvax-Frontier-Barks
     voice: Borg
+
 
 # Hologram projection that the AI's eye tracks.
 - type: entity
