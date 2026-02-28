@@ -108,6 +108,7 @@ stack-iron-ore = залізна руда
 stack-plasma-ore = плазмова руда
 stack-silver-ore = срібна руда
 stack-space-quartz = космічний кварц
+stack-titanium-ore = титанова руда
 stack-uranium-ore = уранова руда
 stack-bananium-ore = бананієва руда
 stack-coal = вугілля

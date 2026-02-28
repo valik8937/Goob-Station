@@ -1,0 +1,6 @@
+- type: salvageLoot
+  id: OreTitanium
+  guaranteed: true
+  loots:
+    - !type:BiomeMarkerLoot
+      proto: OreTitanium
