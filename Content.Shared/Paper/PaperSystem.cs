@@ -91,9 +91,9 @@ using Robust.Shared.Prototypes;
 #region Pirate: paperwork tags
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Content.Shared._Pirate.Paper;
 using Content.Shared.Access.Systems;
 using Content.Shared.GameTicking;
-using Content.Shared.PDA;
 using Content.Shared.Station;
 #endregion
 
@@ -338,7 +338,7 @@ public sealed class PaperSystem : EntitySystem
         var time = _ticker.RoundDuration().ToString("hh\\:mm\\:ss", CultureInfo.InvariantCulture);
         var dateTime = $"{date} {time}";
         var stationNumber = GetStationNumber(entity.Owner, actor);
-        var stationCode = GetStationSecurityCode(actor);
+        var stationCode = GetStationSecurityCode(entity.Owner, actor);
 
         return input
             .Replace("[author]", author)
@@ -395,24 +395,23 @@ public sealed class PaperSystem : EntitySystem
         return "0000";
     }
 
-    private string GetStationSecurityCode(EntityUid actor)
+    private string GetStationSecurityCode(EntityUid paper, EntityUid actor)
     {
-        if (!_idCard.TryFindIdCard(actor, out var idCard))
-            return "N/A";
+        var stationUid = _station.GetOwningStation(paper) ?? _station.GetOwningStation(actor);
+        if (stationUid == null)
+            return Loc.GetString("alert-level-unknown");
 
-        var parentUid = Transform(idCard).ParentUid;
-        if (parentUid != EntityUid.Invalid &&
-            TryComp<PdaComponent>(parentUid, out var pda) &&
-            !string.IsNullOrWhiteSpace(pda.StationAlertLevel))
-        {
-            var alertLevelKey = $"alert-level-{pda.StationAlertLevel}";
-            if (Loc.TryGetString(alertLevelKey, out var localizedLevel))
-                return localizedLevel;
+        var ev = new PaperGetStationAlertLevelEvent();
+        RaiseLocalEvent(stationUid.Value, ref ev);
 
-            return pda.StationAlertLevel;
-        }
+        if (string.IsNullOrWhiteSpace(ev.AlertLevel))
+            return Loc.GetString("alert-level-unknown");
 
-        return Loc.GetString("alert-level-unknown");
+        var alertLevelKey = $"alert-level-{ev.AlertLevel}";
+        if (Loc.TryGetString(alertLevelKey, out var localizedLevel))
+            return localizedLevel;
+
+        return ev.AlertLevel;
     }
     #endregion
 
