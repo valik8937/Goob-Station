@@ -505,7 +505,7 @@
   
 #Інше
 - type: loadoutGroup
-  id: InterdynePublicKee
+  id: InterdynePublicKey
   name: loadout-group-interdyne-key
   loadouts:  
   - LoadoutEncryptionKeyInterdyne

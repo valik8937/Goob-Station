@@ -41,7 +41,7 @@
     - InterdyneCommand
     - InterdyneOfficer
   special:
-  # Shitmed Change
+  # Keep surgery speed bonus on the Interdyne captain role.
   - !type:AddComponentSpecial
     components:
     - type: SurgerySpeedModifier
@@ -50,6 +50,7 @@
 - type: startingGear
   id: InterdyneOfficerGear
   equipment:
+    # Remaining round-start equipment is selected via role loadouts.
     id: CaptainInterdyneIDCard
 
 - type: chameleonOutfit
