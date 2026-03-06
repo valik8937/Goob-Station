@@ -7,19 +7,10 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Pirate.Photo;
 
 [Serializable, NetSerializable]
-public sealed class PhotoCardUiState : BoundUserInterfaceState
-{
-    public byte[]? ImageData { get; }
-    public string? CustomName { get; }
-    public string? Caption { get; }
-
-    public PhotoCardUiState(byte[]? imageData, string? customName, string? caption)
-    {
-        ImageData = imageData;
-        CustomName = customName;
-        Caption = caption;
-    }
-}
+public sealed record PhotoCardUiState(
+    byte[]? ImageData,
+    string? CustomName,
+    string? Caption) : BoundUserInterfaceState;
 
 [Serializable, NetSerializable]
 public enum PhotoCardUiKey : byte
