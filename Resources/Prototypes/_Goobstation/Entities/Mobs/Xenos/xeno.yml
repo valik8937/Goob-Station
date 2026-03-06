@@ -38,6 +38,8 @@
     factions:
     - SimpleHostile
   - type: Hands
+  - type: Inventory
+    templateId: xenomorph
   - type: ComplexInteraction
   - type: Sprite
     drawdepth: Mobs
