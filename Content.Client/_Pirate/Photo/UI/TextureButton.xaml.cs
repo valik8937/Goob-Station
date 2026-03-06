@@ -86,5 +86,13 @@ public sealed partial class TextureButton : ContainerButton
             _clickSound = source;
         }
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        _clickSound?.Dispose();
+        _clickSound = null;
+    }
+
     private IAudioSource? _clickSound;
 }
