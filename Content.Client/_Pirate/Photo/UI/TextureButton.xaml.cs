@@ -60,7 +60,7 @@ public sealed partial class TextureButton : ContainerButton
 
     public Vector2 TextureScale
     {
-        get => Icon.DisplayRect.TextureSizeTarget;
+        get => Icon.DisplayRect.SetSize;
         set => Icon.DisplayRect.SetSize = value;
     }
 
