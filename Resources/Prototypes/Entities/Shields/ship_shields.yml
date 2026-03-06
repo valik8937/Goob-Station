@@ -6,4 +6,5 @@
   - type: ShipShield
   - type: ShipShieldVisuals
   - type: Physics
+    canCollide: false
   - type: Fixtures

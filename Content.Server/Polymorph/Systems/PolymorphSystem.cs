@@ -570,11 +570,30 @@ public sealed partial class PolymorphSystem : EntitySystem
 
         if (component.Configuration.Inventory == PolymorphInventoryChange.Transfer)
         {
-            _inventory.TransferEntityInventories(uid, parent);
-            foreach (var held in _hands.EnumerateHeld(uid))
+            if (TryComp(uid, out InventoryComponent? sourceInventory)
+                && TryComp(parent, out InventoryComponent? targetInventory))
             {
-                _hands.TryDrop(uid, held);
-                _hands.TryPickupAnyHand(parent, held, checkActionBlocker: false);
+                _inventory.TransferEntityInventories((uid, sourceInventory), (parent, targetInventory));
+                foreach (var held in _hands.EnumerateHeld(uid))
+                {
+                    _hands.TryDrop(uid, held);
+                    _hands.TryPickupAnyHand(parent, held, checkActionBlocker: false);
+                }
+            }
+            else
+            {
+                if (_inventory.TryGetContainerSlotEnumerator(uid, out var enumerator))
+                {
+                    while (enumerator.MoveNext(out var slot))
+                    {
+                        _inventory.TryUnequip(uid, slot.ID);
+                    }
+                }
+
+                foreach (var held in _hands.EnumerateHeld(uid))
+                {
+                    _hands.TryDrop(uid, held);
+                }
             }
         }
         else if (component.Configuration.Inventory == PolymorphInventoryChange.Drop)
