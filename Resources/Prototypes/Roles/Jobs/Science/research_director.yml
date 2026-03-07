@@ -169,6 +169,7 @@
   icon: "JobIconResearchDirector"
   supervisors: job-supervisors-captain
   #canBeAntag: false
+  whitelisted: true # Pirate
   antagAdvantage: 75 # Goobstation
   guides: # goobstation
   - Science
