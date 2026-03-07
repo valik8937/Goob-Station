@@ -23,7 +23,13 @@
   id: OreTitanium
 
 - type: Tag
-  id: Photo # Pirate: camera
+  id: Photo
 
 - type: Tag
-  id: CameraFilm # Pirate: camera
+  id: CameraFilm
+
+- type: Tag
+  id: CaptainSabreHeavy
+
+- type: Tag
+  id: CaptainSabreShashka
