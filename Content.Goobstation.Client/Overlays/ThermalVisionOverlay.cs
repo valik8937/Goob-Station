@@ -8,7 +8,6 @@
 
 using System.Linq;
 using System.Numerics;
-using Content.Client._Pirate.Photo;
 using Content.Goobstation.Shared.Overlays;
 using Content.Shared.Body.Components;
 using Content.Shared.Stealth.Components;

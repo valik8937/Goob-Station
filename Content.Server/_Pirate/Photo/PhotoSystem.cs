@@ -472,32 +472,12 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
     private string GetPhotoGender(EntityUid entity)
     {
         if (TryComp<HumanoidAppearanceComponent>(entity, out var humanoid))
-            return GetGenderKey(GetHumanoidPhotoGender(entity, humanoid));
+            return GetGenderKey(humanoid.Gender);
 
         if (TryComp<GrammarComponent>(entity, out var grammar) && grammar.Gender is { } grammarGender)
             return GetGenderKey(grammarGender);
 
         return "other";
-    }
-
-    private Gender GetHumanoidPhotoGender(EntityUid entity, HumanoidAppearanceComponent humanoid)
-    {
-        if (TryComp<GrammarComponent>(entity, out var grammar) &&
-            grammar.Gender is { } grammarGender &&
-            grammarGender != Gender.Neuter)
-        {
-            return grammarGender;
-        }
-
-        if (humanoid.Gender != Gender.Neuter)
-            return humanoid.Gender;
-
-        return humanoid.Sex switch
-        {
-            Sex.Male => Gender.Male,
-            Sex.Female => Gender.Female,
-            _ => Gender.Epicene
-        };
     }
 
     private static string GetGenderKey(Gender gender)

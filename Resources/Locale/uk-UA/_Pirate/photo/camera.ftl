@@ -5,24 +5,18 @@ photo-card-area-description = Це фото ділянки приблизно { 
 photo-card-mob-description = На фото також видно { $name }.
 photo-card-mob-description-state = На фото також видно { $name }, { $state }.
 photo-card-mob-description-holding = На фото також видно { $name }. { $gender ->
-    [male] Він
-    [female] Вона
-    [epicene] Вони
-    [neuter] Воно
-   *[other] Вони
-} трима{ $gender ->
-    [epicene]ють
-   *[other]ють
+    [male] Він тримає
+    [female] Вона тримає
+    [epicene] Вони тримають
+    [neuter] Воно тримає
+   *[other] Вони тримають
 } { $items }.
 photo-card-mob-description-state-holding = На фото також видно { $name }, { $state }. { $gender ->
-    [male] Він
-    [female] Вона
-    [epicene] Вони
-    [neuter] Воно
-   *[other] Вони
-} трима{ $gender ->
-    [epicene]ють
-   *[other]ють
+    [male] Він тримає
+    [female] Вона тримає
+    [epicene] Вони тримають
+    [neuter] Воно тримає
+   *[other] Вони тримають
 } { $items }.
 photo-card-mob-state-critical = у критичному стані
 photo-card-mob-state-dead = неживий

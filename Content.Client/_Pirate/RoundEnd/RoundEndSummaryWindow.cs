@@ -160,7 +160,7 @@ public sealed partial class RoundEndSummaryWindow
             {
                 Orientation = LayoutOrientation.Vertical,
                 HorizontalExpand = true,
-                VerticalExpand = true,
+                VerticalExpand = false,
                 Margin = new Thickness(0, 5, 0, 5)
             };
 
