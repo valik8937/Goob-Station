@@ -12,17 +12,17 @@ public sealed class PhotoCardUiState(byte[]? imageData, string? customName, stri
     /// <summary>
     /// Binary image data for the photo preview/full image.
     /// </summary>
-    public byte[]? ImageData = imageData;
+    public byte[]? ImageData { get; } = imageData;
 
     /// <summary>
     /// Custom user-defined name for the image.
     /// </summary>
-    public string? CustomName = customName;
+    public string? CustomName { get; } = customName;
 
     /// <summary>
     /// Caption text shown with the image.
     /// </summary>
-    public string? Caption = caption;
+    public string? Caption { get; } = caption;
 }
 
 [Serializable, NetSerializable]

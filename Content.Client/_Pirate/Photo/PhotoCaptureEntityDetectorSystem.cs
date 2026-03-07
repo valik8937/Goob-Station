@@ -38,7 +38,7 @@ public sealed class PhotoCaptureEntityDetectorSystem : EntitySystem
         _stealthQuery = GetEntityQuery<StealthComponent>();
     }
 
-    public List<NetEntity> CaptureVisibleEntities(ScalingViewport viewport, int maxEntities = 256)
+    public List<NetEntity> CaptureVisibleEntities(ScalingViewport viewport, int maxEntities = MaxEntitiesHardLimit)
     {
         const float MinVisibleFraction = 0.05f;
 

@@ -292,8 +292,8 @@ public sealed partial class FaxPrintout
         StampedBy = stampedBy ?? new List<StampDisplayInfo>();
         Locked = locked;
         PhotoSourceEntityUid = photoSourceEntityUid; // # Pirate: camera
-        PhotoImageData = photoImageData;
-        PhotoPreviewData = photoPreviewData;
+        PhotoImageData = photoImageData is null ? null : (byte[]) photoImageData.Clone();
+        PhotoPreviewData = photoPreviewData is null ? null : (byte[]) photoPreviewData.Clone();
         PhotoCustomName = photoCustomName;
         PhotoCustomDescription = photoCustomDescription;
         PhotoCaption = photoCaption;

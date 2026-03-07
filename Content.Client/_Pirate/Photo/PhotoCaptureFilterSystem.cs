@@ -103,7 +103,7 @@ public sealed class PhotoCaptureFilterSystem : EntitySystem
         CleanupExpiredScopes();
     }
 
-    private void EndSuppressStatusIcons(int scopeId)
+    private void EndSuppressMaskScope(int scopeId)
     {
         _activeScopes.Remove(scopeId);
     }
@@ -150,7 +150,7 @@ public sealed class PhotoCaptureFilterSystem : EntitySystem
             if (_owner == null)
                 return;
 
-            _owner.EndSuppressStatusIcons(_scopeId);
+            _owner.EndSuppressMaskScope(_scopeId);
             _owner = null;
             _scopeId = -1;
         }

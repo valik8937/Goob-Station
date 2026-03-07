@@ -41,18 +41,9 @@
 
 - type: entity
   id: PhotoAlbumLoadoutSigned
-  parent: PhotoAlbum
+  parent: PhotoAlbumTGGreen
   suffix: loadout
   components:
-  - type: Sprite
-    sprite: _Pirate/Objects/Misc/Photo/photo_album.rsi
-    layers:
-      - state: album_green
-      - state: filled-0
-      - map: ["enum.StorageFillLayers.Fill"]
-  - type: Icon
-    sprite: _Pirate/Objects/Misc/Photo/photo_album.rsi
-    state: album_green
   - type: AutoSignPhotoAlbum
 
 - type: entity

@@ -12,7 +12,7 @@ photo-card-mob-description-holding = На фото також видно { $name
    *[other] Вони
 } трима{ $gender ->
     [epicene]ють
-   *[other]є
+   *[other]ють
 } { $items }.
 photo-card-mob-description-state-holding = На фото також видно { $name }, { $state }. { $gender ->
     [male] Він
@@ -22,7 +22,7 @@ photo-card-mob-description-state-holding = На фото також видно {
    *[other] Вони
 } трима{ $gender ->
     [epicene]ють
-   *[other]є
+   *[other]ють
 } { $items }.
 photo-card-mob-state-critical = у критичному стані
 photo-card-mob-state-dead = неживий

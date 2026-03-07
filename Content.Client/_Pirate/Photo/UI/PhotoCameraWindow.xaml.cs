@@ -162,6 +162,18 @@ public sealed partial class PhotoCameraWindow : FancyWindow
 
     private static Rgba32[] DownscaleBox(ReadOnlySpan<Rgba32> source, int sourceWidth, int sourceHeight, int targetWidth, int targetHeight)
     {
+        if (targetWidth <= 0)
+            throw new System.ArgumentOutOfRangeException(nameof(targetWidth), targetWidth, "Target width must be greater than zero.");
+
+        if (targetHeight <= 0)
+            throw new System.ArgumentOutOfRangeException(nameof(targetHeight), targetHeight, "Target height must be greater than zero.");
+
+        if (sourceWidth <= 0)
+            throw new System.ArgumentOutOfRangeException(nameof(sourceWidth), sourceWidth, "Source width must be greater than zero.");
+
+        if (sourceHeight <= 0)
+            throw new System.ArgumentOutOfRangeException(nameof(sourceHeight), sourceHeight, "Source height must be greater than zero.");
+
         var result = new Rgba32[targetWidth * targetHeight];
 
         for (var y = 0; y < targetHeight; y++)
@@ -196,6 +208,12 @@ public sealed partial class PhotoCameraWindow : FancyWindow
                         sumA += pixel.A;
                         count++;
                     }
+                }
+
+                if (count <= 0)
+                {
+                    result[y * targetWidth + x] = default;
+                    continue;
                 }
 
                 result[y * targetWidth + x] = new Rgba32(

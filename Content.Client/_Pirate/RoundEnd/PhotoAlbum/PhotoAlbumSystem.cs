@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Content.Shared._Pirate.RoundEnd;
 
@@ -10,10 +13,13 @@ namespace Content.Client._Pirate.RoundEnd.PhotoAlbum;
 
 public sealed class PhotoAlbumSystem : EntitySystem
 {
-    public List<AlbumData>? Albums { get; private set; }
+    private static readonly TimeSpan ImageRequestTimeout = TimeSpan.FromSeconds(10);
+
+    public IReadOnlyList<AlbumData>? Albums { get; private set; }
     public event Action? AlbumsUpdated;
     private readonly Dictionary<Guid, byte[]?> _fullImageData = new();
-    private readonly Dictionary<Guid, TaskCompletionSource<byte[]?>> _pendingImageRequests = new();
+    private readonly Dictionary<Guid, PendingImageRequest> _pendingImageRequests = new();
+    private readonly object _pendingImageRequestsLock = new();
 
     public override void Initialize()
     {
@@ -26,7 +32,7 @@ public sealed class PhotoAlbumSystem : EntitySystem
     private void OnStationImagesReceived(PhotoAlbumEvent ev)
     {
         ClearImageCaches();
-        Albums = ev.Albums;
+        Albums = ev.Albums?.ToList();
         AlbumsUpdated?.Invoke();
     }
 
@@ -34,10 +40,11 @@ public sealed class PhotoAlbumSystem : EntitySystem
     {
         _fullImageData[ev.ImageId] = ev.ImageData;
 
-        if (!_pendingImageRequests.Remove(ev.ImageId, out var pending))
+        if (!TryTakePendingImageRequest(ev.ImageId, out var pending))
             return;
 
-        pending.TrySetResult(ev.ImageData);
+        pending.Dispose();
+        pending.Completion.TrySetResult(ev.ImageData);
     }
 
     public Task<byte[]?> GetFullImageDataAsync(Guid imageId)
@@ -45,13 +52,28 @@ public sealed class PhotoAlbumSystem : EntitySystem
         if (_fullImageData.TryGetValue(imageId, out var imageData))
             return Task.FromResult(imageData);
 
-        if (_pendingImageRequests.TryGetValue(imageId, out var pending))
-            return pending.Task;
+        lock (_pendingImageRequestsLock)
+        {
+            if (_pendingImageRequests.TryGetValue(imageId, out var pending))
+                return pending.Completion.Task;
+        }
 
-        var request = new TaskCompletionSource<byte[]?>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _pendingImageRequests[imageId] = request;
+        var completion = new TaskCompletionSource<byte[]?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var request = new PendingImageRequest(completion, ImageRequestTimeout, () => OnImageRequestTimedOut(imageId));
+
+        lock (_pendingImageRequestsLock)
+        {
+            if (_pendingImageRequests.TryGetValue(imageId, out var existing))
+            {
+                request.Dispose();
+                return existing.Completion.Task;
+            }
+
+            _pendingImageRequests[imageId] = request;
+        }
+
         RaiseNetworkEvent(new PhotoAlbumImageRequestEvent(imageId));
-        return request.Task;
+        return completion.Task;
     }
 
     public void ClearImagesData()
@@ -62,12 +84,65 @@ public sealed class PhotoAlbumSystem : EntitySystem
 
     private void ClearImageCaches()
     {
-        foreach (var request in _pendingImageRequests.Values)
+        List<PendingImageRequest> pendingRequests = new();
+
+        lock (_pendingImageRequestsLock)
         {
-            request.TrySetResult(null);
+            foreach (var request in _pendingImageRequests.Values)
+            {
+                pendingRequests.Add(request);
+            }
+
+            _pendingImageRequests.Clear();
         }
 
-        _pendingImageRequests.Clear();
+        foreach (var request in pendingRequests)
+        {
+            request.Dispose();
+            request.Completion.TrySetResult(null);
+        }
+
         _fullImageData.Clear();
+    }
+
+    private void OnImageRequestTimedOut(Guid imageId)
+    {
+        if (!TryTakePendingImageRequest(imageId, out var request))
+            return;
+
+        request.Dispose();
+        request.Completion.TrySetResult(null);
+    }
+
+    private bool TryTakePendingImageRequest(Guid imageId, [NotNullWhen(true)] out PendingImageRequest? request)
+    {
+        lock (_pendingImageRequestsLock)
+        {
+            return _pendingImageRequests.Remove(imageId, out request);
+        }
+    }
+
+    private sealed class PendingImageRequest : IDisposable
+    {
+        public TaskCompletionSource<byte[]?> Completion { get; }
+
+        private readonly CancellationTokenSource _timeoutCancellation = new();
+        private readonly CancellationTokenRegistration _timeoutRegistration;
+
+        public PendingImageRequest(
+            TaskCompletionSource<byte[]?> completion,
+            TimeSpan timeout,
+            Action timeoutAction)
+        {
+            Completion = completion;
+            _timeoutCancellation.CancelAfter(timeout);
+            _timeoutRegistration = _timeoutCancellation.Token.Register(timeoutAction);
+        }
+
+        public void Dispose()
+        {
+            _timeoutRegistration.Dispose();
+            _timeoutCancellation.Dispose();
+        }
     }
 }

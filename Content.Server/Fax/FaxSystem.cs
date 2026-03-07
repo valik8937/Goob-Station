@@ -649,6 +649,7 @@ public sealed class FaxSystem : EntitySystem
         TryComp<NameModifierComponent>(sendEntity, out var nameMod);
 
         FaxPrintout? printout = null; // # Pirate: camera
+        string logContent;
 
         if (TryComp<PaperComponent>(sendEntity, out var paper))
         {
@@ -659,11 +660,13 @@ public sealed class FaxSystem : EntitySystem
                 paper.StampState,
                 paper.StampedBy,
                 paper.EditingDisabled);
+            logContent = paper.Content;
         }
         else if (TryComp<PhotoCardComponent>(sendEntity, out var photo))
         {
+            var photoContent = photo.CustomDescription ?? photo.Caption ?? metadata.EntityDescription;
             printout = new FaxPrintout(
-                string.Empty,
+                photoContent,
                 nameMod?.BaseName ?? metadata.EntityName,
                 labelComponent?.CurrentLabel,
                 metadata.EntityPrototype?.ID ?? "PhotoCard",
@@ -673,10 +676,12 @@ public sealed class FaxSystem : EntitySystem
                 photoCustomDescription: photo.CustomDescription,
                 photoCaption: photo.Caption,
                 photoEntityDescription: metadata.EntityDescription);
+            logContent = photoContent;
         }
-
-        if (printout is null) // # Pirate: camera
+        else
+        {
             return;
+        }
 
         component.PrintingQueue.Enqueue(printout);
         component.SendTimeoutRemaining += component.SendTimeout;
@@ -693,7 +698,7 @@ public sealed class FaxSystem : EntitySystem
             LogImpact.Low,
             $"{ToPrettyString(args.Actor):actor} " +
             $"added copy job to \"{component.FaxName}\" {ToPrettyString(uid):tool} " +
-            $"of {ToPrettyString(sendEntity):subject}: {printout.Content}");
+            $"of {ToPrettyString(sendEntity):subject}: {logContent}");
     }
 
     /// <summary>

@@ -10,6 +10,7 @@ using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Log;
 using Robust.Shared.Utility;
 using System.IO;
 using System.Numerics;
@@ -52,14 +53,6 @@ public sealed partial class RoundEndSummaryWindow
             Name = Loc.GetString("round-end-summary-window-photo-album-tab-title")
         };
 
-        var stationAlbumTab = new BoxContainer
-        {
-            Orientation = LayoutOrientation.Vertical,
-            Name = Loc.GetString("round-end-summary-window-photo-album-tab-title")
-        };
-
-        if (stationAlbumSystem.Albums is null || stationAlbumSystem.Albums.Count == 0)
-
         if (stationAlbumSystem.Albums is null || stationAlbumSystem.Albums.Count == 0)
             return null;
 
@@ -97,7 +90,7 @@ public sealed partial class RoundEndSummaryWindow
                     }
                     catch (Exception ex)
                     {
-                        Log.Warning($"Failed to load round-end photo preview for image id {image.ImageId}: {ex}");
+                        Logger.Warning($"Failed to load round-end photo preview for image id {image.ImageId}: {ex}");
                     }
                 }
 
@@ -131,7 +124,7 @@ public sealed partial class RoundEndSummaryWindow
                 if (image.ImageId == Guid.Empty)
                 {
                     downloadButton.Disabled = true;
-                    Log.Warning($"Round-end photo {downloadId} has an empty image id and cannot be downloaded.");
+                    Logger.Warning($"Round-end photo {downloadId} has an empty image id and cannot be downloaded.");
                 }
                 else
                 {
@@ -229,7 +222,7 @@ public sealed partial class RoundEndSummaryWindow
     {
         if (!_photoDownloadImageIds.TryGetValue(imageId, out var photoImageId))
         {
-            Log.Warning($"Round-end photo download id miss for image id {imageId}.");
+            Logger.Warning($"Round-end photo download id miss for image id {imageId}.");
             return;
         }
 
@@ -237,7 +230,7 @@ public sealed partial class RoundEndSummaryWindow
         var fullImageBytes = await stationAlbumSystem.GetFullImageDataAsync(photoImageId);
         if (fullImageBytes is not { Length: > 0 })
         {
-            Log.Warning($"Round-end photo full image fetch failed for image id {imageId}, photo id {photoImageId}.");
+            Logger.Warning($"Round-end photo full image fetch failed for image id {imageId}, photo id {photoImageId}.");
             _entityManager.System<PopupSystem>().PopupCursor(Loc.GetString("round-end-summary-album-photo-save-failed"));
             return;
         }
@@ -254,7 +247,7 @@ public sealed partial class RoundEndSummaryWindow
         }
         catch (Exception ex)
         {
-            Log.Error($"Failed to save round-end photo for image id {imageId}: {ex}");
+            Logger.Error($"Failed to save round-end photo for image id {imageId}: {ex}");
             _entityManager.System<PopupSystem>().PopupCursor(Loc.GetString("round-end-summary-album-photo-save-failed"));
         }
         finally

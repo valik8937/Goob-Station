@@ -61,14 +61,14 @@ public sealed class PhotoCameraTakeImageMessage : BoundUserInterfaceMessage
     public byte[]? PreviewData { get; }
     public MapCoordinates PhotoPosition { get; }
     public float Zoom { get; }
-    public List<NetEntity> CapturedEntities { get; }
+    public IReadOnlyList<NetEntity> CapturedEntities { get; }
 
-    public PhotoCameraTakeImageMessage(byte[] data, byte[]? previewData, MapCoordinates photoPosition, float zoom, List<NetEntity> capturedEntities)
+    public PhotoCameraTakeImageMessage(byte[] data, byte[]? previewData, MapCoordinates photoPosition, float zoom, IReadOnlyList<NetEntity> capturedEntities)
     {
         Data = data;
         PreviewData = previewData;
         PhotoPosition = photoPosition;
         Zoom = zoom;
-        CapturedEntities = capturedEntities;
+        CapturedEntities = new List<NetEntity>(capturedEntities).AsReadOnly();
     }
 }

@@ -36,6 +36,7 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly HandsSystem _hands = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly SharedInteractionSystem _interactionSystem = default!;
     [Dependency] private readonly MaterialStorageSystem _material = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly UseDelaySystem _delay = default!;
@@ -157,7 +158,7 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
         TryPromptPhotoCustomization(args.User, uid);
     }
 
-    private bool TryTakeImage(EntityUid uid, PhotoCameraComponent component, byte[] imageData, byte[]? previewData, List<NetEntity> capturedEntities, float zoom)
+    private bool TryTakeImage(EntityUid uid, PhotoCameraComponent component, byte[] imageData, byte[]? previewData, IReadOnlyList<NetEntity> capturedEntities, float zoom)
     {
         if (_delay.IsDelayed(uid))
             return false;
@@ -175,7 +176,7 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
         return printCard;
     }
 
-    private bool PrintCard(EntityUid uid, PhotoCameraComponent component, byte[] imageData, byte[]? previewData, List<NetEntity> capturedEntities, float zoom)
+    private bool PrintCard(EntityUid uid, PhotoCameraComponent component, byte[] imageData, byte[]? previewData, IReadOnlyList<NetEntity> capturedEntities, float zoom)
     {
         if (!_material.TryChangeMaterialAmount(uid, component.CardMaterial, -component.CardCost))
         {
@@ -524,7 +525,13 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
 
     private bool CanContinueCustomization(EntityUid user, EntityUid photo)
     {
-        return Exists(user) && Exists(photo);
+        if (!Exists(user) || !Exists(photo))
+            return false;
+
+        if (_hands.IsHolding(user, photo))
+            return true;
+
+        return _interactionSystem.InRangeUnobstructed(user, photo);
     }
 
     private static string? TrimToLength(string? value, int maxLength)

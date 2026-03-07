@@ -48,7 +48,11 @@ public sealed class PhotoAlbumSystem : EntitySystem
 
     private void OnPhotoAlbumImageRequest(PhotoAlbumImageRequestEvent ev, EntitySessionEventArgs args)
     {
-        _roundEndImageData.TryGetValue(ev.ImageId, out var imageData);
+        if (!_roundEndImageData.TryGetValue(ev.ImageId, out var imageData))
+        {
+            Log.Warning($"Round-end photo image cache miss for ImageId {ev.ImageId} requested by session {args.SenderSession}.");
+        }
+
         RaiseNetworkEvent(new PhotoAlbumImageResponseEvent(ev.ImageId, imageData), args.SenderSession);
     }
 

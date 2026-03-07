@@ -105,6 +105,10 @@ public sealed class QuickDialogEntry
     /// </summary>
     public string? Value;
 
+    /// <summary>
+    /// Creates a quick dialog entry.
+    /// Use named arguments for <paramref name="placeholder"/> and <paramref name="value"/> to avoid ambiguous positional usage.
+    /// </summary>
     public QuickDialogEntry(string fieldId, QuickDialogEntryType type, string prompt, string? placeholder = null, string? value = null)
     {
         FieldId = fieldId;
@@ -112,6 +116,14 @@ public sealed class QuickDialogEntry
         Prompt = prompt;
         Placeholder = placeholder;
         Value = value;
+    }
+
+    /// <summary>
+    /// Creates a quick dialog entry with an initial value and no placeholder.
+    /// </summary>
+    public QuickDialogEntry(string fieldId, QuickDialogEntryType type, string prompt, string? value)
+        : this(fieldId, type, prompt, placeholder: null, value: value)
+    {
     }
 }
 
