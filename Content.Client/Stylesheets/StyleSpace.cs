@@ -82,6 +82,13 @@ namespace Content.Client.Stylesheets
             tabContainerBoxActive.SetContentMarginOverride(StyleBox.Margin.Horizontal, 5);
             var tabContainerBoxInactive = new StyleBoxFlat {BackgroundColor = new Color(32, 32, 32)};
             tabContainerBoxInactive.SetContentMarginOverride(StyleBox.Margin.Horizontal, 5);
+            var photoDefaultBorder = new StyleBoxFlat
+            {
+                BackgroundColor = Color.FromHex("#eaedde"),
+                BorderColor = Color.FromHex("#C0C0C0"),
+                BorderThickness = new Thickness(4),
+            };
+            photoDefaultBorder.SetContentMarginOverride(StyleBox.Margin.All, 4);
             var photoCardFramePanel = new StyleBoxFlat
             {
                 BackgroundColor = Color.FromHex("#FFFFFF"),
@@ -98,6 +105,8 @@ namespace Content.Client.Stylesheets
                 Element<Label>().Class(StyleClassLabelSubText)
                     .Prop(Label.StylePropertyFont, notoSans10)
                     .Prop(Label.StylePropertyFontColor, Color.DarkGray),
+                Element<PanelContainer>().Class("PhotoDefaultBorder")
+                    .Prop(PanelContainer.StylePropertyPanel, photoDefaultBorder),
                 Element<PanelContainer>().Class("PhotoCardFramePanel")
                     .Prop(PanelContainer.StylePropertyPanel, photoCardFramePanel),
                 Element<Label>().Class("PhotoCardPrimaryText")

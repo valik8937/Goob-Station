@@ -25,6 +25,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using System;
 using System.IO;
 using System.Numerics;
 
@@ -76,6 +77,7 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
         SubscribeLocalEvent<PhotoCameraComponent, ComponentRemove>(OnCameraComponentRemove);
         SubscribeLocalEvent<PhotoCameraComponent, MaterialAmountChangedEvent>(OnPaperInserted);
         SubscribeLocalEvent<PhotoCameraComponent, InteractUsingEvent>(OnCameraInteractUsing);
+        SubscribeLocalEvent<ActorComponent, EntityTerminatingEvent>(OnCameraUserTerminating);
 
         SubscribeLocalEvent<PhotoCardComponent, AfterActivatableUIOpenEvent>(OnOpenCardInterface);
         SubscribeLocalEvent<PhotoCardComponent, InteractUsingEvent>(OnPhotoCardInteractUsing);
@@ -84,6 +86,7 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
     private void OnOpenCameraInterface(EntityUid uid, PhotoCameraComponent component, AfterActivatableUIOpenEvent args)
     {
         UpdateCameraInterface(uid, component);
+        CloseOtherOpenCameras(args.User, uid);
 
         if (!component.OpenUsers.Add(args.User))
             return;
@@ -111,11 +114,8 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
 
     private void IncrementOpenCameraCount(EntityUid user)
     {
-        if (_openCameraCounts.TryGetValue(user, out var count))
-        {
-            _openCameraCounts[user] = count + 1;
+        if (_openCameraCounts.ContainsKey(user))
             return;
-        }
 
         _openCameraCounts[user] = 1;
         EnsureComp<PhotoCameraUserComponent>(user);
@@ -123,17 +123,37 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
 
     private void DecrementOpenCameraCount(EntityUid user)
     {
-        if (!_openCameraCounts.TryGetValue(user, out var count))
+        if (!_openCameraCounts.ContainsKey(user))
             return;
 
-        if (count <= 1)
+        CleanupOpenCameraUserState(user);
+    }
+
+    private void CloseOtherOpenCameras(EntityUid user, EntityUid activeCamera)
+    {
+        var query = EntityQueryEnumerator<PhotoCameraComponent>();
+        while (query.MoveNext(out var cameraUid, out var camera))
         {
-            _openCameraCounts.Remove(user);
-            RemComp<PhotoCameraUserComponent>(user);
-            return;
-        }
+            if (cameraUid == activeCamera)
+                continue;
 
-        _openCameraCounts[user] = count - 1;
+            if (!camera.OpenUsers.Remove(user))
+                continue;
+
+            _userInterface.CloseUi(cameraUid, PhotoCameraUiKey.Key, user);
+            DecrementOpenCameraCount(user);
+        }
+    }
+
+    private void OnCameraUserTerminating(EntityUid uid, ActorComponent component, ref EntityTerminatingEvent args)
+    {
+        CleanupOpenCameraUserState(uid);
+    }
+
+    private void CleanupOpenCameraUserState(EntityUid user)
+    {
+        _openCameraCounts.Remove(user);
+        RemComp<PhotoCameraUserComponent>(user);
     }
 
     private void OnTakeImageMessage(EntityUid uid, PhotoCameraComponent component, PhotoCameraTakeImageMessage message)
@@ -190,8 +210,8 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
         if (!IsValidCardCost(uid, component))
             return;
 
-        var photosLeft = (int)MathF.Ceiling(_material.GetMaterialAmount(uid, component.CardMaterial) / (float)component.CardCost);
-        if (photosLeft > 0)
+        var amount = _material.GetMaterialAmount(uid, component.CardMaterial);
+        if (amount >= component.CardCost)
         {
             _popup.PopupEntity(Loc.GetString("photo-camera-film-not-empty"), uid, args.User);
             return;
@@ -255,6 +275,12 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
         if (!TryComp<PhotoCardComponent>(card, out var photo))
         {
             Log.Error($"Failed to print photo from camera {ToPrettyString(uid)} for user {ToPrettyString(user)}: spawned card {ToPrettyString(card)} from prototype '{component.CardPrototype}' is missing {nameof(PhotoCardComponent)}.");
+
+            if (!_material.TryChangeMaterialAmount(uid, component.CardMaterial, component.CardCost))
+            {
+                Log.Error($"Failed to refund photo material cost for camera {ToPrettyString(uid)} after print failure: +{component.CardCost} {component.CardMaterial}.");
+            }
+
             Del(card);
             return false;
         }
@@ -312,7 +338,7 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
                 data[4] == 0x0D && data[5] == 0x0A && data[6] == 0x1A && data[7] == 0x0A;
     }
 
-    private static bool ValidatePngData(byte[] data, int maxSize, int maxWidth, int maxHeight, int maxPixels)
+    private bool ValidatePngData(byte[] data, int maxSize, int maxWidth, int maxHeight, int maxPixels)
     {
         if (data.Length == 0 || data.Length > maxSize)
             return false;
@@ -323,18 +349,26 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
         try
         {
             using var stream = new MemoryStream(data, writable: false);
+            var imageInfo = Image.Identify(stream);
+            if (imageInfo == null)
+                return false;
+
+            if (imageInfo.Width <= 0 || imageInfo.Height <= 0)
+                return false;
+
+            if (imageInfo.Width > maxWidth || imageInfo.Height > maxHeight)
+                return false;
+
+            if ((long) imageInfo.Width * imageInfo.Height > maxPixels)
+                return false;
+
+            stream.Position = 0;
             using var image = Image.Load<Rgba32>(stream);
-
-            if (image.Width <= 0 || image.Height <= 0)
-                return false;
-
-            if (image.Width > maxWidth || image.Height > maxHeight)
-                return false;
-
-            return (long) image.Width * image.Height <= maxPixels;
+            return true;
         }
-        catch
+        catch (Exception ex)
         {
+            Log.Debug($"Failed to parse PNG: {ex}");
             return false;
         }
     }
@@ -682,7 +716,7 @@ public sealed partial class PhotoSystem : SharedPhotoSystem
         if (!string.IsNullOrWhiteSpace(composedDescription))
             _metaData.SetEntityDescription(uid, composedDescription);
         else
-            _metaData.SetEntityDescription(uid, string.IsNullOrWhiteSpace(baseDescription) ? string.Empty : baseDescription);
+            _metaData.SetEntityDescription(uid, string.Empty);
     }
 
     // Photo Card

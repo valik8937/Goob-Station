@@ -45,7 +45,7 @@ public sealed class PhotoAlbumSystem : EntitySystem
 
         _fullImageData[ev.ImageId] = ev.ImageData;
         pending.Dispose();
-        pending.Completion.TrySetResult(ev.ImageData);
+        TryCompletePendingRequest(pending.Completion, ev.ImageData);
     }
 
     private void OnJoinGame(TickerJoinGameEvent ev)
@@ -106,7 +106,7 @@ public sealed class PhotoAlbumSystem : EntitySystem
         foreach (var request in pendingRequests)
         {
             request.Dispose();
-            request.Completion.TrySetResult(null);
+            TryCompletePendingRequest(request.Completion, null);
         }
 
         _fullImageData.Clear();
@@ -118,7 +118,12 @@ public sealed class PhotoAlbumSystem : EntitySystem
             return;
 
         request.Dispose();
-        request.Completion.TrySetResult(null);
+        TryCompletePendingRequest(request.Completion, null);
+    }
+
+    private static void TryCompletePendingRequest(TaskCompletionSource<byte[]?> completion, byte[]? imageData)
+    {
+        _ = Task.Run(() => completion.TrySetResult(imageData));
     }
 
     private bool TryTakePendingImageRequest(Guid imageId, [NotNullWhen(true)] out PendingImageRequest? request)

@@ -10,6 +10,7 @@ using Robust.Client.ComponentTrees;
 using Robust.Shared.Graphics;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
+using System;
 using System.Numerics;
 
 namespace Content.Client._Pirate.Photo;
@@ -32,24 +33,24 @@ public sealed class PhotoCaptureEntityDetectorSystem : EntitySystem
         _stealthQuery = GetEntityQuery<StealthComponent>();
     }
 
-    public List<NetEntity> CaptureVisibleEntities(ScalingViewport viewport, int maxEntities = 256)
+    public IReadOnlyList<NetEntity> CaptureVisibleEntities(ScalingViewport viewport, int maxEntities = 256)
     {
         var eye = viewport.Eye;
         if (eye == null)
-            return new List<NetEntity>();
+            return Array.Empty<NetEntity>();
 
         if (maxEntities <= 0)
-            return new List<NetEntity>();
+            return Array.Empty<NetEntity>();
 
         if (eye.Position.MapId == MapId.Nullspace)
-            return new List<NetEntity>();
+            return Array.Empty<NetEntity>();
 
         var viewportSize = viewport.ViewportSize;
         if (viewportSize.X <= 0 || viewportSize.Y <= 0)
-            return new List<NetEntity>();
+            return Array.Empty<NetEntity>();
 
         if (!TryGetViewportWorldBounds(viewport, out var worldBounds))
-            return new List<NetEntity>();
+            return Array.Empty<NetEntity>();
 
         var visibleSprites = _spriteTree.QueryAabb(eye.Position.MapId, worldBounds);
         var unique = new HashSet<NetEntity>(maxEntities);

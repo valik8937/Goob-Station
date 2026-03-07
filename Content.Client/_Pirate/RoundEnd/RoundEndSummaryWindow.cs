@@ -174,8 +174,8 @@ public sealed partial class RoundEndSummaryWindow
 
             var stationAlbumAuthorHeaderLabel = new RichTextLabel();
 
-            string authorName = album.AuthorName == null ? Loc.GetString("round-end-summary-album-photo-no-author-name") : album.AuthorName;
-            string authorCKey = album.AuthorCkey == null ? Loc.GetString("round-end-summary-album-photo-no-author-ckey") : album.AuthorCkey;
+            string authorName = album.AuthorName ?? Loc.GetString("round-end-summary-album-photo-no-author-name");
+            string authorCKey = album.AuthorCkey ?? Loc.GetString("round-end-summary-album-photo-no-author-ckey");
 
             stationAlbumAuthorHeaderLabel.SetMarkup(Loc.GetString("round-end-summary-album-photo-author", ("authorName", authorName), ("authorCKey", authorCKey)));
 

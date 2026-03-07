@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Robust.Shared.Audio;
-using Robust.Shared.Map;
 using Robust.Shared.Serialization;
 using System.Collections.Generic;
 using System.Numerics;
@@ -61,15 +60,13 @@ public sealed class PhotoCameraTakeImageMessage : BoundUserInterfaceMessage
 {
     public byte[] Data { get; }
     public byte[]? PreviewData { get; }
-    public MapCoordinates PhotoPosition { get; }
     public float Zoom { get; }
     public IReadOnlyList<NetEntity> CapturedEntities { get; }
 
-    public PhotoCameraTakeImageMessage(byte[] data, byte[]? previewData, MapCoordinates photoPosition, float zoom, IReadOnlyList<NetEntity> capturedEntities)
+    public PhotoCameraTakeImageMessage(byte[] data, byte[]? previewData, float zoom, IReadOnlyList<NetEntity> capturedEntities)
     {
-        Data = data;
-        PreviewData = previewData;
-        PhotoPosition = photoPosition;
+        Data = (byte[]) data.Clone();
+        PreviewData = previewData == null ? null : (byte[]) previewData.Clone();
         Zoom = zoom;
         var copiedEntities = new NetEntity[capturedEntities.Count];
         for (var i = 0; i < capturedEntities.Count; i++)

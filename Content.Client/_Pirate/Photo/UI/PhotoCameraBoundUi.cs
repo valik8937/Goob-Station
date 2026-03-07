@@ -8,13 +8,15 @@ using Robust.Client.GameObjects;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Shared.Audio.Sources;
-using Robust.Shared.Map;
 using System.Numerics;
 
 namespace Content.Client._Pirate.Photo.UI;
 
 public sealed class PhotoCameraBoundUserInterface : BoundUserInterface
 {
+    private const float ControlAudioActiveVolume = 2f;
+    private const float ControlAudioIdleVolume = -20f;
+
     private readonly EyeSystem _eyeSystem;
     private readonly PhotoSystem _photoSystem;
     private readonly TransformSystem _transform;
@@ -107,49 +109,77 @@ public sealed class PhotoCameraBoundUserInterface : BoundUserInterface
 
     public void UpdateControl(PhotoCameraComponent component, float frameTime)
     {
-        //This looks so bad
-        if (_cameraEntity == null || _window == null)
+        if (!TryGetControlContext(out var cameraUid, out var window, out var worldAngle, out var localAngle))
             return;
 
-        if (!EntMan.HasComponent<TransformComponent>(_cameraEntity))
-            return;
+        var (nextPos, nextZoom, delta) = ComputeNextControlState(component, window, frameTime);
+        _zoomPos = nextPos;
+        _zoomValue = nextZoom;
+        window.ZoomInput = 0;
 
-        Vector2 pos = _zoomPos + _window.MoveInput * _zoomValue * frameTime;
+        var rotateAngle = worldAngle.Opposite() - (localAngle - localAngle.RoundToCardinalAngle());
+        _eyeSystem.SetOffset(cameraUid, rotateAngle.RotateVec(nextPos));
+        _eyeSystem.SetZoom(cameraUid, new Vector2(nextZoom));
+        _eyeSystem.SetRotation(cameraUid, -rotateAngle);
 
-        float zoom = Math.Clamp(_zoomValue + _window.ZoomInput * frameTime * (component.MaxZoom - component.MinZoom), component.MinZoom, component.MaxZoom);
-        float zoomRatio = (zoom - component.MinZoom) / (component.MaxZoom - component.MinZoom);
+        UpdateControlAudio(delta, frameTime);
+    }
 
-        float xClamp = component.ViewBox.X * 0.5f * (1 - zoomRatio);
-        float yClamp = component.ViewBox.Y * 0.5f * (1 - zoomRatio);
+    private bool TryGetControlContext(out EntityUid cameraUid, out PhotoCameraWindow window, out Angle worldAngle, out Angle localAngle)
+    {
+        cameraUid = EntityUid.Invalid;
+        window = null!;
+        worldAngle = Angle.Zero;
+        localAngle = Angle.Zero;
+
+        if (_cameraEntity is not { } uid || _window == null)
+            return false;
+
+        if (!EntMan.HasComponent<TransformComponent>(uid))
+            return false;
+
+        cameraUid = uid;
+        window = _window;
+        worldAngle = _transform.GetWorldRotation(uid);
+        var grid = _transform.GetGrid(uid);
+        if (grid != null)
+            localAngle = worldAngle - _transform.GetWorldRotation(grid.Value);
+
+        return true;
+    }
+
+    private (Vector2 Pos, float Zoom, System.Numerics.Vector3 Delta) ComputeNextControlState(
+        PhotoCameraComponent component,
+        PhotoCameraWindow window,
+        float frameTime)
+    {
+        var pos = _zoomPos + window.MoveInput * _zoomValue * frameTime;
+
+        var zoomRange = component.MaxZoom - component.MinZoom;
+        var zoom = Math.Clamp(_zoomValue + window.ZoomInput * frameTime * zoomRange, component.MinZoom, component.MaxZoom);
+        var zoomRatio = Math.Abs(zoomRange) > float.Epsilon
+            ? (zoom - component.MinZoom) / zoomRange
+            : 0f;
+
+        var xClamp = component.ViewBox.X * 0.5f * (1 - zoomRatio);
+        var yClamp = component.ViewBox.Y * 0.5f * (1 - zoomRatio);
         pos.X = Math.Clamp(pos.X, -xClamp, xClamp);
         pos.Y = Math.Clamp(pos.Y, -yClamp, yClamp);
 
-        var angle = _transform.GetWorldRotation(_cameraEntity.Value);
-        var grid = _transform.GetGrid(_cameraEntity.Value);
-        Angle localAngle = 0;
-        if (grid != null)
-            localAngle = angle - _transform.GetWorldRotation(grid.Value);
-
         var delta = new System.Numerics.Vector3(_zoomPos - pos, _zoomValue - zoom);
-        _zoomPos = pos;
-        _zoomValue = zoom;
+        return (pos, zoom, delta);
+    }
 
-        _window.ZoomInput = 0;
-
-        var rotateAngle = angle.Opposite() - (localAngle - localAngle.RoundToCardinalAngle());
-
-        _eyeSystem.SetOffset(_cameraEntity.Value, rotateAngle.RotateVec(pos));
-        _eyeSystem.SetZoom(_cameraEntity.Value, new Vector2(zoom));
-        _eyeSystem.SetRotation(_cameraEntity.Value, -rotateAngle);
-
+    private void UpdateControlAudio(System.Numerics.Vector3 delta, float frameTime)
+    {
         if (_controlSound == null)
             return;
 
-        var targetVolume = delta != System.Numerics.Vector3.Zero ? 2f : -20f;
-        _controlVolume = delta.Z != 0 ? 2f : _controlVolume;
-        _controlVolume = Math.Clamp(_controlVolume + (targetVolume - _controlVolume) * frameTime, -20f, 2f);
+        var targetVolume = delta != System.Numerics.Vector3.Zero ? ControlAudioActiveVolume : ControlAudioIdleVolume;
+        _controlVolume = delta.Z != 0 ? ControlAudioActiveVolume : _controlVolume;
+        _controlVolume = Math.Clamp(_controlVolume + (targetVolume - _controlVolume) * frameTime, ControlAudioIdleVolume, ControlAudioActiveVolume);
 
-        _controlSound.Volume = _controlVolume > -20f ? _controlVolume : float.NegativeInfinity;
+        _controlSound.Volume = _controlVolume > ControlAudioIdleVolume ? _controlVolume : float.NegativeInfinity;
     }
 
     private void AttemptTakeImage()
@@ -161,15 +191,12 @@ public sealed class PhotoCameraBoundUserInterface : BoundUserInterface
 
         window.RenderImage((bytes, previewBytes) =>
         {
-            if (_cameraEntity is not { } cameraEntity)
+            if (_cameraEntity == null)
                 return;
 
             var capturedEntities = _photoEntityDetector.CaptureVisibleEntities(window.CameraViewport);
 
-            if (!EntMan.TryGetComponent<TransformComponent>(cameraEntity, out var transform))
-                return;
-
-            var message = new PhotoCameraTakeImageMessage(bytes, previewBytes, new MapCoordinates(transform.WorldPosition, transform.MapID), _zoomValue, capturedEntities);
+            var message = new PhotoCameraTakeImageMessage(bytes, previewBytes, _zoomValue, capturedEntities);
             SendMessage(message);
         });
     }

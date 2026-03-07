@@ -759,6 +759,14 @@ namespace Content.Client.Stylesheets
             };
             paperBackground.SetPatchMargin(StyleBox.Margin.All, 16.0f);
 
+            var photoDefaultBorder = new StyleBoxFlat
+            {
+                BackgroundColor = Color.FromHex("#eaedde"),
+                BorderColor = Color.FromHex("#C0C0C0"),
+                BorderThickness = new Thickness(4),
+            };
+            photoDefaultBorder.SetContentMarginOverride(StyleBox.Margin.All, 4);
+
             var photoCardFramePanel = new StyleBoxFlat
             {
                 BackgroundColor = Color.FromHex("#FFFFFF"),
@@ -1805,6 +1813,8 @@ namespace Content.Client.Stylesheets
                 // The default look of paper in UIs. Pages can have components which override this
                 Element<PanelContainer>().Class("PaperDefaultBorder")
                     .Prop(PanelContainer.StylePropertyPanel, paperBackground),
+                Element<PanelContainer>().Class("PhotoDefaultBorder")
+                    .Prop(PanelContainer.StylePropertyPanel, photoDefaultBorder),
                 Element<RichTextLabel>().Class("PaperWrittenText")
                     .Prop(Label.StylePropertyFont, notoSans12)
                     .Prop(Control.StylePropertyModulateSelf, Color.FromHex("#111111")),
