@@ -11,6 +11,15 @@
     back:
     - PhotoAlbumLoadoutSigned
 
+- type: loadout
+  id: TrinketsPhotoCameraFilled
+  storage:
+    back:
+    - PhotoCameraFilled
+  effects:
+  - !type:PointsCostLoadoutEffect
+    cost: 1
+
 # Toys / Іграшки
 - type: loadout
   id: PlushieEntony
