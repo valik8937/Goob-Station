@@ -32,7 +32,7 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
         SubscribeLocalEvent<MindContainerComponent, MindRemovedMessage>(OnMindRemoved);
         SubscribeLocalEvent<MindContainerComponent, MindAddedMessage>(OnMindAdded);
-        SubscribeLocalEvent<GhostComponent, PlayerAttachedEvent>(OnGhostPlayerAttached);
+        SubscribeLocalEvent<PlayerAttachedEvent>(OnPlayerAttached);
 
         SubscribeNetworkEvent<GhostRespawnLobbyRequest>(OnGhostRespawnLobbyRequest);
     }
@@ -85,8 +85,11 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
         _pendingTransitions.Remove(userId);
     }
 
-    private void OnGhostPlayerAttached(Entity<GhostComponent> ent, ref PlayerAttachedEvent args)
+    private void OnPlayerAttached(ref PlayerAttachedEvent args)
     {
+        if (!HasComp<GhostComponent>(args.Entity))
+            return;
+
         ArmTimerIfNeeded(args.Player.UserId);
         SendStatus(args.Player);
     }
