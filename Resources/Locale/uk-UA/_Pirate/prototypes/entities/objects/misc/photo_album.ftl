@@ -1,8 +1,8 @@
 ent-PhotoAlbum = фотоальбом
     .desc = Книга зі спогадами. Покладіть туди фотографії, щоб вони потрапили у фінальне зведення раунду. Використайте ручку, щоб налаштувати назви, описи та підписи фото.
 
-ent-PhotoAlbumLoadoutSigned = { ent-PhotoAlbumGreen }
-    .desc = { ent-PhotoAlbumGreen.desc }
+ent-PhotoAlbumLoadoutSigned = { ent-PhotoAlbum }
+    .desc = { ent-PhotoAlbum.desc }
 
 ent-PhotoAlbumGreen = зелений фотоальбом
     .desc = Книга зі спогадами. Покладіть туди фотографії, щоб вони потрапили у фінальне зведення раунду. Використайте ручку, щоб налаштувати назви, описи та підписи фото.

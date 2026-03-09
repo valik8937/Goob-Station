@@ -47,7 +47,7 @@
 
 - type: entity
   id: PhotoAlbumLoadoutSigned
-  parent: PhotoAlbumGreen
+  parent: PhotoAlbum
   suffix: loadout
   components:
   - type: AutoSignPhotoAlbum
