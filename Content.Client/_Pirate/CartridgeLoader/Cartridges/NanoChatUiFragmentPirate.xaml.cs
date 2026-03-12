@@ -598,6 +598,7 @@ public sealed partial class NanoChatUiFragmentPirate : BoxContainer
             : string.Empty;
         GalleryPreviewName.ToolTip = hasSelectedPhoto ? selectedPhotoFileName : null;
         GalleryPreviewName.Visible = true;
+        GalleryPreviewHeader.Visible = hasSelectedPhoto;
         GalleryEmptyLabel.Visible = !hasSelectedPhoto;
         GalleryPreviewScroll.Visible = false;
         GalleryPreviewImage.Visible = false;

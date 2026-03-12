@@ -226,7 +226,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
         args.Verbs.Add(new AlternativeVerb
         {
             Text = Loc.GetString("nano-chat-upload-photo-verb"),
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/in.svg.192dpi.png")), // Pirate: photo upload alt verb
+            Icon = new SpriteSpecifier.Texture(new("/Textures/_Pirate/Interface/VerbIcons/plus_public.svg")), // Pirate: photo upload alt verb icon from publicicons
             Act = () => TryStartPhotoUpload(ent.Owner, user, used),
             Priority = 5
         });
@@ -321,7 +321,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
         args.Verbs.Add(new AlternativeVerb
         {
             Text = Loc.GetString("nano-chat-print-photo-verb"),
-            Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/VerbIcons/in.svg.192dpi.png")),
+            Icon = new SpriteSpecifier.Texture(new("/Textures/_Pirate/Interface/VerbIcons/file_public.svg")), // Pirate: fax verb icon from publicicons
             Act = () => TryStartPhotoPrintToFax(ent.Owner, user, used),
             Priority = 5
         });

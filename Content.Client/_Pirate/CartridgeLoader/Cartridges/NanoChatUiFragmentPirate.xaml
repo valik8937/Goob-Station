@@ -237,10 +237,10 @@
                       Visible="False">
             <PanelContainer StyleClasses="PanelBackgroundBaseDark"
                             VerticalExpand="True"
-                            MinWidth="188"
-                            MaxWidth="188">
+                            MinWidth="164"
+                            MaxWidth="164">
                 <ScrollContainer VerticalExpand="True"
-                                 MinWidth="182"
+                                 MinWidth="158"
                                  HorizontalExpand="True"
                                  Margin="0"
                                  HScrollEnabled="False">
@@ -269,7 +269,8 @@
                               VerticalExpand="True"
                               HorizontalExpand="True"
                               Margin="6">
-                    <BoxContainer Orientation="Horizontal"
+                    <BoxContainer Name="GalleryPreviewHeader"
+                                  Orientation="Horizontal"
                                   HorizontalExpand="True"
                                   MinSize="0 30"
                                   Margin="0 0 0 6">

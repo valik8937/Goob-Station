@@ -17,6 +17,8 @@ public sealed partial class NanoChatEntryPirate : BoxContainer
     private const int JobMaxChars = 20;
     private const int GalleryLineOneMaxChars = 17;
     private const int GalleryLineTwoMaxChars = 19;
+    private static readonly Thickness ChatNameLabelMargin = new(0, -2, 0, 0);
+    private static readonly Thickness GalleryNameLabelMargin = new(0, -1, 0, 0);
     private static readonly Color SelectedEntryColor = Color.FromHex("#4d5478d9");
     private static readonly Color UnreadIndicatorColor = Color.FromHex("#28d93e");
     private static readonly Color ActiveIndicatorColor = Color.FromHex("#7ea2ff");
@@ -35,6 +37,7 @@ public sealed partial class NanoChatEntryPirate : BoxContainer
     {
         SetupPressHandler(number);
         SetEntryWidth(DefaultEntryWidth);
+        NameLabel.Margin = ChatNameLabelMargin;
 
         NameLabel.Text = TruncateForEntry(recipient.Name, NameMaxChars) ?? string.Empty;
         NameLabel.ToolTip = recipient.Name;
@@ -63,6 +66,7 @@ public sealed partial class NanoChatEntryPirate : BoxContainer
     {
         SetupPressHandler(index);
         SetEntryWidth(GalleryEntryWidth);
+        NameLabel.Margin = GalleryNameLabelMargin;
 
         NameLabel.Text = BuildGalleryLabel(fileName) ?? string.Empty;
         NameLabel.ToolTip = fileName;
