@@ -189,6 +189,7 @@ public struct NanoChatMessage
     /// </summary>
     public bool DeliveryFailed;
 
+    #region Pirate: nullable nano chat message photo payload
     /// <summary>
     ///     Whether the message contains a photo attachment.
     /// </summary>
@@ -197,7 +198,8 @@ public struct NanoChatMessage
     /// <summary>
     ///     Attached photo payload, when present.
     /// </summary>
-    public NanoChatPhotoData Photo;
+    public NanoChatPhotoData? Photo;
+    #endregion
 
     /// <summary>
     ///     Creates a new NanoChat message.
@@ -215,8 +217,8 @@ public struct NanoChatMessage
         Content = content;
         SenderId = senderId;
         DeliveryFailed = deliveryFailed;
-        HasPhoto = photo != null;
-        Photo = photo ?? default;
+        HasPhoto = photo != null; // Pirate: serializer-compatible nullable photo presence
+        Photo = photo; // Pirate: photo presence is driven by nullable payload
     }
 }
 

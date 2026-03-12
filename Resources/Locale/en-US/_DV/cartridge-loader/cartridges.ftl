@@ -182,6 +182,8 @@ nano-chat-upload-photo-verb = Scan photo
 nano-chat-photo-uploaded = Photo scanned
 nano-chat-photo-saved-to-gallery = Photo saved
 nano-chat-photo-upload-failed = Photo scan failed
+# Pirate: nano chat gallery save feedback
+nano-chat-photo-save-failed = Photo save failed
 
 # Create chat popup
 nano-chat-new-title = Add a new chat

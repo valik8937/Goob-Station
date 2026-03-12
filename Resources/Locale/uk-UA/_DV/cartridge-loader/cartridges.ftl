@@ -47,6 +47,8 @@ nano-chat-upload-photo-verb = Відсканувати фото
 nano-chat-photo-uploaded = Фото відскановано
 nano-chat-photo-saved-to-gallery = Фото збережено
 nano-chat-photo-upload-failed = Не вдалося відсканувати фото
+# Pirate: nano chat gallery save feedback
+nano-chat-photo-save-failed = Не вдалося зберегти фото
 
 # Створити спливаюче вікно чату
 nano-chat-new-title = Додати новий чат

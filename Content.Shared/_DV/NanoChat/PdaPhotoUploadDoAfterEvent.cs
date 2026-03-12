@@ -9,16 +9,16 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._DV.NanoChat;
 
 [Serializable, NetSerializable]
-public sealed partial class PdaPhotoUploadDoAfterEvent(EntityUid cardUid, NanoChatPhotoData photo) : SimpleDoAfterEvent
+public sealed partial class PdaPhotoUploadDoAfterEvent(NetEntity cardUid, NanoChatPhotoData photo) : SimpleDoAfterEvent
 {
     #region Pirate: freeze nano chat upload payload
-    public EntityUid CardUid = cardUid; // Pirate: freeze nano chat upload target
+    public NetEntity CardUid = cardUid; // Pirate: freeze nano chat upload target
     public NanoChatPhotoData Photo = photo; // Pirate: freeze nano chat uploaded photo
 
-    public PdaPhotoUploadDoAfterEvent() : this(EntityUid.Invalid, default) // Pirate: serialization ctor for frozen upload payload
+    public PdaPhotoUploadDoAfterEvent() : this(NetEntity.Invalid, default) // Pirate: serialization ctor for frozen upload payload
     {
     }
 
-    public override DoAfterEvent Clone() => this; // Pirate: payload is immutable for do-after completion
+    public override DoAfterEvent Clone() => new PdaPhotoUploadDoAfterEvent(CardUid, Photo); // Pirate: preserve payload without aliasing do-after instances
     #endregion
 }

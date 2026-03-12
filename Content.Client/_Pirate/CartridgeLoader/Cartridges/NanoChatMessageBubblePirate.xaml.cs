@@ -19,6 +19,7 @@ public sealed partial class NanoChatMessageBubblePirate : BoxContainer
     public static readonly Color ErrorColor = Color.FromHex("#cc3333");
     private bool? _previousIsOwnMessage;
     private uint? _previousMessageId;
+    private (uint Id, bool HasPhoto, int PreviewSignature, int ImageSignature)? _previousMessageSignature;
 
     public event Action<uint>? OnStorePhotoPressed;
 
@@ -49,20 +50,28 @@ public sealed partial class NanoChatMessageBubblePirate : BoxContainer
         MessageText.Visible = hasText;
         MessageText.Text = hasText ? FormattedMessage.EscapeText(message.Content) : string.Empty;
 
-        var hasPhoto = message.HasPhoto;
+        var hasPhoto = message.Photo != null;
         PhotoNameLabel.Visible = hasPhoto;
-        PhotoNameLabel.Text = hasPhoto ? message.Photo.FileName : string.Empty;
+        PhotoNameLabel.Text = hasPhoto ? message.Photo!.Value.FileName : string.Empty;
         StorePhotoButton.Visible = hasPhoto && !isOwnMessage;
         StorePhotoButton.Disabled = !StorePhotoButton.Visible;
         StorePhotoButton.ToolTip = StorePhotoButton.Visible
             ? Loc.GetString("nano-chat-store-photo")
             : null;
 
-        if (_previousMessageId != message.Id)
+        var messageSignature = (
+            message.Id,
+            message.HasPhoto,
+            ComputePhotoDataSignature(message.Photo?.PreviewData),
+            ComputePhotoDataSignature(message.Photo?.ImageData));
+
+        if (_previousMessageSignature != messageSignature)
         {
             ApplyPhotoPreview(message);
-            _previousMessageId = message.Id;
+            _previousMessageSignature = messageSignature;
         }
+
+        _previousMessageId = message.Id;
 
         // Show delivery failed text if needed (only for own messages)
         DeliveryFailedLabel.Visible = isOwnMessage && message.DeliveryFailed;
@@ -98,12 +107,12 @@ public sealed partial class NanoChatMessageBubblePirate : BoxContainer
         PhotoPreview.Texture = null;
         PhotoPreview.Visible = false;
 
-        if (!message.HasPhoto)
+        if (message.Photo is not { } photo)
             return;
 
-        var data = message.Photo.ImageData is { Length: > 0 } imageData
-            ? imageData
-            : message.Photo.PreviewData;
+        var data = photo.PreviewData is { Length: > 0 } previewData
+            ? previewData
+            : photo.ImageData;
 
         if (data is not { Length: > 0 })
             return;
@@ -118,12 +127,19 @@ public sealed partial class NanoChatMessageBubblePirate : BoxContainer
                 const float maxHeight = 258f;
                 var textureWidth = PhotoPreview.Texture.Size.X;
                 var textureHeight = PhotoPreview.Texture.Size.Y;
-                var scaledHeight = textureWidth > 0f
-                    ? MathF.Min(maxHeight, maxWidth * textureHeight / textureWidth)
-                    : 96f;
-                PhotoPreview.SetSize = new Vector2(maxWidth, scaledHeight);
+                if (textureWidth > 0f && textureHeight > 0f)
+                {
+                    var scale = MathF.Min(maxWidth / textureWidth, maxHeight / textureHeight);
+                    var scaledWidth = textureWidth * scale;
+                    var scaledHeight = textureHeight * scale;
+                    PhotoPreview.SetSize = new Vector2(scaledWidth, scaledHeight);
+                }
+                else
+                {
+                    PhotoPreview.SetSize = new Vector2(96f, 96f);
+                }
             }
-            PhotoPreview.Visible = true;
+            PhotoPreview.Visible = PhotoPreview.Texture != null;
         }
         catch (Exception ex)
         {
@@ -131,6 +147,20 @@ public sealed partial class NanoChatMessageBubblePirate : BoxContainer
             PhotoPreview.Texture = null;
             PhotoPreview.Visible = false;
         }
+    }
+
+    private static int ComputePhotoDataSignature(byte[]? data)
+    {
+        if (data is not { Length: > 0 })
+            return 0;
+
+        var length = data.Length;
+        var first = data[0];
+        var quarter = data[length / 4];
+        var middle = data[length / 2];
+        var threeQuarter = data[(length * 3) / 4];
+        var last = data[length - 1];
+        return HashCode.Combine(length, first, quarter, middle, threeQuarter, last);
     }
 }
 

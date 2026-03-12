@@ -343,7 +343,7 @@ public sealed partial class NanoChatUiFragmentPirate : BoxContainer
         var hasActiveChat = activeChat != null;
 
         MessagesScroll.Visible = hasActiveChat && _viewMode == NanoChatViewMode.Chat;
-        CurrentChatName.Visible = _viewMode == NanoChatViewMode.Chat && !hasActiveChat;
+        CurrentChatName.Visible = hasActiveChat && _viewMode == NanoChatViewMode.Chat;
         MessageInputContainer.Visible = hasActiveChat && _viewMode == NanoChatViewMode.Chat;
         DeleteChatButton.Visible = hasActiveChat && _viewMode == NanoChatViewMode.Chat;
         DeleteChatButton.Disabled = !hasActiveChat;
@@ -607,7 +607,7 @@ public sealed partial class NanoChatUiFragmentPirate : BoxContainer
         if (hasSelectedPhoto)
         {
             var texture = LoadTexture(
-                selectedPhoto.ImageData is { Length: > 0 } ? selectedPhoto.ImageData : selectedPhoto.PreviewData,
+                selectedPhoto.PreviewData is { Length: > 0 } ? selectedPhoto.PreviewData : selectedPhoto.ImageData,
                 $"nanochat-gallery-{selectedPhoto.FileName}");
             ApplyGalleryPreviewTexture(texture);
             GalleryEmptyLabel.Visible = !GalleryPreviewImage.Visible;

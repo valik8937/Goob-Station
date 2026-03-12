@@ -293,24 +293,26 @@ public abstract class SharedNanoChatSystem : EntitySystem
             return;
 
         card.Comp.SelectedGalleryPhotoFileName = fileName;
+        Dirty(card); // Pirate: sync selected gallery photo changes
     }
     #endregion
 
     /// <summary>
-    ///     Stores or overwrites a gallery photo by file name.
+    ///     Tries to store or overwrite a gallery photo by file name.
     /// </summary>
-    public void StorePhoto(Entity<NanoChatCardComponent?> card, NanoChatPhotoData photo)
+    public bool TryStorePhoto(Entity<NanoChatCardComponent?> card, NanoChatPhotoData photo)
     {
         if (!Resolve(card, ref card.Comp) || string.IsNullOrWhiteSpace(photo.FileName))
-            return;
+            return false;
 
         #region Pirate: nano chat gallery limits
         if (!card.Comp.Photos.ContainsKey(photo.FileName) && card.Comp.Photos.Count >= MaxPhotos)
-            return;
+            return false;
         #endregion
 
         card.Comp.Photos[photo.FileName] = photo;
         Dirty(card);
+        return true;
     }
 
     /// <summary>
