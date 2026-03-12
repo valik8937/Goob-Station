@@ -110,9 +110,9 @@ public sealed partial class NanoChatMessageBubblePirate : BoxContainer
         if (message.Photo is not { } photo)
             return;
 
-        var data = photo.PreviewData is { Length: > 0 } previewData
-            ? previewData
-            : photo.ImageData;
+        var data = photo.ImageData is { Length: > 0 } imageData
+            ? imageData
+            : photo.PreviewData;
 
         if (data is not { Length: > 0 })
             return;

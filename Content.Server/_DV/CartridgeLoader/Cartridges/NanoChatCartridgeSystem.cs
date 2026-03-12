@@ -531,7 +531,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
         }
 
         UpdateUIForCard(card);
-        ShowPhotoActionSuccess(card.Comp.PdaUid ?? card.Owner, msg.Actor, "nano-chat-photo-saved-to-gallery");
+        ShowPhotoActionSuccess(card.Comp.PdaUid ?? card.Owner, msg.Actor, "nano-chat-photo-saved-to-gallery", PhotoScanSuccessSound); // Pirate: use same confirm sound as scan/print
     }
 
     /// <summary>
@@ -1045,8 +1045,8 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
         if (ent.Comp.Card != null && TryComp<NanoChatCardComponent>(ent.Comp.Card, out var card))
         {
             recipients = card.Recipients;
-            messages = BuildUiMessages(card.Messages); // Pirate: strip full image payloads from message UI state
-            photos = BuildUiPhotos(card.Photos); // Pirate: strip full image payloads from gallery UI state
+            messages = BuildUiMessages(card.Messages); // Pirate: keep full image payloads in message UI state
+            photos = BuildUiPhotos(card.Photos); // Pirate: keep full image payloads for gallery UI preview
             currentChat = card.CurrentChat;
             ownNumber = card.Number ?? 0;
             maxRecipients = card.MaxRecipients;
@@ -1066,7 +1066,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
         _cartridge.UpdateCartridgeUiState(loader, state);
     }
 
-    #region Pirate: strip full image payloads from gallery UI state
+    #region Pirate: keep full image payloads in gallery UI state
     private static Dictionary<string, NanoChatPhotoData> BuildUiPhotos(Dictionary<string, NanoChatPhotoData> photos)
     {
         var uiPhotos = new Dictionary<string, NanoChatPhotoData>(photos.Count);
@@ -1074,7 +1074,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
         {
             uiPhotos[fileName] = new NanoChatPhotoData(
                 fileName,
-                null,
+                photo.ImageData,
                 photo.PreviewData,
                 photo.Caption,
                 photo.Description,
@@ -1100,7 +1100,7 @@ public sealed class NanoChatCartridgeSystem : EntitySystem
 
                 var uiPhoto = new NanoChatPhotoData(
                     photo.FileName,
-                    null,
+                    photo.ImageData,
                     photo.PreviewData,
                     photo.Caption,
                     photo.Description,

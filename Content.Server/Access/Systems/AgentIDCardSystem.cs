@@ -96,6 +96,7 @@ using Robust.Shared.Prototypes;
 using Content.Shared.Roles;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared._DV.NanoChat; // DeltaV
+using Content.Shared._DV.CartridgeLoader.Cartridges; // Pirate: agent id nano chat gallery cloning
 using Content.Server.Clothing.Systems;
 using Content.Server.Implants;
 using Content.Shared.Implants;
@@ -192,6 +193,7 @@ namespace Content.Server.Access.Systems
             if (TryComp<NanoChatCardComponent>(args.Target, out var targetNanoChat) &&
                 TryComp<NanoChatCardComponent>(uid, out var agentNanoChat))
             {
+                #region Pirate: preserve nano chat gallery state when copying agent IDs
                 // First clear existing data
                 _nanoChat.Clear((uid, agentNanoChat));
 
@@ -213,6 +215,15 @@ namespace Content.Server.Access.Systems
                         _nanoChat.AddMessage((uid, agentNanoChat), recipientNumber, message);
                     }
                 }
+
+                foreach (var (fileName, photo) in _nanoChat.GetStoredPhotos((args.Target.Value, targetNanoChat)))
+                {
+                    _nanoChat.TryStorePhoto((uid, agentNanoChat), CloneNanoChatPhoto(fileName, photo));
+                }
+
+                _nanoChat.SetCurrentChat((uid, agentNanoChat), _nanoChat.GetCurrentChat((args.Target.Value, targetNanoChat)));
+                _nanoChat.SetSelectedGalleryPhoto((uid, agentNanoChat), _nanoChat.GetSelectedGalleryPhoto((args.Target.Value, targetNanoChat)));
+                #endregion
             }
             // End DeltaV
 
@@ -272,6 +283,19 @@ namespace Content.Server.Access.Systems
             if (TryFindJobProtoFromIcon(jobIcon, out var job))
                 _cardSystem.TryChangeJobDepartment(uid, job, idCard);
         }
+
+        #region Pirate: preserve nano chat gallery state when copying agent IDs
+        private static NanoChatPhotoData CloneNanoChatPhoto(string fileName, NanoChatPhotoData photo)
+        {
+            return new NanoChatPhotoData(
+                fileName,
+                photo.ImageData is null ? null : [.. photo.ImageData],
+                photo.PreviewData is null ? null : [.. photo.PreviewData],
+                photo.Caption,
+                photo.Description,
+                [.. photo.NamesSeen]);
+        }
+        #endregion
 
         private bool TryFindJobProtoFromIcon(JobIconPrototype jobIcon, [NotNullWhen(true)] out JobPrototype? job)
         {
