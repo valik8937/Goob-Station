@@ -92,9 +92,6 @@
           Quantity: 50
   - type: Sprite
     layers:
-    - state: bottle-empty
-      map: ["enum.OpenableVisuals.Layer"]
+    - *syrupBottleOpenableLayer
     - state: label-h
-    - state: bottle-alpha-6
-      map: ["enum.SolutionContainerLayers.Fill"]
-      visible: true
+    - *syrupBottleFillLayer

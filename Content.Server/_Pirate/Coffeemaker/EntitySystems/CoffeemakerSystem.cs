@@ -855,8 +855,14 @@ public sealed class CoffeemakerSystem : EntitySystem
         if (!_containers.TryGetContainer(uid, component.BeanContainerId, out var baseContainer))
             return false;
 
-        container = baseContainer as Container;
-        return container != null;
+        if (baseContainer is not Container realContainer)
+        {
+            Log.Warning($"Coffeemaker {uid} bean container '{component.BeanContainerId}' was expected to be {nameof(Container)} but got {baseContainer.GetType().Name}.");
+            return false;
+        }
+
+        container = realContainer;
+        return true;
     }
 
     private bool HasPrototype(EntityUid uid, EntProtoId prototype)
