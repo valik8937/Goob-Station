@@ -15,6 +15,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Robust.Server.Player;
 using Robust.Shared.Player;
+using Robust.Shared.Random;
 
 namespace Content.Pirate.Server.StationEvents.Events;
 
@@ -23,6 +24,7 @@ public sealed class RandomVirusRule : StationEventSystem<RandomVirusRuleComponen
     [Dependency] private readonly IChatManager _chat = default!;
     [Dependency] private readonly DiseaseSystem _disease = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly StationSystem _station = default!;
 
     protected override void Started(EntityUid uid, RandomVirusRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
@@ -32,20 +34,28 @@ public sealed class RandomVirusRule : StationEventSystem<RandomVirusRuleComponen
         if (!TryGetRandomStation(out var chosenStation))
             return;
 
+        if (component.TargetCount <= 0)
+        {
+            Log.Warning($"RandomVirus event has invalid target count {component.TargetCount}.");
+            return;
+        }
+
         var candidates = new List<Entity<DiseaseCarrierComponent>>();
-        var query = EntityQueryEnumerator<ActorComponent, HumanoidAppearanceComponent, MobStateComponent, DiseaseCarrierComponent, TransformComponent>();
-        while (query.MoveNext(out var target, out _, out _, out var mobState, out var carrier, out var xform))
+        var query = EntityQueryEnumerator<ActorComponent, HumanoidAppearanceComponent, MobStateComponent, DiseaseCarrierComponent>();
+        while (query.MoveNext(out var target, out _, out _, out var mobState, out var carrier))
         {
             if (mobState.CurrentState == MobState.Dead)
                 continue;
 
+            var xform = Transform(target);
             if (_station.GetOwningStation(target, xform) != chosenStation)
                 continue;
 
-            if (_disease.HasAnyDisease((target, carrier)))
+            Entity<DiseaseCarrierComponent> candidate = (target, carrier);
+            if (_disease.HasAnyDisease(candidate.AsNullable()))
                 continue;
 
-            candidates.Add((target, carrier));
+            candidates.Add(candidate);
         }
 
         if (candidates.Count == 0)
@@ -58,7 +68,7 @@ public sealed class RandomVirusRule : StationEventSystem<RandomVirusRuleComponen
             targetCount = candidates.Count;
         }
 
-        var pickedTargets = RobustRandom.GetItems(candidates, targetCount, allowDuplicates: false);
+        var pickedTargets = _random.GetItems(candidates, targetCount, allowDuplicates: false);
         foreach (var target in pickedTargets)
         {
             InfectTarget(target, component);
@@ -67,28 +77,17 @@ public sealed class RandomVirusRule : StationEventSystem<RandomVirusRuleComponen
 
     private void InfectTarget(Entity<DiseaseCarrierComponent> target, RandomVirusRuleComponent component)
     {
-        var pandemic = component.PandemicChance > 0f && RobustRandom.Prob(component.PandemicChance);
+        var pandemicChance = Math.Clamp(component.PandemicChance, 0f, 1f);
+        var pandemic = pandemicChance > 0f && _random.Prob(pandemicChance);
         var diseaseBase = pandemic ? component.PandemicDiseaseBase : component.DiseaseBase;
         var diseaseComplexity = pandemic ? component.PandemicDiseaseComplexity : component.DiseaseComplexity;
         var possibleTypes = pandemic ? component.PandemicPossibleTypes : component.PossibleTypes;
 
-        var disease = _disease.MakeRandomDisease(diseaseBase, diseaseComplexity);
+        var disease = _disease.MakeRandomDisease(diseaseBase, diseaseComplexity, possibleTypes);
         if (disease == null)
             return;
 
-        if (!TryComp<DiseaseComponent>(disease.Value, out var diseaseComp))
-        {
-            QueueDel(disease.Value);
-            return;
-        }
-
-        if (possibleTypes.Count > 0)
-        {
-            diseaseComp.DiseaseType = RobustRandom.Pick(possibleTypes);
-            Dirty(disease.Value, diseaseComp);
-        }
-
-        if (!_disease.TryInfect(target, disease.Value))
+        if (!_disease.TryInfect(target.AsNullable(), disease.Value))
         {
             QueueDel(disease.Value);
             return;

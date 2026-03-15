@@ -36,7 +36,7 @@ public sealed partial class RandomVirusRuleComponent : Component
     public List<ProtoId<DiseaseTypePrototype>> PossibleTypes = new() { "Viral" };
 
     /// <summary>
-    /// Chance that an infection rolls the stronger pandemic profile instead.
+    /// Chance in the range [0.0, 1.0] that an infection rolls the stronger pandemic profile instead.
     /// </summary>
     [DataField]
     public float PandemicChance = 0f;
