@@ -470,6 +470,20 @@ namespace Content.Server.Database
 
         #endregion
 
+        #region Pirate Admin Ratings
+        // #Pirate Changes
+        Task<List<PirateAdminHelpRating>> GetPirateAdminHelpRatingsAsync(CancellationToken cancel = default);
+
+        // #Pirate Changes
+        Task UpsertPirateAdminHelpRatingAsync(
+            string adminKey,
+            string adminName,
+            NetUserId playerId,
+            byte rating,
+            CancellationToken cancel = default);
+
+        #endregion
+
         #region DB Notifications
 
         void SubscribeToNotifications(Action<DatabaseNotification> handler);
@@ -1338,6 +1352,29 @@ namespace Content.Server.Database
         {
             DbReadOpsMetric.Inc();
             return RunDbCommand(() => _db.GetPollResultsAsync(pollId, cancel));
+        }
+
+        #endregion
+
+        #region Pirate Admin Ratings
+
+        // #Pirate Changes
+        public Task<List<PirateAdminHelpRating>> GetPirateAdminHelpRatingsAsync(CancellationToken cancel = default)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetPirateAdminHelpRatingsAsync(cancel));
+        }
+
+        // #Pirate Changes
+        public Task UpsertPirateAdminHelpRatingAsync(
+            string adminKey,
+            string adminName,
+            NetUserId playerId,
+            byte rating,
+            CancellationToken cancel = default)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.UpsertPirateAdminHelpRatingAsync(adminKey, adminName, playerId, rating, cancel));
         }
 
         #endregion
