@@ -42,6 +42,7 @@
     ClothingHandsGlovesAwaria: 4
     ClothingOuterCoatAwaria: 2
     ClothingShoesBootsAwaria: 2
+    ClothingUnderSocksEngi: 1
     # Pirate End
   contrabandInventory:
     ToyFigurineEngineer: 1
