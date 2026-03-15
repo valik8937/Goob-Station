@@ -85,6 +85,8 @@
     contents:
     - id: FoodCoffeeBeansPirate
       amount: 5
+  - type: PhysicalComposition
+    materialComposition: {}
   - type: StaticPrice
     price: 0.04
 
