@@ -665,6 +665,53 @@ namespace Content.Server.Database.Migrations.Sqlite
                     b.ToTable("job", (string)null);
                 });
 
+            modelBuilder.Entity("Content.Server.Database.PirateAdminHelpRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("pirate_admin_help_ratings_id");
+
+                    b.Property<string>("AdminKey")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("admin_key");
+
+                    b.Property<string>("AdminName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("admin_name");
+
+                    b.Property<Guid>("PlayerUserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("player_user_id");
+
+                    b.Property<byte>("Rating")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("rating");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("PK_pirate_admin_help_ratings");
+
+                    b.HasIndex("AdminKey")
+                        .HasDatabaseName("IX_pirate_admin_help_ratings_admin_key");
+
+                    b.HasIndex("PlayerUserId")
+                        .HasDatabaseName("IX_pirate_admin_help_ratings_player_user_id");
+
+                    b.HasIndex("AdminKey", "PlayerUserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_pirate_admin_help_ratings_admin_key_player_user_id");
+
+                    b.ToTable("pirate_admin_help_ratings", (string)null);
+                });
+
             modelBuilder.Entity("Content.Server.Database.PlayTime", b =>
                 {
                     b.Property<int>("Id")
@@ -2003,6 +2050,19 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .HasConstraintName("FK_job_profile_profile_id");
 
                     b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("Content.Server.Database.PirateAdminHelpRating", b =>
+                {
+                    b.HasOne("Content.Server.Database.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerUserId")
+                        .HasPrincipalKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_pirate_admin_help_ratings_player_player_user_id");
+
+                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("Content.Server.Database.Player", b =>

@@ -2320,6 +2320,58 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
 
         #endregion
 
+        #region Pirate Admin Ratings
+
+        // #Pirate Changes
+        public async Task<List<PirateAdminHelpRating>> GetPirateAdminHelpRatingsAsync(CancellationToken cancel = default)
+        {
+            await using var db = await GetDb(cancel);
+
+            return await db.DbContext.PirateAdminHelpRatings
+                .AsNoTracking()
+                .ToListAsync(cancel);
+        }
+
+        // #Pirate Changes
+        public async Task UpsertPirateAdminHelpRatingAsync(
+            string adminKey,
+            string adminName,
+            NetUserId playerId,
+            byte rating,
+            CancellationToken cancel = default)
+        {
+            await using var db = await GetDb(cancel);
+
+            var entity = await db.DbContext.PirateAdminHelpRatings
+                .SingleOrDefaultAsync(
+                    r => r.AdminKey == adminKey && r.PlayerUserId == playerId.UserId,
+                    cancel);
+
+            if (entity == null)
+            {
+                entity = new PirateAdminHelpRating
+                {
+                    AdminKey = adminKey,
+                    AdminName = adminName,
+                    PlayerUserId = playerId.UserId,
+                    Rating = rating,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                db.DbContext.PirateAdminHelpRatings.Add(entity);
+            }
+            else
+            {
+                entity.AdminName = adminName;
+                entity.Rating = rating;
+                entity.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await db.DbContext.SaveChangesAsync(cancel);
+        }
+
+        #endregion
+
         public abstract Task SendNotification(DatabaseNotification notification);
 
         // SQLite returns DateTime as Kind=Unspecified, Npgsql actually knows for sure it's Kind=Utc.
