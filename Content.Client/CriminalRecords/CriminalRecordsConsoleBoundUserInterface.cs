@@ -63,9 +63,16 @@ public sealed class CriminalRecordsConsoleBoundUserInterface : BoundUserInterfac
         #region Pirate: cameras (photo in records)
         _window.OnPrintPhoto += async () =>
         {
-            var message = await _window.BuildPrintPhotoMessage();
-            if (message != null)
-                SendMessage(message);
+            try
+            {
+                var message = await _window.BuildPrintPhotoMessage();
+                if (message != null)
+                    SendMessage(message);
+            }
+            catch (Exception ex)
+            {
+                Logger.ErrorS("criminal-records", ex, "Failed to build print photo message");
+            }
         };
         _window.OnUploadPhoto += () =>
             SendMessage(new CriminalRecordUploadPhoto());
