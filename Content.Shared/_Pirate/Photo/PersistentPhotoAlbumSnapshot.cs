@@ -13,6 +13,7 @@ public sealed class PersistentPhotoAlbumSnapshot
     public string OwnerKind { get; init; } = string.Empty;
     public string OwnerId { get; init; } = string.Empty;
     public string AlbumKey { get; init; } = string.Empty;
+    public bool IsPublic { get; init; } = true;
     public DateTime SavedAt { get; init; }
     public List<PersistentPhotoData> Photos { get; init; } = new();
 }

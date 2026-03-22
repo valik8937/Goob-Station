@@ -718,6 +718,10 @@ namespace Content.Server.Database.Migrations.Postgres
                         .HasColumnType("character varying(64)")
                         .HasColumnName("album_key");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_public");
+
                     b.Property<string>("OwnerId")
                         .IsRequired()
                         .HasMaxLength(128)

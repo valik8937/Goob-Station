@@ -75,6 +75,7 @@ public sealed class PhotoAlbumPersistenceSystem : EntitySystem
                 if (snapshot == null || Deleted(uid) || !IsOwnedBy(uid, ev.Mob))
                     continue;
 
+                persistence.IsPublic = snapshot.IsPublic;
                 RestoreAlbumSnapshot(uid, album, snapshot);
             }
             catch (Exception ex)
@@ -100,6 +101,7 @@ public sealed class PhotoAlbumPersistenceSystem : EntitySystem
                         snapshot.OwnerKind,
                         snapshot.OwnerId,
                         snapshot.AlbumKey,
+                        snapshot.IsPublic,
                         snapshot.Photos);
                 }
                 catch (Exception ex)
@@ -113,8 +115,8 @@ public sealed class PhotoAlbumPersistenceSystem : EntitySystem
     private List<PersistentPhotoAlbumSnapshot> CollectAlbumSnapshots()
     {
         var snapshots = new Dictionary<(string OwnerKind, string OwnerId, string AlbumKey), PersistentPhotoAlbumSnapshot>();
-        var query = EntityQueryEnumerator<PhotoAlbumComponent, PhotoAlbumPersistenceStateComponent>();
-        while (query.MoveNext(out var uid, out var album, out var state))
+        var query = EntityQueryEnumerator<PhotoAlbumComponent, PhotoAlbumPersistenceStateComponent, PersistentPhotoAlbumComponent>();
+        while (query.MoveNext(out var uid, out var album, out var state, out var persistence))
         {
             if (!_container.TryGetContainer(uid, album.ContainerId, out var container))
                 continue;
@@ -137,6 +139,7 @@ public sealed class PhotoAlbumPersistenceSystem : EntitySystem
                 OwnerKind = state.OwnerKind,
                 OwnerId = state.OwnerId,
                 AlbumKey = state.AlbumKey,
+                IsPublic = persistence.IsPublic,
                 SavedAt = DateTime.UtcNow,
                 Photos = photos
             };

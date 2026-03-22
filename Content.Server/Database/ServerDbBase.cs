@@ -2427,6 +2427,7 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
                 OwnerKind = album.OwnerKind,
                 OwnerId = album.OwnerId,
                 AlbumKey = album.AlbumKey,
+                IsPublic = album.IsPublic,
                 SavedAt = album.SavedAt,
                 Photos = photos
             };
@@ -2436,6 +2437,7 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
             string ownerKind,
             string ownerId,
             string albumKey,
+            bool isPublic,
             IReadOnlyCollection<PersistentPhotoData> photos,
             CancellationToken cancel = default)
         {
@@ -2466,6 +2468,7 @@ INSERT INTO player_round (players_id, rounds_id) VALUES ({players[player]}, {id}
             }
 
             album.SavedAt = DateTime.UtcNow;
+            album.IsPublic = isPublic;
 
             var sortOrder = 0;
             foreach (var photo in photos)

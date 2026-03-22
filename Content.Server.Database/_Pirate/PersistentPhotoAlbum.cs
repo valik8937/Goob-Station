@@ -25,6 +25,9 @@ public sealed class PersistentPhotoAlbum
     [Required]
     public DateTime SavedAt { get; set; }
 
+    [Required]
+    public bool IsPublic { get; set; } = true;
+
     public List<PersistentPhotoAlbumPhoto> Photos { get; set; } = new();
 }
 

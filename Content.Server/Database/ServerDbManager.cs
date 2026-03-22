@@ -497,6 +497,7 @@ namespace Content.Server.Database
             string ownerKind,
             string ownerId,
             string albumKey,
+            bool isPublic,
             IReadOnlyCollection<PersistentPhotoData> photos,
             CancellationToken cancel = default);
         #endregion
@@ -1418,11 +1419,12 @@ namespace Content.Server.Database
             string ownerKind,
             string ownerId,
             string albumKey,
+            bool isPublic,
             IReadOnlyCollection<PersistentPhotoData> photos,
             CancellationToken cancel = default)
         {
             DbWriteOpsMetric.Inc();
-            return RunDbCommand(() => _db.UpsertPersistentPhotoAlbumSnapshotAsync(ownerKind, ownerId, albumKey, photos, cancel));
+            return RunDbCommand(() => _db.UpsertPersistentPhotoAlbumSnapshotAsync(ownerKind, ownerId, albumKey, isPublic, photos, cancel));
         }
 
         #endregion

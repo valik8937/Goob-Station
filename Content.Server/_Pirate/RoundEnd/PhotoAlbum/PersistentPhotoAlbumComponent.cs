@@ -16,6 +16,9 @@ public sealed partial class PersistentPhotoAlbumComponent : Component
 
     [DataField]
     public string? OwnerId;
+
+    [DataField]
+    public bool IsPublic = true;
 }
 
 public static class PersistentPhotoAlbumOwnerKinds
