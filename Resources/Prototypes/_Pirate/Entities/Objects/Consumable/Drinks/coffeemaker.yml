@@ -75,7 +75,7 @@
   id: CoffeeCartridgeDecaf
   parent: CoffeeCartridgeGenerico
   name: coffeemaker cartridge - Caffe Decaffeinato
-  description: A cartridge with synthetic coffee for use with the Modello 3 coffeemaker system.
+  description: A cartridge with decaf coffee for use with the Modello 3 coffeemaker system.
   components:
   - type: CoffeeCartridge
     variant: Decaf
@@ -234,7 +234,7 @@
 - type: entity
   id: FoodCoffeeBeansSynthetic
   parent: FoodCoffeeBeans
-  name: syntheticcoffee beans
+  name: synthetic coffee beans
   components:
   - type: Sprite
     state: coffee_synthetic
