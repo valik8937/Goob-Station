@@ -88,27 +88,37 @@ ent-CoffeePackPirate = Arabica bean pack
     .desc = A pack of dry Arabica coffee beans.
 ent-CoffeePackRobustaPirate = Robusta bean pack
     .desc = A pack of dry Robusta coffee beans.
+ent-CoffeePackSyntheticPirate = synthetic bean pack
+    .desc = A pack of dry synthetic coffee beans.
+ent-CoffeePackStenophyllaPirate = stenophylla bean pack
+    .desc = A pack of dry stenophylla coffee beans.
 
-ent-CoffeeCartridgePirate = coffee cartridge — Caffè Generico
+ent-CoffeeCartridgeGenerico = coffee cartridge — Caffè Generico
     .desc = A standard coffee cartridge for Modello 3 coffeemakers.
-ent-CoffeeCartridgeFancyPirate = coffee cartridge — Caffè Fantasioso
+ent-CoffeeCartridgeFancy = coffee cartridge — Caffè Fantasioso
     .desc = A premium coffee cartridge for Modello 3 coffeemakers.
-ent-CoffeeCartridgeDecafPirate = coffee cartridge — Caffè Decaffeinato
+ent-CoffeeCartridgeDecaf = coffee cartridge — Caffè Decaffeinato
     .desc = A decaffeinated cartridge for Modello 3 coffeemakers.
-ent-CoffeeCartridgeBootlegPirate = coffee cartridge — Botany Blend
+ent-CoffeeCartridgeBootleg = coffee cartridge — Botany Blend
     .desc = A jury-rigged cartridge. It works, but your warranty is definitely void.
-ent-BlankCoffeeCartridgePirate = blank coffee cartridge
+ent-BlankCoffeeCartridge = blank coffee cartridge
     .desc = An empty cartridge, ready to be filled.
+ent-CoffeeCartridgeSynthetic = coffee cartridge - Caffe Sintetico
+    .desc = A synthetic coffee cartridge for Modello 3 coffeemakers.
 
 ent-DrinkCoffeepotPirate = coffeepot
     .desc = A large pot for serving coffee. Holds four standard cups.
 ent-DrinkCoffeeCupPirate = coffee cup
     .desc = A heat-formed plastic coffee cup.
 
-ent-FoodCoffeeBeansPirate = Arabica coffee beans
+ent-FoodCoffeeBeans = Arabica coffee beans
     .desc = Dry coffee beans for Impressa coffeemakers.
-ent-FoodCoffeeBeansRobustaPirate = Robusta coffee beans
+ent-FoodCoffeeBeansRobusta = Robusta coffee beans
     .desc = Dry coffee beans for Impressa coffeemakers.
+ent-FoodCoffeeBeansSynthetic = synthetic coffee beans
+    .desc = Dry synthetic coffee beans for Impressa coffeemakers.
+ent-FoodCoffeeBeansStenophylla = stenophylla coffee beans
+    .desc = Dry stenophylla coffee beans for Impressa coffeemakers.
 
 ent-FoodCondimentPacketCreamerPirate = creamer packet
     .desc = A tiny packet of coffee creamer.

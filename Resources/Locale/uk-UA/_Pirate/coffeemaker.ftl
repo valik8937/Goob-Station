@@ -88,27 +88,37 @@ ent-CoffeePackPirate = пачка арабіки
     .desc = Пакування із сухими зернами арабіки.
 ent-CoffeePackRobustaPirate = пачка робусти
     .desc = Пакування із сухими зернами робусти.
+ent-CoffeePackSyntheticPirate = пачка синтетичної кави
+    .desc = Пакування із сухими зернами синтетичної кави.
+ent-CoffeePackStenophyllaPirate = пачка стенофілли
+    .desc = Пакування із сухими зернами стенофілли.
 
-ent-CoffeeCartridgePirate = картридж для кавоварки — Caffè Generico
+ent-CoffeeCartridgeGenerico = картридж  Caffè Generico
     .desc = Звичайний картридж із кавою для кавоварки Modello 3.
-ent-CoffeeCartridgeFancyPirate = картридж для кавоварки — Caffè Fantasioso
+ent-CoffeeCartridgeFancy = картридж Caffè Fantasioso
     .desc = Вишуканий картридж із кавою для системи Modello 3.
-ent-CoffeeCartridgeDecafPirate = картридж для кавоварки — Caffè Decaffeinato
+ent-CoffeeCartridgeDecaf = картридж Caffè Decaffeinato
     .desc = Безкофеїновий картридж для кавоварки Modello 3.
-ent-CoffeeCartridgeBootlegPirate = картридж для кавоварки — Botany Blend
+ent-CoffeeCartridgeBootleg = картридж Botany Blend
     .desc = Кустарній картридж. Працює, але гарантію анульовано.
-ent-BlankCoffeeCartridgePirate = порожній картридж для кави
+ent-BlankCoffeeCartridge = порожній картридж для кави
     .desc = Порожній картридж, готовий до наповнення.
+ent-CoffeeCartridgeSynthetic = картридж Caffe Sintetico
+    .desc = Картридж із синтетичною кавою для кавоварки Modello 3.
 
 ent-DrinkCoffeepotPirate = кавник
     .desc = Великий кавник. Вистачає на чотири стандартні чашки.
 ent-DrinkCoffeeCupPirate = кавова чашка
     .desc = Пластикова чашка для гарячих напоїв.
 
-ent-FoodCoffeeBeansPirate = зерна арабіки
+ent-FoodCoffeeBeans = зерна арабіки
     .desc = Сухі кавові зерна для кавоварок Impressa.
-ent-FoodCoffeeBeansRobustaPirate = зерна робусти
+ent-FoodCoffeeBeansRobusta = зерна робусти
     .desc = Сухі кавові зерна для кавоварок Impressa.
+ent-FoodCoffeeBeansSynthetic = зерна синтетичної кави
+    .desc = Сухі зерна синтетичної кави для кавоварок Impressa.
+ent-FoodCoffeeBeansStenophylla = зерна стенофілли
+    .desc = Сухі кавові зерна стенофілли для кавоварок Impressa.
 
 ent-FoodCondimentPacketCreamerPirate = пакетик вершків
     .desc = Маленький пакетик із кавовими вершками.

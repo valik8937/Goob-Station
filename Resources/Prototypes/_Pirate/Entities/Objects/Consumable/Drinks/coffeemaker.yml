@@ -1,17 +1,17 @@
 - type: entity
-  id: CoffeeCartridgePirate
+  id: BlankCoffeeCartridge
   parent: BaseItem
-  name: coffeemaker cartridge - Caffe Generico
-  description: A coffee cartridge manufactured for use with the Modello 3 coffeemaker system.
+  name: blank coffee cartridge
+  description: A blank coffee cartridge for use with the Modello 3 coffeemaker system.
   components:
   - type: Sprite
     sprite: _Pirate/Objects/Consumable/Drinks/coffeemaker_cartridges.rsi
     layers:
     - map: [ "enum.CoffeeCartridgeVisualLayers.Base" ]
-      state: cartridge_basic
+      state: cartridge_blank
   - type: Icon
     sprite: _Pirate/Objects/Consumable/Drinks/coffeemaker_cartridges.rsi
-    state: cartridge_basic
+    state: cartridge_blank
   - type: Item
     sprite: _Pirate/Objects/Consumable/Drinks/coffeemaker_cartridges.rsi
     size: Tiny
@@ -28,22 +28,40 @@
           Decaf: { state: cartridge_decaf }
           Bootleg: { state: cartridge_bootleg }
           Blank: { state: cartridge_blank }
-  - type: CoffeeCartridge
-    charges: 5
-    variant: Basic
-    reagentYield:
-    - ReagentId: Coffee
-      Quantity: 120
   - type: StaticPrice
     price: 0.04
 
 - type: entity
-  id: CoffeeCartridgeFancyPirate
-  parent: CoffeeCartridgePirate
+  id: CoffeeCartridgeGenerico
+  parent: BlankCoffeeCartridge
+  name: coffeemaker cartridge - Caffe Generico
+  description: A coffee cartridge manufactured for use with the Modello 3 coffeemaker system.
+  components:
+  - type: CoffeeCartridge
+    charges: 5
+    variant: Basic
+    brewReagent: Coffee
+    brewAmount: 120
+    extraReagents:
+    - ReagentId: Ephedrine
+      Quantity: 4
+  - type: Icon
+    state: cartridge_basic
+
+- type: entity
+  id: CoffeeCartridgeFancy
+  parent: CoffeeCartridgeGenerico
   name: coffeemaker cartridge - Caffe Fantasioso
   description: A fancy coffee cartridge manufactured for use with the Modello 3 coffeemaker system.
   components:
   - type: CoffeeCartridge
+    brewReagent: Coffee
+    brewAmount: 120
+    extraReagents:
+    - ReagentId: Tricordrazine
+      Quantity: 2
+    - ReagentId: Ephedrine
+      Quantity: 2
     variant: Blend
     fancyVariants:
     - variant: Blend
@@ -52,14 +70,12 @@
       name: coffeemaker cartridge - Montagna Blu
     - variant: Kilimanjaro
       name: coffeemaker cartridge - Kilimangiaro
-    - variant: Mocha
-      name: coffeemaker cartridge - Moka Arabica
 
 - type: entity
-  id: CoffeeCartridgeDecafPirate
-  parent: CoffeeCartridgePirate
+  id: CoffeeCartridgeDecaf
+  parent: CoffeeCartridgeGenerico
   name: coffeemaker cartridge - Caffe Decaffeinato
-  description: A decaf cartridge for use with the Modello 3 coffeemaker system.
+  description: A cartridge with synthetic coffee for use with the Modello 3 coffeemaker system.
   components:
   - type: CoffeeCartridge
     variant: Decaf
@@ -67,33 +83,40 @@
     state: cartridge_decaf
 
 - type: entity
-  id: CoffeeCartridgeBootlegPirate
-  parent: CoffeeCartridgePirate
+  id: CoffeeCartridgeBootleg
+  parent: CoffeeCartridgeGenerico
   name: coffeemaker cartridge - Botany blend
   description: A jury-rigged cartridge. It works, but probably voids the warranty.
   components:
   - type: CoffeeCartridge
+    brewReagent: Coffee
+    brewAmount: 120
+    extraReagents:
+    - ReagentId: Omnizine
+      Quantity: 2
+    - ReagentId: Ephedrine
+      Quantity: 2
     variant: Bootleg
   - type: Icon
     state: cartridge_bootleg
 
 - type: entity
-  id: BlankCoffeeCartridgePirate
-  parent: BaseItem
-  name: blank coffee cartridge
-  description: A blank coffee cartridge ready to be filled.
+  id: CoffeeCartridgeSynthetic
+  parent: CoffeeCartridgeGenerico
+  name: coffeemaker cartridge - Caffe Sintetico
+  description: A synthetic coffee cartridge for use with the Modello 3 coffeemaker system.
   components:
-  - type: Sprite
-    sprite: _Pirate/Objects/Consumable/Drinks/coffeemaker_cartridges.rsi
-    layers:
-    - map: [ "enum.CoffeeCartridgeVisualLayers.Base" ]
-      state: cartridge_blank
+  - type: CoffeeCartridge
+    brewReagent: SyntheticCoffee
+    brewAmount: 120
+    extraReagents:
+    - ReagentId: Inaprovaline
+      Quantity: 2
+    - ReagentId: Ephedrine
+      Quantity: 2
+    variant: Mocha
   - type: Icon
-    sprite: _Pirate/Objects/Consumable/Drinks/coffeemaker_cartridges.rsi
-    state: cartridge_blank
-  - type: Item
-    sprite: _Pirate/Objects/Consumable/Drinks/coffeemaker_cartridges.rsi
-    size: Tiny
+    state: cartridge_mocha
 
 - type: entity
   id: DrinkCoffeepotPirate
@@ -172,9 +195,9 @@
     solution: drink
 
 - type: entity
-  id: FoodCoffeeBeansPirate
+  id: FoodCoffeeBeans
   parent: BaseItem
-  name: coffee arabica beans
+  name: arabica coffee beans
   description: Dry coffee beans for impressa coffeemakers.
   components:
   - type: Sprite
@@ -187,11 +210,17 @@
     sprite: _Pirate/Objects/Specific/Hydroponics/coffee_beans.rsi
     size: Tiny
   - type: CoffeeBean
+    brewReagent: Coffee
+    extraReagents:
+    - ReagentId: Tricordrazine
+      Quantity: 4
+    - ReagentId: Ephedrine
+      Quantity: 4
 
 - type: entity
-  id: FoodCoffeeBeansRobustaPirate
-  parent: FoodCoffeeBeansPirate
-  name: coffee robusta beans
+  id: FoodCoffeeBeansRobusta
+  parent: FoodCoffeeBeans
+  name: robustacoffee beans
   components:
   - type: Sprite
     state: coffee_robusta
@@ -200,7 +229,40 @@
   - type: CoffeeBean
     extraReagents:
     - ReagentId: Ephedrine
-      Quantity: 2
+      Quantity: 8
+
+- type: entity
+  id: FoodCoffeeBeansSynthetic
+  parent: FoodCoffeeBeans
+  name: syntheticcoffee beans
+  components:
+  - type: Sprite
+    state: coffee_synthetic
+  - type: Icon
+    state: coffee_synthetic
+  - type: CoffeeBean
+    brewReagent: SyntheticCoffee
+    extraReagents:
+    - ReagentId: Inaprovaline
+      Quantity: 4
+    - ReagentId: Ephedrine
+      Quantity: 4
+
+- type: entity
+  id: FoodCoffeeBeansStenophylla
+  parent: FoodCoffeeBeans
+  name: stenophylla coffee beans
+  components:
+  - type: Sprite
+    state: coffee_stenophylla 
+  - type: Icon
+    state: coffee_stenophyllac
+  - type: CoffeeBean
+    extraReagents:
+    - ReagentId: Omnizine
+      Quantity: 4
+    - ReagentId: Ephedrine
+      Quantity: 4
 
 - type: entity
   id: FoodCondimentPacketCreamerPirate
