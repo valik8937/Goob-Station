@@ -254,9 +254,9 @@
   name: stenophylla coffee beans
   components:
   - type: Sprite
-    state: coffee_stenophylla 
+    state: coffee_stenophylla
   - type: Icon
-    state: coffee_stenophyllac
+    state: coffee_stenophylla
   - type: CoffeeBean
     extraReagents:
     - ReagentId: Omnizine
