@@ -86,7 +86,7 @@
           - CoffeeBean
     - type: StorageFill
       contents:
-        - id: FoodCoffeeBeans
+        - id: FoodCoffeeBeansPirate
           amount: 5
     - type: PhysicalComposition
       materialComposition: {}
@@ -105,7 +105,7 @@
       state: robusta_beans
     - type: StorageFill
       contents:
-        - id: FoodCoffeeBeansRobusta
+        - id: FoodCoffeeBeansRobustaPirate
           amount: 5
 
 - type: entity

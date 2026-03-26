@@ -93,17 +93,17 @@ ent-CoffeePackSyntheticPirate = пачка синтетичної кави
 ent-CoffeePackStenophyllaPirate = пачка стенофілли
     .desc = Пакування із сухими зернами стенофілли.
 
-ent-CoffeeCartridgeGenerico = картридж  Caffè Generico
+ent-CoffeeCartridgePirate = картридж Caffè Generico
     .desc = Звичайний картридж із кавою для кавоварки Modello 3.
-ent-CoffeeCartridgeFancy = картридж Caffè Fantasioso
+ent-CoffeeCartridgeFancyPirate = картридж Caffè Fantasioso
     .desc = Вишуканий картридж із кавою для системи Modello 3.
-ent-CoffeeCartridgeDecaf = картридж Caffè Decaffeinato
+ent-CoffeeCartridgeDecafPirate = картридж Caffè Decaffeinato
     .desc = Безкофеїновий картридж для кавоварки Modello 3.
-ent-CoffeeCartridgeBootleg = картридж Botany Blend
+ent-CoffeeCartridgeBootlegPirate = картридж Botany Blend
     .desc = Кустарній картридж. Працює, але гарантію анульовано.
-ent-BlankCoffeeCartridge = порожній картридж для кави
+ent-BlankCoffeeCartridgePirate = порожній картридж для кави
     .desc = Порожній картридж, готовий до наповнення.
-ent-CoffeeCartridgeSynthetic = картридж Caffe Sintetico
+ent-CoffeeCartridgeSyntheticPirate = картридж Caffe Sintetico
     .desc = Картридж із синтетичною кавою для кавоварки Modello 3.
 
 ent-DrinkCoffeepotPirate = кавник
@@ -111,9 +111,9 @@ ent-DrinkCoffeepotPirate = кавник
 ent-DrinkCoffeeCupPirate = кавова чашка
     .desc = Пластикова чашка для гарячих напоїв.
 
-ent-FoodCoffeeBeans = зерна арабіки
+ent-FoodCoffeeBeansPirate = зерна арабіки
     .desc = Сухі кавові зерна для кавоварок Impressa.
-ent-FoodCoffeeBeansRobusta = зерна робусти
+ent-FoodCoffeeBeansRobustaPirate = зерна робусти
     .desc = Сухі кавові зерна для кавоварок Impressa.
 ent-FoodCoffeeBeansSynthetic = зерна синтетичної кави
     .desc = Сухі зерна синтетичної кави для кавоварок Impressa.

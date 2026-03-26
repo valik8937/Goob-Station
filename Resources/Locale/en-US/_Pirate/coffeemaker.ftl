@@ -93,17 +93,17 @@ ent-CoffeePackSyntheticPirate = synthetic bean pack
 ent-CoffeePackStenophyllaPirate = stenophylla bean pack
     .desc = A pack of dry stenophylla coffee beans.
 
-ent-CoffeeCartridgeGenerico = coffee cartridge — Caffè Generico
+ent-CoffeeCartridgePirate = coffee cartridge — Caffè Generico
     .desc = A standard coffee cartridge for Modello 3 coffeemakers.
-ent-CoffeeCartridgeFancy = coffee cartridge — Caffè Fantasioso
+ent-CoffeeCartridgeFancyPirate = coffee cartridge — Caffè Fantasioso
     .desc = A premium coffee cartridge for Modello 3 coffeemakers.
-ent-CoffeeCartridgeDecaf = coffee cartridge — Caffè Decaffeinato
+ent-CoffeeCartridgeDecafPirate = coffee cartridge — Caffè Decaffeinato
     .desc = A decaffeinated cartridge for Modello 3 coffeemakers.
-ent-CoffeeCartridgeBootleg = coffee cartridge — Botany Blend
+ent-CoffeeCartridgeBootlegPirate = coffee cartridge — Botany Blend
     .desc = A jury-rigged cartridge. It works, but your warranty is definitely void.
-ent-BlankCoffeeCartridge = blank coffee cartridge
+ent-BlankCoffeeCartridgePirate = blank coffee cartridge
     .desc = An empty cartridge, ready to be filled.
-ent-CoffeeCartridgeSynthetic = coffee cartridge - Caffe Sintetico
+ent-CoffeeCartridgeSyntheticPirate = coffee cartridge - Caffe Sintetico
     .desc = A synthetic coffee cartridge for Modello 3 coffeemakers.
 
 ent-DrinkCoffeepotPirate = coffeepot
@@ -111,9 +111,9 @@ ent-DrinkCoffeepotPirate = coffeepot
 ent-DrinkCoffeeCupPirate = coffee cup
     .desc = A heat-formed plastic coffee cup.
 
-ent-FoodCoffeeBeans = Arabica coffee beans
+ent-FoodCoffeeBeansPirate = Arabica coffee beans
     .desc = Dry coffee beans for Impressa coffeemakers.
-ent-FoodCoffeeBeansRobusta = Robusta coffee beans
+ent-FoodCoffeeBeansRobustaPirate = Robusta coffee beans
     .desc = Dry coffee beans for Impressa coffeemakers.
 ent-FoodCoffeeBeansSynthetic = synthetic coffee beans
     .desc = Dry synthetic coffee beans for Impressa coffeemakers.

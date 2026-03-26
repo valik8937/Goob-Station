@@ -114,10 +114,10 @@
     CoffeePackRobustaPirate: 2 # Pirate: coffeemaker
     CoffeePackStenophyllaPirate: 2 # Pirate: coffeemaker
     CoffeePackSyntheticPirate: 2 # Pirate: coffeemaker
-    CoffeeCartridgeGenerico: 2 # Pirate: coffeemaker
-    CoffeeCartridgeDecaf: 2 # Pirate: coffeemaker
-    CoffeeCartridgeBootleg: 2 # Pirate: coffeemaker
-    CoffeeCartridgeSynthetic: 2 # Pirate: coffeemaker
+    CoffeeCartridgePirate: 2 # Pirate: coffeemaker
+    CoffeeCartridgeDecafPirate: 2 # Pirate: coffeemaker
+    CoffeeCartridgeBootlegPirate: 2 # Pirate: coffeemaker
+    CoffeeCartridgeSyntheticPirate: 2 # Pirate: coffeemaker
   contrabandInventory:
     EggBoxBroken: 1
     FoodBoxDonkpocket: 1
