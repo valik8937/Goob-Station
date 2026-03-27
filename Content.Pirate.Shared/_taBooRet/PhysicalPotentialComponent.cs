@@ -27,7 +27,7 @@ namespace Content.Shared._taBooRet
     public sealed partial class PhysicalPotentialComponent : Component
     {
         [DataField("trainingEffectiveness"), ViewVariables(VVAccess.ReadWrite)]
-        public float trainingEffectiveness = 0.5f;
+        public float trainingEffectiveness = 100;
 
         #region Damage
         [DataField("strains")]
@@ -58,8 +58,6 @@ namespace Content.Shared._taBooRet
         [DataField("staminaRisingSpeed"), ViewVariables(VVAccess.ReadWrite)]
         public float StaminaRisingSpeed = 0.1f;
 
-        public bool IsSprinting;
-
         public float SprintTimer;
 
         [DataField("maxStamina")]
@@ -77,18 +75,19 @@ namespace Content.Shared._taBooRet
         public float TimeForRest = 180f;
 
         [ViewVariables] public TimeSpan EndRestTime;
+        [ViewVariables] public bool IsResting;
         [ViewVariables] public TimeSpan NextStrainTime;
         #endregion
 
         #region Strain
-        [DataField(""), ViewVariables(VVAccess.ReadWrite)]
+        [DataField("maxStainsNumber"), ViewVariables(VVAccess.ReadWrite)]
         public float MaxStrainsNumber = 150;
 
         [DataField("strainsApplyingDelay"), ViewVariables(VVAccess.ReadWrite)]
         public float StrainsApplyingDelay = 0.5f;
 
         [DataField("hungerCost"), ViewVariables(VVAccess.ReadWrite)]
-        public float HungerCost = 2f;
+        public float HungerCost = 1f;
         #endregion
     }
 }
