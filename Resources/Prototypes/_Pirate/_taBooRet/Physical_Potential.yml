@@ -1,7 +1,7 @@
 - type: trait
   id: PhysicalPotential
-  name: "Спортивний потенціал"
-  description: "Ти можеш тренуватися та ставати сильнішим"
+  name: "trait-physical-potential-name"
+  description: "trait-physical-potential-desc"
   blacklist:
     components:
       - BorgChassis
