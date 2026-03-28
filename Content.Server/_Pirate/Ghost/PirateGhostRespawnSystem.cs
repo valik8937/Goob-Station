@@ -94,7 +94,9 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
 
         if (HasComp<GhostComponent>(ent.Owner))
         {
-            ArmTimerIfNeeded(userId);
+            if (ShouldShowRespawnStatus(userId, ent.Owner))
+                ArmTimerIfNeeded(userId);
+
             SendStatusToUser(userId);
             return;
         }
@@ -108,7 +110,7 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
         if (!HasComp<GhostComponent>(args.Entity))
             return;
 
-        if (!IsTemporaryGhostProjection(args.Player.UserId, args.Entity))
+        if (ShouldShowRespawnStatus(args.Player.UserId, args.Entity))
             ArmTimerIfNeeded(args.Player.UserId);
 
         SendStatus(args.Player);
@@ -292,7 +294,20 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
         if (entity is not { Valid: true } attachedEntity)
             return true;
 
-        return !IsTemporaryGhostProjection(session.UserId, attachedEntity);
+        return ShouldShowRespawnStatus(session.UserId, attachedEntity);
+    }
+
+    private bool ShouldShowRespawnStatus(NetUserId userId, EntityUid attached)
+    {
+        if (IsAdminObserver(attached))
+            return false;
+
+        return !IsTemporaryGhostProjection(userId, attached);
+    }
+
+    private bool IsAdminObserver(EntityUid attached)
+    {
+        return MetaData(attached).EntityPrototype == GameTicker.AdminObserverPrototypeName;
     }
 
     private bool IsTemporaryGhostProjection(NetUserId userId, EntityUid attached)
