@@ -554,9 +554,13 @@ public sealed class GhostRespawnLobbyTests
         });
 
         var ticker = pair.Server.System<GameTicker>();
+        var mapSystem = pair.Server.System<SharedMapSystem>();
+        var entMan = pair.Server.EntMan;
         await pair.Server.WaitPost(() =>
         {
             pair.Server.CfgMan.SetCVar(CCVars.GhostRespawnDelay, TimeSpan.FromSeconds(5));
+            mapSystem.CreateMap(out var mapId);
+            entMan.SpawnEntity("SpawnPointObserver", new MapCoordinates(0, 0, mapId));
             ticker.JoinAsObserver(pair.Server.PlayerMan.Sessions.Single());
         });
         await pair.RunTicksSync(20);
