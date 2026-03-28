@@ -8,6 +8,7 @@ using Content.Shared.Bed.Cryostorage;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
+using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Goobstation.Shared.MisandryBox.Thunderdome;
 using Robust.Server.Player;
@@ -27,7 +28,6 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
 
     private readonly Dictionary<NetUserId, GhostRespawnState> _states = new();
     private readonly Dictionary<NetUserId, PendingGhostTransition> _pendingTransitions = new();
-    private readonly Dictionary<NetUserId, int> _suppressedCrewCycleSeeds = new();
 
     public override void Initialize()
     {
@@ -49,14 +49,12 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
     private void OnPlayerJoinedLobby(PlayerJoinedLobbyEvent ev)
     {
         ClearState(ev.PlayerSession.UserId);
-        _suppressedCrewCycleSeeds.Remove(ev.PlayerSession.UserId);
     }
 
     private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
     {
         _states.Clear();
         _pendingTransitions.Clear();
-        _suppressedCrewCycleSeeds.Clear();
     }
 
     private void OnMindRemoved(Entity<MindContainerComponent> ent, ref MindRemovedMessage args)
@@ -87,6 +85,7 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
             return;
         }
 
+        EnsureInitialCrewCycle(userId, ent.Owner, args.Mind.Comp);
         _pendingTransitions.Remove(userId);
     }
 
@@ -96,10 +95,7 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
         {
             ArmTimerIfNeeded(args.Player.UserId);
             SendStatus(args.Player);
-            return;
         }
-
-        EnsureCrewCycle(args.Player.UserId, args.Entity);
     }
 
     private void OnGhostRespawnLobbyRequest(GhostRespawnLobbyRequest ev, EntitySessionEventArgs args)
@@ -119,9 +115,6 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
             SendStatus(session);
             return;
         }
-
-        if (!_gameTicker.LobbyEnabled)
-            _suppressedCrewCycleSeeds[session.UserId] = 2;
 
         ClearState(session.UserId);
         _gameTicker.Respawn(session);
@@ -161,7 +154,7 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
             return;
         }
 
-        if (TryConsumeSuppressedCrewCycleSeed(userId) || _states.ContainsKey(userId))
+        if (_states.ContainsKey(userId))
         {
             _pendingTransitions.Remove(userId);
             return;
@@ -177,17 +170,16 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
         _pendingTransitions.Remove(userId);
     }
 
-    private bool TryConsumeSuppressedCrewCycleSeed(NetUserId userId)
+    private void EnsureInitialCrewCycle(NetUserId userId, EntityUid entity, MindComponent mind)
     {
-        if (!_suppressedCrewCycleSeeds.TryGetValue(userId, out var remaining) || remaining <= 0)
-            return false;
+        if (_states.ContainsKey(userId))
+            return;
 
-        if (remaining == 1)
-            _suppressedCrewCycleSeeds.Remove(userId);
-        else
-            _suppressedCrewCycleSeeds[userId] = remaining - 1;
+        // Pirate: only treat the first owned body of a mind as a fresh life.
+        if (mind.OriginalOwnedEntity != GetNetEntity(entity))
+            return;
 
-        return true;
+        EnsureCrewCycle(userId, entity);
     }
 
     private bool ShouldSeedCrewCycle(EntityUid entity)
