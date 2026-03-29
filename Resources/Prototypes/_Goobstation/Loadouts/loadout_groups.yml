@@ -1348,7 +1348,6 @@
   - JackBoots
   - SecurityWinterBoots
   - AdvancedJackBoots
-  - SocksHeadSecurity # Pirate
 
 - type: loadoutGroup
   id: HeadofSecurityEnvirohelm
