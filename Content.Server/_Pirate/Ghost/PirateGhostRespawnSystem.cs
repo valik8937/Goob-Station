@@ -259,8 +259,8 @@ public sealed class PirateGhostRespawnSystem : EntitySystem
 
     private TimeSpan GetRespawnDelay()
     {
-        var delay = _cfg.GetCVar(CCVars.GhostRespawnDelay);
-        return delay > TimeSpan.Zero ? delay : TimeSpan.Zero;
+        var delaySeconds = _cfg.GetCVar(CCVars.GhostRespawnDelay);
+        return delaySeconds > 0 ? TimeSpan.FromSeconds(delaySeconds) : TimeSpan.Zero;
     }
 
     private void SendStatusToUser(NetUserId userId)

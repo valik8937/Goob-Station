@@ -237,7 +237,7 @@ public sealed class GhostRespawnLobbyTests
 
         await pair.Server.WaitPost(() =>
         {
-            pair.Server.CfgMan.SetCVar(CCVars.GhostRespawnDelay, TimeSpan.FromSeconds(5));
+            pair.Server.CfgMan.SetCVar(CCVars.GhostRespawnDelay, 5);
             mapSystem.CreateMap(out mapId);
 
             var session = pair.Server.PlayerMan.Sessions.Single();
@@ -533,7 +533,7 @@ public sealed class GhostRespawnLobbyTests
         var ticker = pair.Server.System<GameTicker>();
         await pair.Server.WaitPost(() =>
         {
-            pair.Server.CfgMan.SetCVar(CCVars.GhostRespawnDelay, delay);
+            pair.Server.CfgMan.SetCVar(CCVars.GhostRespawnDelay, Math.Max(0, (int) Math.Ceiling(delay.TotalSeconds)));
             pair.Server.CfgMan.SetCVar(CCVars.GhostKillCrit, ghostKillCrit);
             ticker.ToggleReadyAll(true);
             ticker.StartRound();
@@ -558,7 +558,7 @@ public sealed class GhostRespawnLobbyTests
         var entMan = pair.Server.EntMan;
         await pair.Server.WaitPost(() =>
         {
-            pair.Server.CfgMan.SetCVar(CCVars.GhostRespawnDelay, TimeSpan.FromSeconds(5));
+            pair.Server.CfgMan.SetCVar(CCVars.GhostRespawnDelay, 5);
             mapSystem.CreateMap(out var mapId);
             entMan.SpawnEntity("SpawnPointObserver", new MapCoordinates(0, 0, mapId));
             ticker.JoinAsObserver(pair.Server.PlayerMan.Sessions.Single());
