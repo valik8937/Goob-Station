@@ -146,7 +146,7 @@ public sealed partial class AudioTab : Control
             SliderRadioSoundDelay,
             0f,
             4f,
-            1f,
+            0.1f,
             (_, value) => Loc.GetString("ui-options-radio-sound-delay-value", ("seconds", value.ToString("0.0#", CultureInfo.InvariantCulture)))));
         #endregion
 

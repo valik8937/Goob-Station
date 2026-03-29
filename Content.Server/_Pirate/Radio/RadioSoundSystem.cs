@@ -18,12 +18,6 @@ using Robust.Shared.Utility;
 
 namespace Content.Server._Pirate.Radio;
 
-/// <summary>
-/// Ports tgstyle radio chirps:
-/// transmit sounds only for the speaker,
-/// receive sounds only for direct holders / intrinsic receivers,
-/// and no extra world chirps for bystanders around rebroadcast devices.
-/// </summary>
 public sealed class RadioSoundSystem : EntitySystem
 {
     private static readonly SoundSpecifier RadioTalkSound =
@@ -42,13 +36,10 @@ public sealed class RadioSoundSystem : EntitySystem
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     private readonly Dictionary<(NetUserId UserId, EntityUid RadioUid), TimeSpan> _normalAudioCooldowns = new();
-    private int _commonFrequency;
 
     public override void Initialize()
     {
         base.Initialize();
-
-        _commonFrequency = _prototype.Index<RadioChannelPrototype>(SharedChatSystem.CommonChannel).Frequency;
 
         SubscribeLocalEvent<HeadsetComponent, PirateRadioSentEvent>(OnHeadsetSent);
         SubscribeLocalEvent<RadioMicrophoneComponent, PirateRadioSentEvent>(OnMicrophoneSent);
@@ -56,6 +47,17 @@ public sealed class RadioSoundSystem : EntitySystem
         SubscribeLocalEvent<HeadsetComponent, PirateRadioReceivedEvent>(OnHeadsetReceive);
         SubscribeLocalEvent<RadioSpeakerComponent, PirateRadioReceivedEvent>(OnSpeakerReceive);
         SubscribeLocalEvent<IntrinsicRadioReceiverComponent, PirateRadioReceivedEvent>(OnIntrinsicReceive);
+        SubscribeLocalEvent<HeadsetComponent, EntityTerminatingEvent>(OnRadioTerminating);
+        SubscribeLocalEvent<RadioMicrophoneComponent, EntityTerminatingEvent>(OnRadioTerminating);
+        SubscribeLocalEvent<RadioSpeakerComponent, EntityTerminatingEvent>(OnRadioTerminating);
+        SubscribeLocalEvent<IntrinsicRadioTransmitterComponent, EntityTerminatingEvent>(OnRadioTerminating);
+        SubscribeLocalEvent<IntrinsicRadioReceiverComponent, EntityTerminatingEvent>(OnRadioTerminating);
+    }
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+        PruneCooldowns();
     }
 
     private void OnHeadsetSent(EntityUid uid, HeadsetComponent component, ref PirateRadioSentEvent args)
@@ -150,7 +152,7 @@ public sealed class RadioSoundSystem : EntitySystem
         if (!TryGetTransmitSound(radioUid, args.Channel.ID, out var sound))
             return;
 
-        if (args.Frequency == _commonFrequency)
+        if (args.Frequency == GetCommonFrequency())
             return;
 
         if (!TryGetActorSession(args.MessageSource, out var session))
@@ -160,6 +162,11 @@ public sealed class RadioSoundSystem : EntitySystem
             return;
 
         _audio.PlayGlobal(sound, session);
+    }
+
+    private int GetCommonFrequency()
+    {
+        return _prototype.Index<RadioChannelPrototype>(SharedChatSystem.CommonChannel).Frequency;
     }
 
     private bool TryGetActorSession(EntityUid uid, out ICommonSession session)
@@ -197,6 +204,45 @@ public sealed class RadioSoundSystem : EntitySystem
 
         _normalAudioCooldowns[key] = now + TimeSpan.FromSeconds(delay);
         return true;
+    }
+
+    private void OnRadioTerminating<T>(EntityUid uid, T component, ref EntityTerminatingEvent args)
+    {
+        if (_normalAudioCooldowns.Count == 0)
+            return;
+
+        var keysToRemove = new List<(NetUserId UserId, EntityUid RadioUid)>();
+
+        foreach (var (key, _) in _normalAudioCooldowns)
+        {
+            if (key.RadioUid == uid)
+                keysToRemove.Add(key);
+        }
+
+        foreach (var key in keysToRemove)
+        {
+            _normalAudioCooldowns.Remove(key);
+        }
+    }
+
+    private void PruneCooldowns()
+    {
+        if (_normalAudioCooldowns.Count == 0)
+            return;
+
+        var now = _timing.CurTime;
+        var keysToRemove = new List<(NetUserId UserId, EntityUid RadioUid)>();
+
+        foreach (var (key, until) in _normalAudioCooldowns)
+        {
+            if (until <= now || !Exists(key.RadioUid))
+                keysToRemove.Add(key);
+        }
+
+        foreach (var key in keysToRemove)
+        {
+            _normalAudioCooldowns.Remove(key);
+        }
     }
 
     private bool TryGetTransmitSound(
