@@ -113,6 +113,9 @@
       "name": "open"
     },
     {
+      "name": "open_unlit"
+    },
+    {
       "name": "panel_open"
     },
     {

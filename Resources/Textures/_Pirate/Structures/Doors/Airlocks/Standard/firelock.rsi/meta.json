@@ -17,9 +17,6 @@
       "name": "closed"
     },
     {
-      "name": "closed_unlit"
-    },
-    {
       "name": "closing",
       "delays": [
         [
