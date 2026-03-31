@@ -276,6 +276,7 @@
     - KnockOn
   - type: WeldingSparksAnimation # Goobstation
     startingOffset: 0, 0.5
+  - type: AirlockIllumination # Pirate changes
   placement:
     mode: SnapgridCenter
 
