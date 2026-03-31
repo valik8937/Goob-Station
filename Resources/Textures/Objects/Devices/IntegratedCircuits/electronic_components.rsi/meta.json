@@ -1,0 +1,605 @@
+{
+  "version": 1,
+  "license": null,
+  "copyright": null,
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "template"
+    },
+    {
+      "name": "addition"
+    },
+    {
+      "name": "subtraction"
+    },
+    {
+      "name": "multiplication"
+    },
+    {
+      "name": "division"
+    },
+    {
+      "name": "exponent"
+    },
+    {
+      "name": "sign"
+    },
+    {
+      "name": "modulo"
+    },
+    {
+      "name": "square_root"
+    },
+    {
+      "name": "sine"
+    },
+    {
+      "name": "cosine"
+    },
+    {
+      "name": "tangent"
+    },
+    {
+      "name": "cosecant"
+    },
+    {
+      "name": "cotangent"
+    },
+    {
+      "name": "secant"
+    },
+    {
+      "name": "round"
+    },
+    {
+      "name": "absolute"
+    },
+    {
+      "name": "average"
+    },
+    {
+      "name": "pi"
+    },
+    {
+      "name": "random"
+    },
+    {
+      "name": "memory"
+    },
+    {
+      "name": "memory4"
+    },
+    {
+      "name": "memory8"
+    },
+    {
+      "name": "memory16"
+    },
+    {
+      "name": "equal"
+    },
+    {
+      "name": "not_equal"
+    },
+    {
+      "name": "less_than"
+    },
+    {
+      "name": "greater_than"
+    },
+    {
+      "name": "less_than_or_equal"
+    },
+    {
+      "name": "greater_than_or_equal"
+    },
+    {
+      "name": "not"
+    },
+    {
+      "name": "and"
+    },
+    {
+      "name": "nand"
+    },
+    {
+      "name": "xor"
+    },
+    {
+      "name": "or"
+    },
+    {
+      "name": "sr_nor"
+    },
+    {
+      "name": "jklatch"
+    },
+    {
+      "name": "gated_d"
+    },
+    {
+      "name": "button"
+    },
+    {
+      "name": "toggle_button"
+    },
+    {
+      "name": "numberpad"
+    },
+    {
+      "name": "textpad"
+    },
+    {
+      "name": "colorpad"
+    },
+    {
+      "name": "listpad"
+    },
+    {
+      "name": "card_reader"
+    },
+    {
+      "name": "led"
+    },
+    {
+      "name": "screen"
+    },
+    {
+      "name": "screen_medium"
+    },
+    {
+      "name": "screen_large"
+    },
+    {
+      "name": "internalbm"
+    },
+    {
+      "name": "gps",
+      "delays": [
+        [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "recorder",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "medscan"
+    },
+    {
+      "name": "medscan_adv",
+      "delays": [
+        [
+          0.5,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "signal",
+      "delays": [
+        [
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "signal_advanced",
+      "delays": [
+        [
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "speaker"
+    },
+    {
+      "name": "locomotion",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "locomotion_simple",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "video_camera"
+    },
+    {
+      "name": "mux2"
+    },
+    {
+      "name": "mux4"
+    },
+    {
+      "name": "mux8"
+    },
+    {
+      "name": "mux16"
+    },
+    {
+      "name": "dmux2"
+    },
+    {
+      "name": "dmux4"
+    },
+    {
+      "name": "dmux8"
+    },
+    {
+      "name": "dmux16"
+    },
+    {
+      "name": "split"
+    },
+    {
+      "name": "join"
+    },
+    {
+      "name": "constr"
+    },
+    {
+      "name": "constr8"
+    },
+    {
+      "name": "deconstr"
+    },
+    {
+      "name": "deconstr8"
+    },
+    {
+      "name": "tick-f",
+      "delays": [
+        [
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "tick-m",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "tick-s",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "clock",
+      "delays": [
+        [
+          1.5,
+          1.5,
+          1.5,
+          1.5
+        ]
+      ]
+    },
+    {
+      "name": "delay",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "delay-50",
+      "delays": [
+        [
+          0.83000004,
+          0.83000004,
+          0.83000004,
+          0.83000004,
+          0.83000004,
+          0.83000004
+        ]
+      ]
+    },
+    {
+      "name": "delay-20",
+      "delays": [
+        [
+          0.32999998,
+          0.32999998,
+          0.32999998,
+          0.32999998,
+          0.32999998,
+          0.32999998
+        ]
+      ]
+    },
+    {
+      "name": "delay-10",
+      "delays": [
+        [
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16
+        ]
+      ]
+    },
+    {
+      "name": "delay-5",
+      "delays": [
+        [
+          0.083,
+          0.083,
+          0.083,
+          0.083,
+          0.083,
+          0.083
+        ]
+      ]
+    },
+    {
+      "name": "delay-1",
+      "delays": [
+        [
+          0.015999999,
+          0.015999999,
+          0.015999999,
+          0.015999999,
+          0.015999999,
+          0.015999999
+        ]
+      ]
+    },
+    {
+      "name": "tile"
+    },
+    {
+      "name": "uppercase"
+    },
+    {
+      "name": "lowercase"
+    },
+    {
+      "name": "num-string"
+    },
+    {
+      "name": "string-num"
+    },
+    {
+      "name": "hsv-hex"
+    },
+    {
+      "name": "rgb-hex"
+    },
+    {
+      "name": "ref-string"
+    },
+    {
+      "name": "ascii-string"
+    },
+    {
+      "name": "string-ascii"
+    },
+    {
+      "name": "light"
+    },
+    {
+      "name": "light_adv"
+    },
+    {
+      "name": "reagent_pump"
+    },
+    {
+      "name": "reagent_filter"
+    },
+    {
+      "name": "injector"
+    },
+    {
+      "name": "reagent_storage"
+    },
+    {
+      "name": "reagent_storage_big"
+    },
+    {
+      "name": "reagent_storage_cryo",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "reagent_scan"
+    },
+    {
+      "name": "smoke",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "chemical_cell"
+    },
+    {
+      "name": "solar_cell"
+    },
+    {
+      "name": "power_transmitter"
+    },
+    {
+      "name": "power_relay"
+    },
+    {
+      "name": "filter_mob"
+    },
+    {
+      "name": "filter_humanoid"
+    },
+    {
+      "name": "filter_obj"
+    },
+    {
+      "name": "filter_item"
+    },
+    {
+      "name": "filter_machinery"
+    },
+    {
+      "name": "filter_structure"
+    },
+    {
+      "name": "filter_custom"
+    },
+    {
+      "name": "sensor_accelerometer"
+    },
+    {
+      "name": "sensor_ir"
+    },
+    {
+      "name": "sensor_proxy"
+    },
+    {
+      "name": "ai"
+    },
+    {
+      "name": "grenade"
+    },
+    {
+      "name": "bluespace",
+      "delays": [
+        [
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "pressure_plate"
+    },
+    {
+      "name": "externalbm"
+    },
+    {
+      "name": "shocker"
+    },
+    {
+      "name": "grabber"
+    },
+    {
+      "name": "manipulator"
+    },
+    {
+      "name": "plant_m"
+    },
+    {
+      "name": "manip_base"
+    },
+    {
+      "name": "reagent_heater"
+    },
+    {
+      "name": "pull_claw"
+    },
+    {
+      "name": "signalsc",
+      "delays": [
+        [
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "blender"
+    },
+    {
+      "name": "wire_node"
+    },
+    {
+      "name": "reagent_funnel"
+    },
+    {
+      "name": "anchoring_bolts"
+    },
+    {
+      "name": "hatch_lock"
+    },
+    {
+      "name": "reagent_cooler"
+    },
+    {
+      "name": "interactor"
+    }
+  ]
+}
