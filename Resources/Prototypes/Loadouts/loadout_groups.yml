@@ -478,7 +478,7 @@
   name: loadout-group-passenger-shoes
   loadouts:
   - BlackShoes
-  - WinterBoots
+  - WinterBoots 
 
 - type: loadoutGroup
   id: BartenderHead

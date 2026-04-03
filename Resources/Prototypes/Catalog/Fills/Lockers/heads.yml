@@ -176,6 +176,7 @@
     - id: CargoMegaphone # goob - loudspeaker
     - id: SlotMachineHighRollerFlatPack # Goob - gambling
     - id: Eftpos #Pirate banking
+    - id: PhotoAlbumDepartmentSupply
 
 - type: entity
   id: LockerQuarterMasterFilled
@@ -215,6 +216,7 @@
       conditions:
       - !type:PlayerCountCondition
         max: 15
+    - id: PhotoAlbumDepartmentCommand
 
 # No laser table + Laser table
 - type: entityTable
@@ -306,6 +308,7 @@
     - id: PrinterDocFlatpack  # Pirate document printer
     - id: Eftpos #Pirate banking
     - id: WalletCartridge #Pirate banking
+    - id: PhotoAlbumDepartmentService
 
 - type: entity
   id: LockerHeadOfPersonnelFilled
@@ -349,6 +352,7 @@
     - id: MachinePowerTransmissionLaserFlatpack
     - id: RCDRechargingCE
     - id: PrinterDocFlatpack  # Pirate document printer
+    - id: PhotoAlbumDepartmentEngineering
 
 # Hardsuit table, used for suit storage as well
 - type: entityTable
@@ -428,6 +432,7 @@
     # Goobstation End
     - id: PrinterDocFlatpack  # Pirate document printer
     - id: ClothingHandsGlovesCombatNitrile #Pirate
+    - id: PhotoAlbumDepartmentMedical
 
 # Hardsuit table, used for suit storage as well
 - type: entityTable
@@ -493,6 +498,7 @@
     - id: ClothingEyesGlassesEpistemics
     - id: ClothingEyesHudEpistemics
       amount: 3
+    - id: PhotoAlbumDepartmentScience
 
 # Hardsuit table, used for suit storage as well
 - type: entityTable
@@ -556,6 +562,7 @@
     - id: DrinkHosFlask
     - id: ClothingBeltSheathHeadOfSecurityFilled # Goobstation - security revamp
     - id: PrinterDocFlatpack  # Pirate document printer
+    - id: PhotoAlbumDepartmentSecurity
 
 # Hardsuit table, used for suit storage as well
 - type: entityTable
