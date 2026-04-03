@@ -94,8 +94,8 @@
 - type: entity
   id: Airlock
   parent: BaseStructure
-  name: airlock
-  description: It opens, it closes, and maybe crushes you.
+  name: "повітряний шлюз"
+  description: "Він відкривається, закривається і, можливо, розчавить вас."
   components:
   - type: StationAiWhitelist
   - type: MeleeSound
@@ -276,6 +276,7 @@
     - KnockOn
   - type: WeldingSparksAnimation # Goobstation
     startingOffset: 0, 0.5
+  - type: AirlockIllumination # Pirate changes
   placement:
     mode: SnapgridCenter
 
@@ -291,7 +292,7 @@
 - type: entity
   id: AirlockGlass
   parent: Airlock
-  name: glass airlock
+  name: "скляний шлюз"
   components:
   - type: MeleeSound
     soundGroups:

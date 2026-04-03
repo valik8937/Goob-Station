@@ -728,3 +728,35 @@ Entries:
       message: Пофікшені скляні двері
   id: 60
   time: '2026-03-30T19:00:27.0000000+00:00'
+- author: Vareniko
+  changes:
+    - type: Fix
+      message: Виправлено текстурку рами Firelock
+    - type: Fix
+      message: Виправлено освітлення Firelock
+    - type: Fix
+      message: Повернено освітлення шлюзів
+  id: 61
+  time: '2026-04-01T06:04:03.0000000+00:00'
+- author: Vareniko
+  changes:
+    - type: Remove
+      message: Видалено контент по івенту Джо-Джо
+  id: 62
+  time: '2026-04-03T15:35:28.0000000+00:00'
+- author: Vareniko
+  changes:
+    - type: Add
+      message: Повернуто Ансамбль Утилізатора шахтарю і утилізатору в гардероб
+  id: 63
+  time: '2026-04-03T17:59:49.0000000+00:00'
+- author: luciusGodGame
+  changes:
+    - type: Add
+      message: Зручне покращення довідника хімікатів
+    - type: Add
+      message: Кнопки повторити й перемішати для музичного автомата
+    - type: Fix
+      message: Маріш нікому не відомий, крім самих тіньовиків
+  id: 64
+  time: '2026-04-03T18:02:45.0000000+00:00'

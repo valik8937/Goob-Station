@@ -11,11 +11,23 @@
 - type: entity
   parent: [ ClothingNeckBase, BaseCentcommContraband ]
   id: ClothingNeckMantleBlueshield
-  name: blueshield officer mantle
-  description: A well-balanced, protective mantle, designed for optimal bodyguarding efficiency.
+  name: "мантія офіцера синього щита"
+  description: "Добре збалансована, захисна мантія, розроблена для оптимальної ефективності охорони."
   components:
   - type: Sprite
     sprite: _Goobstation/Clothing/Neck/Mantle/bsomantle.rsi
   - type: Clothing
     sprite: _Goobstation/Clothing/Neck/Mantle/bsomantle.rsi
+
+#Senior Security mantle
+- type: entity
+  parent: [ ClothingNeckBase ]
+  id: ClothingNeckMantleVeteranSecurity
+  name: "мантія ветерана охорони"
+  description: "Особисто вручена керівником служби безпеки за відбиття атаки Синдикату; одного погляду на неї досить, щоб трохи підняти бойовий дух"
+  components:
+  - type: Sprite
+    sprite: _Goobstation/Clothing/Neck/Mantle/veteran_security.rsi
+  - type: Clothing
+    sprite: _Goobstation/Clothing/Neck/Mantle/veteran_security.rsi
 

@@ -1,8 +1,8 @@
 - type: entity
-  name: machete
+  name: "мачете"
   parent: [ BaseSword, BaseMajorContraband ]
   id: SlasherMachete
-  description: A large, vicious looking blade.
+  description: "Великий, зловісний на вигляд клинок."
   components:
   - type: Tag
     tags:
@@ -10,7 +10,6 @@
   - type: Sprite
     sprite: _Goobstation/Objects/Specific/Slasher/machete.rsi
   - type: MeleeWeapon
-    canWideSwing: false # Wideswing causes issues with massacre.
     damage:
       types:
         Slash: 15
@@ -39,8 +38,8 @@
 - type: entity
   parent: WeldingMaskBase
   id: ClothingHeadHatSlasherMask
-  name: slasher mask
-  description: A head-mounted face cover designed to protect the wearer completely from space-arc eye.
+  name: "маска Слешера"
+  description: "Наголовна маска, що повністю захищає власника від дугового ураження очей у відкритому космосі."
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Specific/Slasher/mask.rsi
@@ -74,12 +73,15 @@
         Piercing: 0.90
         Heat: 0.90
         Caustic: 0.90
+  - type: ClothingGrantComponent
+    component:
+    - type: FaceHuggerBlocker
 
 - type: entity
   parent: ClothingOuterStorageBase
   id: ClothingOuterSlasherApron
-  name: slasher apron
-  description: A fancy apron for a stylish person.
+  name: "фартух Слешера"
+  description: "Вишуканий фартух для стильної особи."
   components:
   - type: Sprite
     sprite: _Goobstation/Objects/Specific/Slasher/apron.rsi
@@ -116,8 +118,8 @@
 - type: entity
   parent: ClothingHandsGlovesColorBlack
   id: ClothingHandsSlasherGloves
-  name: slasher gloves
-  description: Heavy black gloves, stained by time.
+  name: "рукавиці Слешера"
+  description: "Важкі чорні рукавиці, зіпсовані часом."
   components:
   - type: Armor
     coverage:
@@ -133,8 +135,8 @@
 - type: entity
   parent: ClothingShoesLeather
   id: ClothingShoesSlasher
-  name: slasher shoes
-  description: Old leather boots that have seen better days.
+  name: "черевики Слешера"
+  description: "Старі шкіряні черевики, що бачили кращі часи."
   components:
   - type: Armor
     coverage:
@@ -150,8 +152,8 @@
 - type: entity
   id: SlasherMeatSpike
   parent: BaseStructure
-  name: Ominous Meat Spike
-  description: You might want to run.
+  name: "Зловісний кривавий шип"
+  description: "Можливо, тобі варто тікати."
   components:
   - type: InteractionOutline
   - type: Sprite
@@ -194,6 +196,7 @@
   - type: Strap
     position: Down
     rotation: -180
+    buckleBreakOnDamage: false
     selfUnBuckleDelay: 30
     blacklist:
       components:
