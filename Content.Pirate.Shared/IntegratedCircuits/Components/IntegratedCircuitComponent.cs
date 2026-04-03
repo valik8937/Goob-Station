@@ -32,19 +32,19 @@ public sealed partial class IntegratedCircuitComponent : Component
     /// <summary>
     /// Input data pins — receive data from other circuits' outputs.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField]
     public List<IntegratedPin> InputPins = new();
 
     /// <summary>
     /// Output data pins — send data to other circuits' inputs.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField]
     public List<IntegratedPin> OutputPins = new();
 
     /// <summary>
     /// Activator pins — trigger circuit execution or propagate pulses.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField]
     public List<IntegratedPin> ActivatorPins = new();
 
     /// <summary>
@@ -68,7 +68,7 @@ public sealed partial class IntegratedCircuitComponent : Component
     /// <summary>
     /// The assembly entity this circuit is currently installed in, if any.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField]
     public EntityUid? AssemblyUid;
 
     /// <summary>

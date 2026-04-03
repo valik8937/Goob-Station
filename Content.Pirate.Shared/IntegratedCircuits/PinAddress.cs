@@ -7,7 +7,7 @@ namespace Content.Pirate.Shared.IntegratedCircuits;
 /// Uniquely identifies a pin within an electronic assembly.
 /// Used for serializing wire connections between circuits.
 /// </summary>
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition]
 public sealed partial class PinAddress
 {
     /// <summary>

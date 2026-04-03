@@ -49,6 +49,6 @@ public sealed partial class CircuitWirerComponent : Component
     /// The first pin selected during a wire/unwire operation.
     /// Null when no pin is currently selected.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField]
     public PinAddress? SelectedPin;
 }

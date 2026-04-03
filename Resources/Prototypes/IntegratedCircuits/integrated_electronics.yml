@@ -1,0 +1,413 @@
+# Base entity for all integrated circuits (microchips).
+- type: entity
+  id: BaseIntegratedCircuit
+  abstract: true
+  name: integrated circuit
+  description: A tiny modular chip that performs a specific function inside an electronic assembly.
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_components.rsi
+    state: template
+  - type: Item
+    size: Tiny
+  - type: IntegratedCircuit
+    complexity: 1
+    size: 1
+    cooldownPerUse: 0.1
+    inputPins: []
+    outputPins: []
+    activatorPins: []
+
+# Base entity for all electronic assemblies (cases).
+- type: entity
+  id: BaseElectronicAssembly
+  abstract: true
+  name: electronic assembly
+  description: A case for assembling modular electronics.
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_setups.rsi
+    state: setup_small
+  - type: Item
+    size: Small
+  - type: ElectronicAssembly
+    maxComponents: 25
+    maxComplexity: 75
+    opened: true
+  - type: UserInterface
+    interfaces:
+      enum.ElectronicAssemblyUiKey.Key:
+        type: ElectronicAssemblyBoundUI
+  - type: ActivatableUI
+    key: enum.ElectronicAssemblyUiKey.Key
+  - type: ItemSlots
+    slots:
+      battery_slot:
+        name: Power Cell
+        whitelist:
+          components:
+          - Battery
+        insertSound: /Audio/Weapons/Guns/MagIn/batrifle_magin.ogg
+        ejectSound: /Audio/Weapons/Guns/MagOut/batrifle_magout.ogg
+  - type: PowerCellSlot
+    cellSlotId: battery_slot
+
+# Small assembly (25 size, 75 complexity)
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblySmall
+  name: electronic assembly
+  description: A case used for assembling small electronics.
+  components:
+  - type: Sprite
+    state: setup_small
+  - type: Item
+    size: Small
+  - type: ElectronicAssembly
+    maxComponents: 25
+    maxComplexity: 75
+
+# Small assembly - calculator style
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblySmallCalc
+  name: type-b electronic assembly
+  description: A case used for assembling small electronics. This one resembles a pocket calculator.
+  components:
+  - type: Sprite
+    state: setup_small_calc
+  - type: ElectronicAssembly
+    maxComponents: 25
+    maxComplexity: 75
+
+# Small assembly - clamshell style
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblySmallClam
+  name: type-c electronic assembly
+  description: A case used for assembling small electronics. This one has a clamshell design.
+  components:
+  - type: Sprite
+    state: setup_small_clam
+  - type: ElectronicAssembly
+    maxComponents: 25
+    maxComplexity: 75
+
+# Small assembly - simple style
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblySmallSimple
+  name: type-d electronic assembly
+  description: A case used for assembling small electronics. This one has a simple design.
+  components:
+  - type: Sprite
+    state: setup_small_simple
+  - type: ElectronicAssembly
+    maxComponents: 25
+    maxComplexity: 75
+
+# Small assembly - hook/belt clip style
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblySmallHook
+  name: type-e electronic assembly
+  description: A case used for assembling small electronics. This one looks like it has a belt clip.
+  components:
+  - type: Sprite
+    state: setup_small_hook
+  - type: ElectronicAssembly
+    maxComponents: 25
+    maxComplexity: 75
+
+# Small assembly - PDA style
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblySmallPda
+  name: type-f electronic assembly
+  description: A case used for assembling small electronics. This one resembles a PDA.
+  components:
+  - type: Sprite
+    state: setup_small_pda
+  - type: ElectronicAssembly
+    maxComponents: 25
+    maxComplexity: 75
+
+# Medium assembly (50 size, 150 complexity)
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblyMedium
+  name: electronic mechanism
+  description: A case used for assembling medium-sized electronics.
+  components:
+  - type: Sprite
+    state: setup_medium
+  - type: Item
+    size: Normal
+  - type: ElectronicAssembly
+    maxComponents: 50
+    maxComplexity: 150
+
+# Medium assembly - boxy style
+- type: entity
+  parent: ElectronicAssemblyMedium
+  id: ElectronicAssemblyMediumBox
+  name: type-b electronic mechanism
+  description: A case used for assembling electronics. This one has a boxy design.
+  components:
+  - type: Sprite
+    state: setup_medium_box
+
+# Medium assembly - clamshell style
+- type: entity
+  parent: ElectronicAssemblyMedium
+  id: ElectronicAssemblyMediumClam
+  name: type-c electronic mechanism
+  description: A case used for assembling electronics. This one has a clamshell design.
+  components:
+  - type: Sprite
+    state: setup_medium_clam
+
+# Medium assembly - medical style
+- type: entity
+  parent: ElectronicAssemblyMedium
+  id: ElectronicAssemblyMediumMed
+  name: type-d electronic mechanism
+  description: A case used for assembling electronics. This one resembles some type of medical apparatus.
+  components:
+  - type: Sprite
+    state: setup_medium_med
+
+# Medium assembly - gun style
+- type: entity
+  parent: ElectronicAssemblyMedium
+  id: ElectronicAssemblyMediumGun
+  name: type-e electronic mechanism
+  description: A case used for assembling electronics. This one resembles a gun, or some type of tool.
+  components:
+  - type: Sprite
+    state: setup_medium_gun
+  - type: ElectronicAssembly
+    allowedActionFlags: 7  # Combat | LongRange | Movement
+
+# Medium assembly - radio style
+- type: entity
+  parent: ElectronicAssemblyMedium
+  id: ElectronicAssemblyMediumRadio
+  name: type-f electronic mechanism
+  description: A case used for assembling electronics. This one resembles an old radio.
+  components:
+  - type: Sprite
+    state: setup_medium_radio
+
+# Large assembly (100 size, 300 complexity)
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblyLarge
+  name: electronic machine
+  description: A case used for assembling large electronics.
+  components:
+  - type: Sprite
+    state: setup_large
+  - type: Item
+    size: Large
+  - type: ElectronicAssembly
+    maxComponents: 100
+    maxComplexity: 300
+
+# Large assembly - scope style
+- type: entity
+  parent: ElectronicAssemblyLarge
+  id: ElectronicAssemblyLargeScope
+  name: type-b electronic machine
+  description: A case used for assembling large electronics. This one resembles an oscilloscope.
+  components:
+  - type: Sprite
+    state: setup_large_scope
+
+# Large assembly - terminal style
+- type: entity
+  parent: ElectronicAssemblyLarge
+  id: ElectronicAssemblyLargeTerminal
+  name: type-c electronic machine
+  description: A case used for assembling large electronics. This one resembles a computer terminal.
+  components:
+  - type: Sprite
+    state: setup_large_terminal
+
+# Large assembly - robotic arm style
+- type: entity
+  parent: ElectronicAssemblyLarge
+  id: ElectronicAssemblyLargeArm
+  name: type-d electronic machine
+  description: A case used for assembling large electronics. This one resembles a robotic arm.
+  components:
+  - type: Sprite
+    state: setup_large_arm
+
+# Large assembly - tall style
+- type: entity
+  parent: ElectronicAssemblyLarge
+  id: ElectronicAssemblyLargeTall
+  name: type-e electronic machine
+  description: A case used for assembling large electronics. This one has a tall design.
+  components:
+  - type: Sprite
+    state: setup_large_tall
+
+# Large assembly - industrial style
+- type: entity
+  parent: ElectronicAssemblyLarge
+  id: ElectronicAssemblyLargeIndustrial
+  name: type-f electronic machine
+  description: A case used for assembling large electronics. This one resembles some kind of industrial machinery.
+  components:
+  - type: Sprite
+    state: setup_large_industrial
+
+# Drone assembly (75 size, 225 complexity) - mobile
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblyDrone
+  name: electronic drone
+  description: A case used for assembling mobile electronics.
+  components:
+  - type: Sprite
+    state: setup_drone
+  - type: Item
+    size: Large
+  - type: ElectronicAssembly
+    maxComponents: 75
+    maxComplexity: 225
+    allowedActionFlags: 7  # Combat | LongRange | Movement
+
+# Drone - arms style
+- type: entity
+  parent: ElectronicAssemblyDrone
+  id: ElectronicAssemblyDroneArms
+  name: type-b electronic drone
+  description: A case used for assembling mobile electronics. This one is armed and dangerous.
+  components:
+  - type: Sprite
+    state: setup_drone_arms
+
+# Drone - secbot style
+- type: entity
+  parent: ElectronicAssemblyDrone
+  id: ElectronicAssemblyDroneSecbot
+  name: type-c electronic drone
+  description: A case used for assembling mobile electronics. This one resembles a Securitron.
+  components:
+  - type: Sprite
+    state: setup_drone_secbot
+
+# Drone - medbot style
+- type: entity
+  parent: ElectronicAssemblyDrone
+  id: ElectronicAssemblyDroneMedbot
+  name: type-d electronic drone
+  description: A case used for assembling mobile electronics. This one resembles a Medibot.
+  components:
+  - type: Sprite
+    state: setup_drone_medbot
+
+# Drone - generic bot style
+- type: entity
+  parent: ElectronicAssemblyDrone
+  id: ElectronicAssemblyDroneGenbot
+  name: type-e electronic drone
+  description: A case used for assembling mobile electronics. This one has a generic bot design.
+  components:
+  - type: Sprite
+    state: setup_drone_genbot
+
+# Drone - android style (huge)
+- type: entity
+  parent: ElectronicAssemblyDrone
+  id: ElectronicAssemblyDroneAndroid
+  name: type-f electronic drone
+  description: A huge, bipedal case used for assembling hominid-esque mobile electronics.
+  components:
+  - type: Sprite
+    state: setup_drone_android
+  - type: ElectronicAssembly
+    maxComponents: 125
+    maxComplexity: 375
+
+# Wall-mounted assembly (medium size)
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblyWallmount
+  name: wall-mounted electronic assembly
+  description: A case used for assembling electronics. It has a magnetized backing to stick to walls.
+  components:
+  - type: Sprite
+    state: setup_wallmount_medium
+  - type: Item
+    size: Normal
+  - type: ElectronicAssembly
+    maxComponents: 50
+    maxComplexity: 150
+
+# Wall-mounted assembly - heavy (large size)
+- type: entity
+  parent: ElectronicAssemblyWallmount
+  id: ElectronicAssemblyWallmountHeavy
+  name: heavy wall-mounted electronic assembly
+  description: A large case for assembling electronics. It has a magnetized backing to stick to walls.
+  components:
+  - type: Sprite
+    state: setup_wallmount_large
+  - type: Item
+    size: Large
+  - type: ElectronicAssembly
+    maxComponents: 100
+    maxComplexity: 300
+
+# ── Tools ──
+
+# Circuit Wirer
+- type: entity
+  id: CircuitWirer
+  name: circuit wirer
+  description: A small wiring tool with a wire roll, soldering iron, wire cutter, and more in one package.
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_tools.rsi
+    state: wirer-wire
+  - type: Item
+    size: Small
+  - type: CircuitWirer
+
+# Circuit Debugger
+- type: entity
+  id: CircuitDebugger
+  name: circuit debugger
+  description: This small tool allows directly setting data to a specific pin, useful for debugging.
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_tools.rsi
+    state: debugger
+  - type: Item
+    size: Small
+  - type: CircuitDebugger
+
+# ── Circuit Printer ──
+
+- type: entity
+  id: IntegratedCircuitPrinter
+  name: integrated circuit printer
+  description: A portable machine made to print tiny modular circuitry out of metal.
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_tools.rsi
+    state: circuit_printer
+  - type: Item
+    size: Large
+  - type: CircuitPrinter
+    materialMax: 2500
+  - type: UserInterface
+    interfaces:
+      enum.CircuitPrinterUiKey.Key:
+        type: CircuitPrinterBoundUI
+  - type: ActivatableUI
+    key: enum.CircuitPrinterUiKey.Key

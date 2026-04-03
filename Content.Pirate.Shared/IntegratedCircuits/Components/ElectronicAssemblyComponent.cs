@@ -37,7 +37,7 @@ public sealed partial class ElectronicAssemblyComponent : Component
     /// <summary>
     /// Ordered list of circuit entity UIDs installed in this assembly.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField]
     public List<EntityUid> CircuitEntities = new();
 
     /// <summary>

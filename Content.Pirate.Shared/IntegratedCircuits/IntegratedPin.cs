@@ -8,7 +8,7 @@ namespace Content.Pirate.Shared.IntegratedCircuits;
 /// Pins hold data and can be connected to pins on other circuits via wires.
 /// Data pins transfer values; activator pins send execution pulses.
 /// </summary>
-[DataDefinition, Serializable, NetSerializable]
+[DataDefinition]
 public sealed partial class IntegratedPin
 {
     /// <summary>

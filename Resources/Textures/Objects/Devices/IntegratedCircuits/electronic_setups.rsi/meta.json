@@ -262,60 +262,13 @@
     },
     {
       "name": "setup_drone",
-      "directions": 4,
-      "delays": [
-        [
-          0.1,
-          1,
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          1,
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          1,
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          1,
-          0.1,
-          0.1
-        ]
-      ]
+      "_TODO_ORIGINAL_DIRECTIONS": "Was 4 dirs with delays [[0.1,1,0.1,0.1]x4] + duplicate entry with [[0.1,0.1]x4]. Need to fix PNG sprite sheet to restore 4-dir animation."
     },
     {
       "name": "setup_drone-color",
       "directions": 4
     },
-    {
-      "name": "setup_drone",
-      "directions": 4,
-      "delays": [
-        [
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          0.1
-        ],
-        [
-          0.1,
-          0.1
-        ]
-      ]
-    },
+
     {
       "name": "setup_drone-open",
       "directions": 4

@@ -1,0 +1,75 @@
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+               Resizable="True"
+               Title="Integrated Circuit Printer">
+    <BoxContainer Orientation="Vertical"
+                  MinSize="800 630"
+                  Margin="5">
+
+        <!-- Title -->
+        <Label Text="Integrated Circuit Printer"
+               StyleClasses="LabelHeading"
+               HorizontalAlignment="Center"
+               Margin="0 0 0 5" />
+
+        <!-- Materials info -->
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 3 0 3">
+            <Label Text="Materials: " />
+            <Label Name="MaterialsLabel"
+                   Text="0/2500 Steel" />
+        </BoxContainer>
+
+        <!-- Upgrade status -->
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 0 0 3">
+            <Label Text="Circuits available: " />
+            <Label Name="UpgradeLabel"
+                   Text="Regular" />
+        </BoxContainer>
+
+        <!-- Separator -->
+        <PanelContainer SetHeight="2"
+                        Margin="0 5 0 5">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#404046" />
+            </PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Category tabs -->
+        <Label Text="Categories:"
+               Margin="0 0 0 3" />
+        <ScrollContainer HScrollEnabled="True"
+                         VScrollEnabled="False"
+                         SetHeight="35"
+                         Margin="0 0 0 3">
+            <BoxContainer Name="CategoriesContainer"
+                          Orientation="Horizontal" />
+        </ScrollContainer>
+
+        <!-- Separator -->
+        <PanelContainer SetHeight="2"
+                        Margin="0 3 0 3">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#404046" />
+            </PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Current category header -->
+        <Label Name="CategoryHeader"
+               Text=""
+               StyleClasses="LabelSubText"
+               HorizontalAlignment="Center"
+               Margin="0 0 0 5" />
+
+        <!-- Recipe list -->
+        <ScrollContainer VerticalExpand="True"
+                         HScrollEnabled="False"
+                         Margin="0 0 0 5">
+            <BoxContainer Name="RecipesList"
+                          Orientation="Vertical" />
+        </ScrollContainer>
+
+    </BoxContainer>
+</DefaultWindow>

@@ -6,7 +6,6 @@ namespace Content.Pirate.Shared.IntegratedCircuits.Events;
 /// Raised on a circuit entity when one of its activator pins receives a pulse.
 /// Systems implementing specific circuit behavior should subscribe to this event.
 /// </summary>
-[Serializable, NetSerializable]
 public sealed class CircuitActivatedEvent : EntityEventArgs
 {
     /// <summary>

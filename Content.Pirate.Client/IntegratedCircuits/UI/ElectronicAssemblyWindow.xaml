@@ -1,0 +1,81 @@
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+               Resizable="True"
+               Title="Electronic Assembly">
+    <BoxContainer Orientation="Vertical"
+                  MinSize="655 350"
+                  Margin="5">
+
+        <!-- Header: Name + Rename -->
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 0 0 5">
+            <Label Name="AssemblyNameLabel"
+                   Text="Electronic Assembly"
+                   StyleClasses="LabelHeading"
+                   HorizontalExpand="True" />
+            <LineEdit Name="AssemblyNameEdit"
+                      Visible="False"
+                      HorizontalExpand="True" />
+            <Button Name="RenameButton"
+                    Text="[Rename]"
+                    MinSize="80 0" />
+        </BoxContainer>
+
+        <!-- Separator -->
+        <PanelContainer SetHeight="2"
+                        Margin="0 2 0 2">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#404046" />
+            </PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Size / Complexity info -->
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 3 0 0">
+            <Label Name="SizeLabel"
+                   Text="0/25 space taken up in the assembly." />
+        </BoxContainer>
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 2 0 0">
+            <Label Name="ComplexityLabel"
+                   Text="0/75 complexity in the assembly." />
+        </BoxContainer>
+
+        <!-- Battery info -->
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 2 0 5">
+            <Label Name="BatteryLabel"
+                   Text="No power cell detected!"
+                   StyleClasses="LabelDanger" />
+            <Button Name="RemoveBatteryButton"
+                    Text="[Remove]"
+                    MinSize="70 0"
+                    Visible="False"
+                    Margin="10 0 0 0" />
+        </BoxContainer>
+
+        <!-- Separator -->
+        <PanelContainer SetHeight="2"
+                        Margin="0 2 0 2">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#404046" />
+            </PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Components header -->
+        <Label Name="ComponentsHeader"
+               Text="Components:"
+               Margin="0 3 0 3"
+               Visible="False" />
+
+        <!-- Scrollable component list -->
+        <ScrollContainer VerticalExpand="True"
+                         HScrollEnabled="False"
+                         Margin="0 0 0 5">
+            <BoxContainer Name="ComponentsList"
+                          Orientation="Vertical" />
+        </ScrollContainer>
+
+    </BoxContainer>
+</DefaultWindow>
