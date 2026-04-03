@@ -1,9 +1,10 @@
 using System.Linq;
-using Content.Goobstation.Shared.IntegratedCircuits.Components;
-using Content.Goobstation.Shared.IntegratedCircuits.Events;
+using Content.Pirate.Shared.IntegratedCircuits.Components;
+using Content.Pirate.Shared.IntegratedCircuits.Events;
 using Robust.Shared.Timing;
+using Robust.Shared.GameObjects;
 
-namespace Content.Goobstation.Shared.IntegratedCircuits.Systems;
+namespace Content.Pirate.Shared.IntegratedCircuits.Systems;
 
 /// <summary>
 /// Core system for managing integrated circuit pins, wiring, data flow, and activation.
@@ -12,6 +13,7 @@ namespace Content.Goobstation.Shared.IntegratedCircuits.Systems;
 public abstract class SharedIntegratedCircuitSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     /// <summary>
     /// Maximum number of elements a list pin can hold.
@@ -194,6 +196,11 @@ public abstract class SharedIntegratedCircuitSystem : EntitySystem
         if (fromIsActivator != toIsActivator)
             return false;
 
+        // Prevent connecting same-type data pins (Input↔Input, Output↔Output).
+        // Only Input↔Output and Activator↔Activator are valid.
+        if (!fromIsActivator && fromPin.PinType == toPin.PinType)
+            return false;
+
         // Check if they must be in the same assembly.
         if (fromComp.AssemblyUid != toComp.AssemblyUid)
             return false;
@@ -322,9 +329,11 @@ public abstract class SharedIntegratedCircuitSystem : EntitySystem
 
     /// <summary>
     /// Activates a circuit through one of its activator pins.
-    /// Checks cooldown, then raises <see cref="CircuitActivatedEvent"/>.
+    /// Checks cooldown and assembly loop-protection limits,
+    /// then raises <see cref="CircuitActivatedEvent"/>.
+    /// Virtual so that the server system can add power checks.
     /// </summary>
-    public bool ActivateCircuit(EntityUid uid, int activatorIndex,
+    public virtual bool ActivateCircuit(EntityUid uid, int activatorIndex,
         IntegratedCircuitComponent? comp = null)
     {
         if (!Resolve(uid, ref comp, false))
@@ -338,12 +347,81 @@ public abstract class SharedIntegratedCircuitSystem : EntitySystem
         if (curTime - comp.LastActivation < TimeSpan.FromSeconds(comp.CooldownPerUse))
             return false;
 
+        // Check assembly-level loop protection with lazy per-tick reset.
+        // Instead of resetting counters every frame in Update() (expensive with many assemblies),
+        // we reset on first activation each tick — zero cost when idle.
+        if (comp.AssemblyUid is { } assemblyUid &&
+            TryComp<ElectronicAssemblyComponent>(assemblyUid, out var assemblyComp))
+        {
+            if (assemblyComp.LastActivationTick != curTime)
+            {
+                assemblyComp.LastActivationTick = curTime;
+                assemblyComp.CurrentTickActivations = 0;
+            }
+
+            if (assemblyComp.CurrentTickActivations >= assemblyComp.MaxActivationsPerTick)
+                return false; // Short-circuit: too many activations this tick.
+
+            assemblyComp.CurrentTickActivations++;
+        }
+
         comp.LastActivation = curTime;
 
         var ev = new CircuitActivatedEvent(activatorIndex);
         RaiseLocalEvent(uid, ev);
 
         return true;
+    }
+
+    #endregion
+
+    #region Target Resolution
+
+    /// <summary>
+    /// Returns the entity that represents the circuit's physical presence in the world.
+    /// If the circuit is inside an assembly, returns the assembly.
+    /// If the circuit is lying on its own, returns itself.
+    /// </summary>
+    public EntityUid GetActingEntity(EntityUid circuitUid, IntegratedCircuitComponent? comp = null)
+    {
+        if (Resolve(circuitUid, ref comp, false) && comp.AssemblyUid is { } assemblyUid)
+            return assemblyUid;
+
+        return circuitUid;
+    }
+
+    /// <summary>
+    /// Checks whether a circuit (via its assembly or itself) can physically interact with a target entity.
+    /// Uses transform system for range checking.
+    /// </summary>
+    /// <param name="circuitUid">The circuit entity.</param>
+    /// <param name="target">The target to interact with.</param>
+    /// <param name="range">Maximum interaction range in tiles. Default ~1.5 for adjacent.</param>
+    /// <param name="comp">Optional resolved component.</param>
+    /// <returns>True if the target is within range.</returns>
+    public bool CanInteractWith(EntityUid circuitUid, EntityUid target, float range = 1.5f,
+        IntegratedCircuitComponent? comp = null)
+    {
+        var actingEntity = GetActingEntity(circuitUid, comp);
+
+        // Can't interact with ourselves.
+        if (actingEntity == target)
+            return false;
+
+        // Both must exist in the world.
+        if (!TryComp<TransformComponent>(actingEntity, out var actingXform) ||
+            !TryComp<TransformComponent>(target, out var targetXform))
+            return false;
+
+        // Must be on the same map.
+        if (actingXform.MapID != targetXform.MapID)
+            return false;
+
+        var actingPos = _transform.GetWorldPosition(actingXform);
+        var targetPos = _transform.GetWorldPosition(targetXform);
+        var distSq = (actingPos - targetPos).LengthSquared();
+
+        return distSq <= range * range;
     }
 
     #endregion

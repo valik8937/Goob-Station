@@ -1,7 +1,8 @@
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
+using Content.Pirate.Shared.IntegratedCircuits;
 
-namespace Content.Goobstation.Shared.IntegratedCircuits.Components;
+namespace Content.Pirate.Shared.IntegratedCircuits.Components;
 
 /// <summary>
 /// Marks an entity as an electronic assembly — a physical case that holds
@@ -44,4 +45,33 @@ public sealed partial class ElectronicAssemblyComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public Color DetailColor = Color.Black;
+
+    /// <summary>
+    /// Which circuit action types this assembly case supports.
+    /// Circuits requiring unsupported flags cannot be inserted.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public CircuitActionFlags AllowedActionFlags = CircuitActionFlags.Combat | CircuitActionFlags.LongRange;
+
+    /// <summary>
+    /// Number of circuit activations that have occurred this tick.
+    /// Lazily reset when the tick changes (checked in ActivateCircuit).
+    /// Used to prevent infinite loops from freezing the server.
+    /// </summary>
+    [ViewVariables]
+    public int CurrentTickActivations;
+
+    /// <summary>
+    /// The game time of the last tick when activations were counted.
+    /// When curTime differs from this, CurrentTickActivations is reset to 0.
+    /// This avoids needing an Update() loop just to reset counters.
+    /// </summary>
+    [ViewVariables]
+    public TimeSpan LastActivationTick = TimeSpan.Zero;
+
+    /// <summary>
+    /// Maximum number of circuit activations allowed per tick before the assembly "short-circuits".
+    /// </summary>
+    [DataField]
+    public int MaxActivationsPerTick = 100;
 }

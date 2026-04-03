@@ -1,7 +1,7 @@
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
 
-namespace Content.Goobstation.Shared.IntegratedCircuits;
+namespace Content.Pirate.Shared.IntegratedCircuits;
 
 /// <summary>
 /// Uniquely identifies a pin within an electronic assembly.

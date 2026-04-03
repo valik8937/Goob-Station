@@ -1,7 +1,7 @@
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
 
-namespace Content.Goobstation.Shared.IntegratedCircuits;
+namespace Content.Pirate.Shared.IntegratedCircuits;
 
 /// <summary>
 /// Represents a single I/O pin on an integrated circuit.

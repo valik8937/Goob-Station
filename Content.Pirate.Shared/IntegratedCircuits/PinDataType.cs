@@ -1,6 +1,6 @@
 using Robust.Shared.Serialization;
 
-namespace Content.Goobstation.Shared.IntegratedCircuits;
+namespace Content.Pirate.Shared.IntegratedCircuits;
 
 /// <summary>
 /// Constrains what kind of data a pin can hold.

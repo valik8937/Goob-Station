@@ -1,6 +1,6 @@
 using Robust.Shared.Serialization;
 
-namespace Content.Goobstation.Shared.IntegratedCircuits;
+namespace Content.Pirate.Shared.IntegratedCircuits;
 
 /// <summary>
 /// The role of a pin on an integrated circuit.

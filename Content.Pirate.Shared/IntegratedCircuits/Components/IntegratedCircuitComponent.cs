@@ -1,7 +1,8 @@
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
+using Content.Pirate.Shared.IntegratedCircuits;
 
-namespace Content.Goobstation.Shared.IntegratedCircuits.Components;
+namespace Content.Pirate.Shared.IntegratedCircuits.Components;
 
 /// <summary>
 /// Marks an entity as an integrated circuit (microchip).
@@ -76,6 +77,13 @@ public sealed partial class IntegratedCircuitComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public bool Removable = true;
+
+    /// <summary>
+    /// Flags describing what actions this circuit performs.
+    /// The assembly must support all of these flags for the circuit to be inserted.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public CircuitActionFlags ActionFlags = CircuitActionFlags.None;
 
     /// <summary>
     /// Custom display name set by the player (via rename).

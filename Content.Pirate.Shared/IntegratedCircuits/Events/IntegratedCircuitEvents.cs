@@ -1,6 +1,6 @@
 using Robust.Shared.Serialization;
 
-namespace Content.Goobstation.Shared.IntegratedCircuits.Events;
+namespace Content.Pirate.Shared.IntegratedCircuits.Events;
 
 /// <summary>
 /// Raised on a circuit entity when one of its activator pins receives a pulse.

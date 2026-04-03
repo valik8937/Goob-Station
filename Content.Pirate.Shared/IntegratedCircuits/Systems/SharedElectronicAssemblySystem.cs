@@ -1,11 +1,11 @@
-using Content.Goobstation.Shared.IntegratedCircuits.Components;
-using Content.Goobstation.Shared.IntegratedCircuits.Events;
+using Content.Pirate.Shared.IntegratedCircuits.Components;
+using Content.Pirate.Shared.IntegratedCircuits.Events;
 
-namespace Content.Goobstation.Shared.IntegratedCircuits.Systems;
+namespace Content.Pirate.Shared.IntegratedCircuits.Systems;
 
 /// <summary>
 /// System for managing electronic assemblies — adding/removing circuits,
-/// checking capacity limits, and handling lifecycle events.
+/// checking capacity limits, action flags, and handling lifecycle events.
 /// </summary>
 public abstract class SharedElectronicAssemblySystem : EntitySystem
 {
@@ -75,7 +75,8 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
 
     /// <summary>
     /// Attempts to add a circuit entity to an assembly.
-    /// Checks that the panel is open and capacity limits are not exceeded.
+    /// Checks that the panel is open, capacity limits are not exceeded,
+    /// and that the assembly supports the circuit's action flags.
     /// Returns true on success.
     /// </summary>
     public bool TryAddCircuit(EntityUid assemblyUid, EntityUid circuitUid,
@@ -91,6 +92,10 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
 
         // Already in an assembly?
         if (circuitComp.AssemblyUid != null)
+            return false;
+
+        // Check action flag compatibility — assembly must support all flags the circuit requires.
+        if ((circuitComp.ActionFlags & ~assemblyComp.AllowedActionFlags) != CircuitActionFlags.None)
             return false;
 
         // Check size limits.
