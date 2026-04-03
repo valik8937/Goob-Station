@@ -14,16 +14,22 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
 {
     [Dependency] private readonly BatterySystem _battery = default!;
 
+    private float _accumulatedFrameTime = 0f;
+    private const float UpdateInterval = 1.0f; // Оновлюємо енергію РАЗ В СЕКУНДУ, а не 30 разів
+
     public override void Update(float frameTime)
     {
-        base.Update(frameTime);
+        _accumulatedFrameTime += frameTime;
+        if (_accumulatedFrameTime < UpdateInterval)
+            return;
 
-        // Drain idle power from each assembly's battery.
         var query = EntityQueryEnumerator<ElectronicAssemblyComponent>();
         while (query.MoveNext(out var uid, out var assembly))
         {
-            DrainIdlePower(uid, assembly, frameTime);
+            // Передаємо накопичений час (1 сек), а не мікро-фреймтайм
+            DrainIdlePower(uid, assembly, _accumulatedFrameTime);
         }
+        _accumulatedFrameTime = 0f;
     }
 
     /// <summary>

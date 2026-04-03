@@ -1,45 +1,69 @@
 # Base entity for all integrated circuits (microchips).
+# Base entity for all integrated circuits (microchips).
 - type: entity
   id: BaseIntegratedCircuit
   abstract: true
   name: integrated circuit
-  description: A tiny modular chip that performs a specific function inside an electronic assembly.
+  description: A tiny modular chip that performs a specific function.
   components:
   - type: Sprite
     sprite: Objects/Devices/IntegratedCircuits/electronic_components.rsi
     state: template
   - type: Item
     size: Tiny
-  - type: IntegratedCircuit
+  - type: IntegratedCircuit # Твій кастомний компонент
     complexity: 1
     size: 1
-    cooldownPerUse: 0.1
-    inputPins: []
-    outputPins: []
-    activatorPins: []
+  # --- ФІЗИКА ТА КЛІКИ ---
+  - type: Clickable          # Дозволяє клікати
+  - type: InteractionOutline # Малює контур при наведенні
+  - type: Physics            # Вмикає фізичний рух
+    bodyType: Dynamic
+  - type: Fixtures           # Створює хітбокс (фізичне тіло)
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.15,-0.15,0.15,0.15" # Маленький хітбокс для мікрочіпа
+        mask:
+        - ItemMask
+        layer:
+        - ItemLayer
 
 # Base entity for all electronic assemblies (cases).
 - type: entity
   id: BaseElectronicAssembly
   abstract: true
   name: electronic assembly
-  description: A case for assembling modular electronics.
   components:
   - type: Sprite
     sprite: Objects/Devices/IntegratedCircuits/electronic_setups.rsi
     state: setup_small
   - type: Item
     size: Small
-  - type: ElectronicAssembly
-    maxComponents: 25
-    maxComplexity: 75
-    opened: true
+  - type: ElectronicAssembly # Твій кастомний компонент
   - type: UserInterface
     interfaces:
       enum.ElectronicAssemblyUiKey.Key:
         type: ElectronicAssemblyBoundUI
   - type: ActivatableUI
     key: enum.ElectronicAssemblyUiKey.Key
+  # --- ФІЗИКА ТА КЛІКИ ---
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.25,0.25,0.25" # Трохи більший хітбокс для коробки
+        mask:
+        - ItemMask
+        layer:
+        - ItemLayer
+  # --- СЛОТИ ТА ІНШЕ ---
   - type: ItemSlots
     slots:
       battery_slot:
@@ -47,8 +71,6 @@
         whitelist:
           components:
           - Battery
-        insertSound: /Audio/Weapons/Guns/MagIn/batrifle_magin.ogg
-        ejectSound: /Audio/Weapons/Guns/MagOut/batrifle_magout.ogg
   - type: PowerCellSlot
     cellSlotId: battery_slot
 
