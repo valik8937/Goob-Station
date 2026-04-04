@@ -1,4 +1,5 @@
 using Robust.Shared.Serialization;
+using Content.Shared.DoAfter;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.Events;
 
@@ -67,3 +68,15 @@ public sealed class PinDataChangedEvent : EntityEventArgs
         NewData = newData;
     }
 }
+
+/// <summary>
+/// Івент завершення роботи викруткою.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed partial class AssemblyTogglePanelEvent : SimpleDoAfterEvent { }
+
+/// <summary>
+/// Івент завершення роботи зваркою.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed partial class AssemblyToggleWeldEvent : SimpleDoAfterEvent { }

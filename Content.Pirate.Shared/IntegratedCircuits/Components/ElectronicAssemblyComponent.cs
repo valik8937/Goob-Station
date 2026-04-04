@@ -35,6 +35,12 @@ public sealed partial class ElectronicAssemblyComponent : Component
     public bool Opened = true;
 
     /// <summary>
+    /// Чи заварений корпус зваркою. Якщо так, викрутка не працюватиме.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool Welded = false;
+
+    /// <summary>
     /// Ordered list of circuit entity UIDs installed in this assembly.
     /// </summary>
     [DataField]

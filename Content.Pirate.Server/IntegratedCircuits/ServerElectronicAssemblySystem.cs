@@ -2,6 +2,10 @@ using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
+using Content.Shared.Tools.Systems;
+using Content.Shared.Popups;
+using Content.Shared.Interaction;
+using Content.Pirate.Shared.IntegratedCircuits.Events;
 
 namespace Content.Pirate.Server.IntegratedCircuits;
 
@@ -13,6 +17,9 @@ namespace Content.Pirate.Server.IntegratedCircuits;
 public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySystem
 {
     [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly SharedToolSystem _tool = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ElectronicAssemblyUISystem _ui = default!;
 
     private float _accumulatedFrameTime = 0f;
     private const float UpdateInterval = 1.0f; // Оновлюємо енергію РАЗ В СЕКУНДУ, а не 30 разів
@@ -30,6 +37,18 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
             DrainIdlePower(uid, assembly, _accumulatedFrameTime);
         }
         _accumulatedFrameTime = 0f;
+    }
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        // Підписуємося на клік предметом по корпусу
+        SubscribeLocalEvent<ElectronicAssemblyComponent, InteractUsingEvent>(OnInteractUsing);
+        
+        // Підписуємося на завершення смужки прогресу (DoAfter)
+        SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyTogglePanelEvent>(OnTogglePanel);
+        SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyToggleWeldEvent>(OnToggleWeld);
     }
 
     /// <summary>
@@ -94,4 +113,80 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
 
         return battery.CurrentCharge >= amount;
     }
+
+
+private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, InteractUsingEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        // 1. ПЕРЕВІРЯЄМО ЗВАРКУ
+        if (_tool.HasQuality(args.Used, "Welding"))
+        {
+            // Логічно, що заварити можна тільки закритий корпус
+            if (comp.Opened)
+            {
+                _popup.PopupEntity("Спочатку закрийте панель викруткою, щоб заварити корпус!", uid, args.User);
+                return;
+            }
+
+            // Запускаємо процес заварювання (триває 2 секунди)
+            _tool.UseTool(args.Used, args.User, uid, 2f, "Welding", new AssemblyToggleWeldEvent());
+            args.Handled = true;
+            return;
+        }
+
+        // 2. ПЕРЕВІРЯЄМО ВИКРУТКУ
+        if (_tool.HasQuality(args.Used, "Screwing"))
+        {
+            // Якщо заварено - викрутка безсила
+            if (comp.Welded)
+            {
+                _popup.PopupEntity("Корпус міцно заварений! Відкрутити гвинти неможливо.", uid, args.User);
+                return;
+            }
+
+            // Запускаємо процес відкручування (триває 1 секунду)
+            _tool.UseTool(args.Used, args.User, uid, 1f, "Screwing", new AssemblyTogglePanelEvent());
+            args.Handled = true;
+            return;
+        }
+    }
+
+    /// <summary>
+    /// Спрацьовує, коли смужка прогресу викрутки дійшла до кінця
+    /// </summary>
+    private void OnTogglePanel(EntityUid uid, ElectronicAssemblyComponent comp, AssemblyTogglePanelEvent args)
+    {
+        if (args.Cancelled || args.Handled)
+            return;
+
+        comp.Opened = !comp.Opened; // Міняємо стан на протилежний
+        
+        var text = comp.Opened ? "відкрутили гвинти і відкрили" : "закрили і закрутили гвинти";
+        _popup.PopupEntity($"Ви {text} технічну панель.", uid, args.User);
+
+        // Оновлюємо UI, щоб у гравців, які дивляться в інтерфейс, оновився стан
+        _ui.UpdateUI(uid, comp);
+        args.Handled = true;
+    }
+
+    /// <summary>
+    /// Спрацьовує, коли смужка прогресу зварки дійшла до кінця
+    /// </summary>
+    private void OnToggleWeld(EntityUid uid, ElectronicAssemblyComponent comp, AssemblyToggleWeldEvent args)
+    {
+        if (args.Cancelled || args.Handled)
+            return;
+
+        comp.Welded = !comp.Welded; // Міняємо стан на протилежний
+
+        var text = comp.Welded ? "наглухо заварили" : "розварили";
+        _popup.PopupEntity($"Ви {text} корпус мікросхеми.", uid, args.User);
+
+        args.Handled = true;
+    }
+
+
+
 }
