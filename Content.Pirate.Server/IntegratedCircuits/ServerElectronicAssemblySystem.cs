@@ -6,6 +6,7 @@ using Content.Shared.Tools.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Interaction;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
+using Content.Pirate.Shared.IntegratedCircuits;
 
 namespace Content.Pirate.Server.IntegratedCircuits;
 
@@ -20,6 +21,7 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
     [Dependency] private readonly SharedToolSystem _tool = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly ElectronicAssemblyUISystem _ui = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
 
     private float _accumulatedFrameTime = 0f;
     private const float UpdateInterval = 1.0f; // Оновлюємо енергію РАЗ В СЕКУНДУ, а не 30 разів
@@ -49,6 +51,18 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
         // Підписуємося на завершення смужки прогресу (DoAfter)
         SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyTogglePanelEvent>(OnTogglePanel);
         SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyToggleWeldEvent>(OnToggleWeld);
+        
+        // Підписуємося на спробу відкрити UI (забороняємо, якщо закрито)
+        SubscribeLocalEvent<ElectronicAssemblyComponent, Content.Shared.UserInterface.ActivatableUIOpenAttemptEvent>(OnUIOpenAttempt);
+
+        // Підписуємося на ініціалізацію для встановлення початкових візуалів
+        SubscribeLocalEvent<ElectronicAssemblyComponent, MapInitEvent>(OnMapInit);
+    }
+
+    private void OnMapInit(EntityUid uid, ElectronicAssemblyComponent comp, MapInitEvent args)
+    {
+        _appearance.SetData(uid, AssemblyVisuals.Opened, comp.Opened);
+        _appearance.SetData(uid, AssemblyVisuals.Color, comp.DetailColor);
     }
 
     /// <summary>
@@ -151,6 +165,22 @@ private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, In
             args.Handled = true;
             return;
         }
+
+        // 3. ПЕРЕВІРЯЄМО, ЧИ ЦЕ МІКРОСХЕМА
+        if (TryComp<IntegratedCircuitComponent>(args.Used, out var circuitComp))
+        {
+            if (TryAddCircuit(uid, args.Used, comp, circuitComp))
+            {
+                _popup.PopupEntity("Ви вставили мікросхему в корпус.", uid, args.User);
+                args.Handled = true;
+            }
+            else
+            {
+                _popup.PopupEntity("Не вдалося! (Кришка закрита або немає місця)", uid, args.User);
+            }
+            return;
+        }
+
     }
 
     /// <summary>
@@ -165,6 +195,9 @@ private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, In
         
         var text = comp.Opened ? "відкрутили гвинти і відкрили" : "закрили і закрутили гвинти";
         _popup.PopupEntity($"Ви {text} технічну панель.", uid, args.User);
+
+        // --- ОНОВЛЕННЯ ГРАФІКИ ---
+        _appearance.SetData(uid, AssemblyVisuals.Opened, comp.Opened);
 
         // Оновлюємо UI, щоб у гравців, які дивляться в інтерфейс, оновився стан
         _ui.UpdateUI(uid, comp);
@@ -187,6 +220,14 @@ private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, In
         args.Handled = true;
     }
 
-
+    private void OnUIOpenAttempt(EntityUid uid, ElectronicAssemblyComponent comp, Content.Shared.UserInterface.ActivatableUIOpenAttemptEvent args)
+    {
+        // Якщо панель закручена (не відкрита), скасовуємо відкриття UI
+        if (!comp.Opened)
+        {
+            _popup.PopupEntity("Технічна панель міцно закручена! Скористайтесь викруткою.", uid, args.User);
+            args.Cancel(); // Блокуємо відкриття вікна
+        }
+    }
 
 }

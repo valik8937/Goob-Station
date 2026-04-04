@@ -317,7 +317,7 @@ public sealed partial class CircuitPrinterWindow : DefaultWindow
                 Text = $"[{recipe.Name}]",
                 MinSize = new System.Numerics.Vector2(180, 0),
             };
-            var capturedId = recipe.PrototypeId;
+            var capturedId = recipe.RecipeId;
             buildBtn.OnPressed += _ => OnBuildPressed?.Invoke(capturedId);
             row.AddChild(buildBtn);
         }
@@ -429,6 +429,10 @@ using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
+using Content.Shared.Tools.Systems;
+using Content.Shared.Popups;
+using Content.Shared.Interaction;
+using Content.Pirate.Shared.IntegratedCircuits.Events;
 
 namespace Content.Pirate.Server.IntegratedCircuits;
 
@@ -440,6 +444,9 @@ namespace Content.Pirate.Server.IntegratedCircuits;
 public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySystem
 {
     [Dependency] private readonly BatterySystem _battery = default!;
+    [Dependency] private readonly SharedToolSystem _tool = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly ElectronicAssemblyUISystem _ui = default!;
 
     private float _accumulatedFrameTime = 0f;
     private const float UpdateInterval = 1.0f; // Оновлюємо енергію РАЗ В СЕКУНДУ, а не 30 разів
@@ -457,6 +464,21 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
             DrainIdlePower(uid, assembly, _accumulatedFrameTime);
         }
         _accumulatedFrameTime = 0f;
+    }
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        // Підписуємося на клік предметом по корпусу
+        SubscribeLocalEvent<ElectronicAssemblyComponent, InteractUsingEvent>(OnInteractUsing);
+        
+        // Підписуємося на завершення смужки прогресу (DoAfter)
+        SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyTogglePanelEvent>(OnTogglePanel);
+        SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyToggleWeldEvent>(OnToggleWeld);
+        
+        // Підписуємося на спробу відкрити UI (забороняємо, якщо закрито)
+        SubscribeLocalEvent<ElectronicAssemblyComponent, Content.Shared.UserInterface.ActivatableUIOpenAttemptEvent>(OnUIOpenAttempt);
     }
 
     /// <summary>
@@ -521,6 +543,106 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
 
         return battery.CurrentCharge >= amount;
     }
+
+
+private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, InteractUsingEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        // 1. ПЕРЕВІРЯЄМО ЗВАРКУ
+        if (_tool.HasQuality(args.Used, "Welding"))
+        {
+            // Логічно, що заварити можна тільки закритий корпус
+            if (comp.Opened)
+            {
+                _popup.PopupEntity("Спочатку закрийте панель викруткою, щоб заварити корпус!", uid, args.User);
+                return;
+            }
+
+            // Запускаємо процес заварювання (триває 2 секунди)
+            _tool.UseTool(args.Used, args.User, uid, 2f, "Welding", new AssemblyToggleWeldEvent());
+            args.Handled = true;
+            return;
+        }
+
+        // 2. ПЕРЕВІРЯЄМО ВИКРУТКУ
+        if (_tool.HasQuality(args.Used, "Screwing"))
+        {
+            // Якщо заварено - викрутка безсила
+            if (comp.Welded)
+            {
+                _popup.PopupEntity("Корпус міцно заварений! Відкрутити гвинти неможливо.", uid, args.User);
+                return;
+            }
+
+            // Запускаємо процес відкручування (триває 1 секунду)
+            _tool.UseTool(args.Used, args.User, uid, 1f, "Screwing", new AssemblyTogglePanelEvent());
+            args.Handled = true;
+            return;
+        }
+
+        // 3. ПЕРЕВІРЯЄМО, ЧИ ЦЕ МІКРОСХЕМА
+        if (TryComp<IntegratedCircuitComponent>(args.Used, out var circuitComp))
+        {
+            if (TryAddCircuit(uid, args.Used, comp, circuitComp))
+            {
+                _popup.PopupEntity("Ви вставили мікросхему в корпус.", uid, args.User);
+                args.Handled = true;
+            }
+            else
+            {
+                _popup.PopupEntity("Не вдалося! (Кришка закрита або немає місця)", uid, args.User);
+            }
+            return;
+        }
+
+    }
+
+    /// <summary>
+    /// Спрацьовує, коли смужка прогресу викрутки дійшла до кінця
+    /// </summary>
+    private void OnTogglePanel(EntityUid uid, ElectronicAssemblyComponent comp, AssemblyTogglePanelEvent args)
+    {
+        if (args.Cancelled || args.Handled)
+            return;
+
+        comp.Opened = !comp.Opened; // Міняємо стан на протилежний
+        
+        var text = comp.Opened ? "відкрутили гвинти і відкрили" : "закрили і закрутили гвинти";
+        _popup.PopupEntity($"Ви {text} технічну панель.", uid, args.User);
+
+        // Оновлюємо UI, щоб у гравців, які дивляться в інтерфейс, оновився стан
+        _ui.UpdateUI(uid, comp);
+        args.Handled = true;
+    }
+
+    /// <summary>
+    /// Спрацьовує, коли смужка прогресу зварки дійшла до кінця
+    /// </summary>
+    private void OnToggleWeld(EntityUid uid, ElectronicAssemblyComponent comp, AssemblyToggleWeldEvent args)
+    {
+        if (args.Cancelled || args.Handled)
+            return;
+
+        comp.Welded = !comp.Welded; // Міняємо стан на протилежний
+
+        var text = comp.Welded ? "наглухо заварили" : "розварили";
+        _popup.PopupEntity($"Ви {text} корпус мікросхеми.", uid, args.User);
+
+        args.Handled = true;
+    }
+
+    private void OnUIOpenAttempt(EntityUid uid, ElectronicAssemblyComponent comp, Content.Shared.UserInterface.ActivatableUIOpenAttemptEvent args)
+    {
+        // Якщо панель закручена (не відкрита), скасовуємо відкриття UI
+        if (!comp.Opened)
+        {
+            _popup.PopupEntity("Технічна панель міцно закручена! Скористайтесь викруткою.", uid, args.User);
+            args.Cancel(); // Блокуємо відкриття вікна
+        }
+    }
+
 }
 
 кінець 6 ServerElectronicAssemblySystem.cs
@@ -714,46 +836,22 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
 кінець 8 ElectronicAssemblyUISystem.cs
 
 файл 9 CircuitPrinterUISystem.cs
+using Content.Pirate.Shared.IntegratedCircuits;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
 using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Content.Pirate.Server.IntegratedCircuits;
 
-/// <summary>
-/// Server-side system for handling Circuit Printer BUI messages.
-/// Manages category switching, recipe building, material deduction, and UI state updates.
-/// </summary>
 public sealed class CircuitPrinterUISystem : EntitySystem
 {
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
-
-    // Hardcoded recipes for now. In a full implementation, this could be driven by a Prototype data definition (e.g., LatheRecipePrototype).
-    // Key: Category Name, Value: List of recipes
-    private readonly Dictionary<string, List<PrinterRecipeEntry>> _recipes = new()
-    {
-        {
-            "Assemblies", new List<PrinterRecipeEntry>
-            {
-                new() { PrototypeId = "ElectronicAssemblySmall", Name = "Small Assembly", Description = "A small case for circuitry.", Cost = new() { { "Steel", 100 } } },
-                new() { PrototypeId = "ElectronicAssemblyMedium", Name = "Medium Assembly", Description = "A medium case for circuitry.", Cost = new() { { "Steel", 250 } } },
-                new() { PrototypeId = "ElectronicAssemblyLarge", Name = "Large Assembly", Description = "A large case for circuitry.", Cost = new() { { "Steel", 500 } } },
-                new() { PrototypeId = "ElectronicAssemblyDrone", Name = "Drone Assembly", Description = "A mobile drone assembly.", Cost = new() { { "Steel", 400 } } },
-                new() { PrototypeId = "ElectronicAssemblyWallmount", Name = "Wall-mounted Assembly", Description = "An assembly that mounts to a wall.", Cost = new() { { "Steel", 200 } } }
-            }
-        },
-        {
-            "Tools", new List<PrinterRecipeEntry>
-            {
-                new() { PrototypeId = "CircuitWirer", Name = "Circuit Wirer", Description = "Tool for wiring pins.", Cost = new() { { "Steel", 50 } } },
-                new() { PrototypeId = "CircuitDebugger", Name = "Circuit Debugger", Description = "Tool for debugging pins.", Cost = new() { { "Steel", 50 } } }
-            }
-        }
-    };
 
     public override void Initialize()
     {
@@ -764,17 +862,41 @@ public sealed class CircuitPrinterUISystem : EntitySystem
         SubscribeLocalEvent<CircuitPrinterComponent, CircuitPrinterBuildMessage>(OnBuild);
     }
 
+    /// <summary>
+    /// Збирає всі існуючі рецепти з YAML файлів і групує їх по категоріям.
+    /// </summary>
+    private Dictionary<string, List<PrinterRecipeEntry>> GetCategoriesAndRecipes()
+    {
+        var dict = new Dictionary<string, List<PrinterRecipeEntry>>();
+
+        foreach (var proto in _prototypeManager.EnumeratePrototypes<CircuitRecipePrototype>())
+        {
+            if (!dict.ContainsKey(proto.Category))
+                dict[proto.Category] = new List<PrinterRecipeEntry>();
+
+            dict[proto.Category].Add(new PrinterRecipeEntry
+            {
+                RecipeId = proto.ID,
+                Name = proto.Name,
+                Description = proto.Description,
+                Cost = new Dictionary<string, int>(proto.Cost),
+                RequiresUpgrade = proto.RequiresUpgrade
+            });
+        }
+
+        return dict;
+    }
+
     private void OnUIOpened(EntityUid uid, CircuitPrinterComponent comp, BoundUIOpenedEvent args)
     {
         if (args.UiKey is not CircuitPrinterUiKey)
             return;
 
-        if (string.IsNullOrEmpty(comp.CurrentCategory) && _recipes.Count > 0)
+        var categories = GetCategoriesAndRecipes();
+
+        if (string.IsNullOrEmpty(comp.CurrentCategory) && categories.Count > 0)
         {
-            // Select first category by default
-            var enumerator = _recipes.Keys.GetEnumerator();
-            if (enumerator.MoveNext())
-                comp.CurrentCategory = enumerator.Current;
+            comp.CurrentCategory = categories.Keys.First();
         }
 
         UpdateUI(uid, comp);
@@ -782,54 +904,48 @@ public sealed class CircuitPrinterUISystem : EntitySystem
 
     private void OnCategoryChanged(EntityUid uid, CircuitPrinterComponent comp, CircuitPrinterCategoryMessage msg)
     {
-        if (!_recipes.ContainsKey(msg.Category))
-            return;
-
         comp.CurrentCategory = msg.Category;
         UpdateUI(uid, comp);
     }
 
     private void OnBuild(EntityUid uid, CircuitPrinterComponent comp, CircuitPrinterBuildMessage msg)
     {
-        // Find recipe
-        PrinterRecipeEntry? recipeToBuild = null;
-        foreach (var category in _recipes.Values)
+        // 1. Шукаємо рецепт в IPrototypeManager за ID, який прислав клієнт
+        if (!_prototypeManager.TryIndex<CircuitRecipePrototype>(msg.PrototypeId, out var recipe))
         {
-            foreach (var recipe in category)
-            {
-                if (recipe.PrototypeId == msg.PrototypeId)
-                {
-                    recipeToBuild = recipe;
-                    break;
-                }
-            }
-            if (recipeToBuild != null) break;
+            Log.Warning($"Спроба крафту неіснуючого рецепту: {msg.PrototypeId}");
+            return;
         }
 
-        if (recipeToBuild == null)
+        // 2. Перевіряємо, чи існує сутність (Result), яку ми збираємося спавнити
+        if (!_prototypeManager.HasIndex<EntityPrototype>(recipe.Result))
+        {
+            Log.Error($"Рецепт {recipe.ID} намагається створити неіснуючу сутність: {recipe.Result}!");
+            return;
+        }
+
+        // 3. Перевірка апгрейдів
+        if (recipe.RequiresUpgrade && !comp.Upgraded)
             return;
 
-        // Check upgrades
-        if (recipeToBuild.RequiresUpgrade && !comp.Upgraded)
-            return;
-
-        // Check materials
-        foreach (var (mat, cost) in recipeToBuild.Cost)
+        // 4. Перевірка наявності матеріалів
+        foreach (var (mat, cost) in recipe.Cost)
         {
             if (!comp.Materials.TryGetValue(mat, out var amount) || amount < cost)
                 return;
         }
 
-        // Deduct materials
-        foreach (var (mat, cost) in recipeToBuild.Cost)
+        // 5. Віднімаємо матеріали
+        foreach (var (mat, cost) in recipe.Cost)
         {
             comp.Materials[mat] -= cost;
         }
 
-        // Spawn item
+        // 6. Спавнимо предмет
         var transform = Transform(uid);
-        Spawn(recipeToBuild.PrototypeId, _transform.GetMapCoordinates(uid, transform));
+        Spawn(recipe.Result, _transform.GetMapCoordinates(uid, transform));
 
+        // Оновлюємо UI (щоб показати нові цифри металу)
         UpdateUI(uid, comp);
     }
 
@@ -846,17 +962,191 @@ public sealed class CircuitPrinterUISystem : EntitySystem
             CanClone = comp.CanClone,
             FastClone = comp.FastClone,
             Cloning = comp.Cloning,
-            Categories = _recipes,
+            Categories = GetCategoriesAndRecipes(), // Відправляємо динамічний список
             CurrentCategory = comp.CurrentCategory ?? string.Empty
         };
 
         _ui.SetUiState(uid, CircuitPrinterUiKey.Key, state);
     }
 }
-
 кінець 9 CircuitPrinterUISystem.cs
 
-файл 10 CircuitActionFlags.cs
+файл 10 CircuitPrinterSystem.cs
+using Content.Pirate.Shared.IntegratedCircuits.Components;
+using Content.Shared.Interaction;
+using Content.Shared.Popups;
+using Content.Shared.Stacks;
+using Robust.Shared.GameObjects;
+using System;
+
+namespace Content.Pirate.Server.IntegratedCircuits;
+
+/// <summary>
+/// Серверна система принтера. Обробляє фізичну взаємодію з принтером 
+/// (вставку матеріалів, дисків оновлення тощо).
+/// </summary>
+public sealed class CircuitPrinterSystem : EntitySystem
+{
+    [Dependency] private readonly SharedStackSystem _stack = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly CircuitPrinterUISystem _ui = default!;
+
+    // Скільки "одиниць" матеріалу дає один лист сталі. 
+    // За твоїми коментарями: 1 лист = 100 одиниць матеріалу.
+    private const int UnitsPerSheet = 100;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        // Підписуємося на івент кліку предметом по принтеру
+        SubscribeLocalEvent<CircuitPrinterComponent, InteractUsingEvent>(OnInteractUsing);
+    }
+
+    private void OnInteractUsing(EntityUid uid, CircuitPrinterComponent comp, InteractUsingEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        // Перевіряємо, чи предмет, яким клікають, є стаком (купою матеріалів)
+        if (!TryComp<StackComponent>(args.Used, out var stack))
+            return;
+
+        // В SS14 матеріали мають StackTypeId. Наприклад, "Steel", "Glass" тощо.
+        // Перевіряємо, чи підтримує наш принтер цей матеріал.
+        var materialName = GetMaterialNameFromStack(stack.StackTypeId);
+
+        if (materialName == null || !comp.Materials.ContainsKey(materialName))
+        {
+            _popup.PopupEntity("Принтер не приймає цей матеріал!", uid, args.User);
+            return;
+        }
+
+        // Рахуємо, скільки одиниць матеріалу ще може вмістити принтер
+        var currentAmount = comp.Materials[materialName];
+        var spaceLeft = comp.MaterialMax - currentAmount;
+
+        if (spaceLeft <= 0)
+        {
+            _popup.PopupEntity("Принтер вже повністю заповнений цим матеріалом!", uid, args.User);
+            args.Handled = true;
+            return;
+        }
+
+        // Рахуємо, скільки листів ми можемо забрати з руки
+        var maxSheetsToInsert = spaceLeft / UnitsPerSheet;
+        var sheetsToTake = Math.Min(stack.Count, maxSheetsToInsert);
+
+        if (sheetsToTake <= 0)
+        {
+            _popup.PopupEntity("Тут недостатньо місця навіть для одного листа!", uid, args.User);
+            args.Handled = true;
+            return;
+        }
+
+        // Віднімаємо листи з руки гравця
+        _stack.SetCount(args.Used, stack.Count - sheetsToTake);
+
+        // Додаємо матеріал у принтер
+        comp.Materials[materialName] += (sheetsToTake * UnitsPerSheet);
+
+        _popup.PopupEntity($"Ви завантажили {sheetsToTake} листів матеріалу {materialName}.", uid, args.User);
+
+        // Оновлюємо UI, щоб гравець одразу побачив нові цифри
+        _ui.UpdateUI(uid, comp);
+
+        // Позначаємо івент як оброблений, щоб гравець не вдарив принтер сталлю
+        args.Handled = true;
+    }
+
+    /// <summary>
+    /// Мапить ідентифікатор стаку SS14 у назву матеріалу для нашого словника.
+    /// Залежно від вашої кодової бази, ID можуть відрізнятися (наприклад "Steel" чи "Metal").
+    /// </summary>
+    private string? GetMaterialNameFromStack(string stackTypeId)
+    {
+        return stackTypeId switch
+        {
+            "Steel" => "Steel", // Звичайна сталь в SS14
+            "Glass" => "Glass", // Скло
+            "Plastic" => "Plastic",
+            _ => null
+        };
+    }
+}
+кінець 10 CircuitPrinterSystem.cs
+
+файл 11 ServerCircuitContentSystem.cs
+using Content.Pirate.Shared.IntegratedCircuits.Components;
+using Content.Pirate.Shared.IntegratedCircuits.Events;
+using Content.Pirate.Shared.IntegratedCircuits.Systems;
+using Content.Shared.Interaction.Events;
+using Content.Shared.Popups;
+using Robust.Shared.GameObjects;
+using Content.Pirate.Shared.IntegratedCircuits;
+
+namespace Content.Pirate.Server.IntegratedCircuits;
+
+public sealed class ServerCircuitContentSystem : EntitySystem
+{
+    [Dependency] private readonly SharedIntegratedCircuitSystem _circuits = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        // 1. Коли динамік отримує імпульс (активується)
+        SubscribeLocalEvent<CircuitSpeakerComponent, CircuitActivatedEvent>(OnSpeakerActivated);
+
+        // 2. Коли гравець "використовує" зібраний корпус в руці (натискає Z)
+        SubscribeLocalEvent<ElectronicAssemblyComponent, UseInHandEvent>(OnAssemblyUsed);
+    }
+
+    private void OnSpeakerActivated(EntityUid uid, CircuitSpeakerComponent comp, CircuitActivatedEvent args)
+    {
+        // Читаємо текст із першого вхідного піна (індекс 0)
+        var text = _circuits.ReadPinData(uid, PinType.Input, 0) as string;
+
+        if (string.IsNullOrWhiteSpace(text))
+            return;
+
+        // Шукаємо сутність, яка повинна "говорити" (Корпус або сама мікросхема, якщо вона лежить на підлозі)
+        var actingEntity = _circuits.GetActingEntity(uid);
+
+        // Виводимо повідомлення над корпусом (поки що через Popup, потім можна через ChatSystem)
+        _popup.PopupEntity($"[Динамік]: {text}", actingEntity);
+    }
+
+    private void OnAssemblyUsed(EntityUid uid, ElectronicAssemblyComponent comp, UseInHandEvent args)
+    {
+        if (args.Handled || comp.Opened) 
+            return; // Не можна клікати кнопки, поки корпус відкритий
+
+        bool pressed = false;
+
+        // Шукаємо всі мікросхеми-кнопки всередині корпусу
+        foreach (var circuitUid in comp.CircuitEntities)
+        {
+            if (HasComp<CircuitButtonComponent>(circuitUid))
+            {
+                // Кнопка має вихідний імпульсний пін (Activator, індекс 0). 
+                // Ми "штовхаємо" з нього імпульс далі по дротах.
+                _circuits.PushData(circuitUid, PinType.Activator, 0);
+                pressed = true;
+            }
+        }
+
+        if (pressed)
+        {
+            _popup.PopupEntity("Ви натиснули на пристрій.", uid, args.User);
+            args.Handled = true;
+        }
+    }
+}
+кінець 11 ServerCircuitContentSystem.cs
+
+файл 12 CircuitActionFlags.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -887,9 +1177,9 @@ public enum CircuitActionFlags : byte
     Movement = 1 << 2,
 }
 
-кінець 10 CircuitActionFlags.cs
+кінець 12 CircuitActionFlags.cs
 
-файл 11 CircuitDebuggerComponent.cs
+файл 13 CircuitDebuggerComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
@@ -954,9 +1244,9 @@ public sealed partial class CircuitDebuggerComponent : Component
     public bool AcceptingRefs;
 }
 
-кінець 11 CircuitDebuggerComponent.cs
+кінець 13 CircuitDebuggerComponent.cs
 
-файл 12 CircuitWirerComponent.cs
+файл 14 CircuitWirerComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
@@ -1012,9 +1302,9 @@ public sealed partial class CircuitWirerComponent : Component
     public PinAddress? SelectedPin;
 }
 
-кінець 12 CircuitWirerComponent.cs
+кінець 14 CircuitWirerComponent.cs
 
-файл 13 ElectronicAssemblyComponent.cs
+файл 15 ElectronicAssemblyComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
 using Content.Pirate.Shared.IntegratedCircuits;
@@ -1050,6 +1340,12 @@ public sealed partial class ElectronicAssemblyComponent : Component
     /// </summary>
     [DataField, AutoNetworkedField]
     public bool Opened = true;
+
+    /// <summary>
+    /// Чи заварений корпус зваркою. Якщо так, викрутка не працюватиме.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public bool Welded = false;
 
     /// <summary>
     /// Ordered list of circuit entity UIDs installed in this assembly.
@@ -1093,9 +1389,9 @@ public sealed partial class ElectronicAssemblyComponent : Component
     public int MaxActivationsPerTick = 100;
 }
 
-кінець 13 ElectronicAssemblyComponent.cs
+кінець 15 ElectronicAssemblyComponent.cs
 
-файл 14 IntegratedCircuitComponent.cs
+файл 16 IntegratedCircuitComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
 using Content.Pirate.Shared.IntegratedCircuits;
@@ -1197,9 +1493,9 @@ public sealed partial class IntegratedCircuitComponent : Component
     public TimeSpan LastActivation = TimeSpan.Zero;
 }
 
-кінець 14 IntegratedCircuitComponent.cs
+кінець 16 IntegratedCircuitComponent.cs
 
-файл 15 CircuitPrinterComponent.cs
+файл 17 CircuitPrinterComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
 
@@ -1238,7 +1534,9 @@ public sealed partial class CircuitPrinterComponent : Component
     [DataField, AutoNetworkedField]
     public Dictionary<string, int> Materials = new()
     {
-        { "Steel", 0 }
+        { "Steel", 0 },
+        { "Glass", 0 },
+        { "Plastic", 0 }
     };
 
     /// <summary>
@@ -1261,10 +1559,84 @@ public sealed partial class CircuitPrinterComponent : Component
     public string? CurrentCategory;
 }
 
-кінець 15 CircuitPrinterComponent.cs
+кінець 17 CircuitPrinterComponent.cs
 
-файл 16 IntegratedCircuitEvents.cs
+файл 18 CircuitRecipePrototype.cs
+using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization.Manager.Attributes;
+using System.Collections.Generic;
+
+namespace Content.Pirate.Shared.IntegratedCircuits;
+
+/// <summary>
+/// Прототип рецепту для принтера інтегральних схем.
+/// Зберігається в YAML файлах.
+/// </summary>
+[Prototype("circuitRecipe")]
+public sealed class CircuitRecipePrototype : IPrototype
+{
+    [IdDataField]
+    public string ID { get; private set; } = default!;
+
+    /// <summary>
+    /// ID сутності, яка буде створена (заспавнена).
+    /// </summary>
+    [DataField("result", required: true)]
+    public string Result { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Назва рецепту, яка відображається в UI.
+    /// </summary>
+    [DataField("name")]
+    public string Name { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Опис рецепту в UI.
+    /// </summary>
+    [DataField("description")]
+    public string Description { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Категорія (вкладка) у вікні принтера (наприклад: "Assemblies", "Tools", "Logic").
+    /// </summary>
+    [DataField("category")]
+    public string Category { get; private set; } = "Misc";
+
+    /// <summary>
+    /// Вартість крафту (Матеріал -> Кількість).
+    /// </summary>
+    [DataField("cost")]
+    public Dictionary<string, int> Cost { get; private set; } = new();
+
+    /// <summary>
+    /// Чи потрібен апгрейд принтера для цього рецепту.
+    /// </summary>
+    [DataField("requiresUpgrade")]
+    public bool RequiresUpgrade { get; private set; } = false;
+}
+кінець 18 CircuitRecipePrototype.cs
+
+файл 19 CircuitComponents.cs
+using Robust.Shared.GameObjects;
+
+namespace Content.Pirate.Shared.IntegratedCircuits.Components;
+
+[RegisterComponent]
+public sealed partial class CircuitButtonComponent : Component
+{
+    // Мікросхема-кнопка
+}
+
+[RegisterComponent]
+public sealed partial class CircuitSpeakerComponent : Component
+{
+    // Мікросхема-динамік
+}
+кінець 19 CircuitComponents.cs
+
+файл 20 IntegratedCircuitEvents.cs
 using Robust.Shared.Serialization;
+using Content.Shared.DoAfter;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.Events;
 
@@ -1334,9 +1706,20 @@ public sealed class PinDataChangedEvent : EntityEventArgs
     }
 }
 
-кінець 16 IntegratedCircuitEvents.cs
+/// <summary>
+/// Івент завершення роботи викруткою.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed partial class AssemblyTogglePanelEvent : SimpleDoAfterEvent { }
 
-файл 17 IntegratedPin.cs
+/// <summary>
+/// Івент завершення роботи зваркою.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed partial class AssemblyToggleWeldEvent : SimpleDoAfterEvent { }
+кінець 20 IntegratedCircuitEvents.cs
+
+файл 21 IntegratedPin.cs
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
 
@@ -1385,9 +1768,9 @@ public sealed partial class IntegratedPin
     public List<PinAddress> LinkedPins { get; set; } = new();
 }
 
-кінець 17 IntegratedPin.cs
+кінець 21 IntegratedPin.cs
 
-файл 18 PinAddress.cs
+файл 22 PinAddress.cs
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
 
@@ -1430,9 +1813,9 @@ public sealed partial class PinAddress
     }
 }
 
-кінець 18 PinAddress.cs
+кінець 22 PinAddress.cs
 
-файл 19 PinDataType.cs
+файл 23 PinDataType.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -1496,9 +1879,9 @@ public enum PinDataType : byte
     Char,
 }
 
-кінець 19 PinDataType.cs
+кінець 23 PinDataType.cs
 
-файл 20 PinType.cs
+файл 24 PinType.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -1525,9 +1908,9 @@ public enum PinType : byte
     Activator,
 }
 
-кінець 20 PinType.cs
+кінець 24 PinType.cs
 
-файл 21 CircuitToolsSystem.cs
+файл 25 CircuitToolsSystem.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
@@ -1553,6 +1936,7 @@ public sealed class CircuitToolsSystem : EntitySystem
 
         // Debugger: capture ref on AfterInteract (clicking on world entities).
         SubscribeLocalEvent<CircuitDebuggerComponent, AfterInteractEvent>(OnDebuggerAfterInteract);
+        SubscribeLocalEvent<CircuitDebuggerComponent, UseInHandEvent>(OnDebuggerUseInHand);
     }
 
     #region Wirer
@@ -1778,12 +2162,37 @@ public sealed class CircuitToolsSystem : EntitySystem
         args.Handled = true;
     }
 
+    private void OnDebuggerUseInHand(EntityUid uid, CircuitDebuggerComponent comp, UseInHandEvent args)
+    {
+        if (args.Handled) return;
+
+        // Перемикаємо режими по колу для зручності тестування
+        if (comp.Mode == DebuggerMode.String)
+        {
+            DebuggerSetMode(uid, DebuggerMode.Number, 1f, comp);
+            _popup.PopupEntity("Дебагер: Режим [ЧИСЛО] (значення: 1)", uid, args.User);
+        }
+        else if (comp.Mode == DebuggerMode.Number)
+        {
+            DebuggerSetMode(uid, DebuggerMode.Ref, null, comp);
+            _popup.PopupEntity("Дебагер: Режим [REF] (Клікніть по предмету)", uid, args.User);
+        }
+        else
+        {
+            // Для тесту одразу записуємо туди якийсь текст
+            DebuggerSetMode(uid, DebuggerMode.String, "Привіт світ!", comp);
+            _popup.PopupEntity("Дебагер: Режим [ТЕКСТ] ('Привіт світ!')", uid, args.User);
+        }
+        
+        args.Handled = true;
+    }
+
     #endregion
 }
 
-кінець 21 CircuitToolsSystem.cs
+кінець 25 CircuitToolsSystem.cs
 
-файл 22 SharedElectronicAssemblySystem.cs
+файл 26 SharedElectronicAssemblySystem.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
 
@@ -1974,9 +2383,9 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
     #endregion
 }
 
-кінець 22 SharedElectronicAssemblySystem.cs
+кінець 26 SharedElectronicAssemblySystem.cs
 
-файл 23 SharedIntegratedCircuitSystem.cs
+файл 27 SharedIntegratedCircuitSystem.cs
 using System.Linq;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
@@ -2406,9 +2815,9 @@ public abstract class SharedIntegratedCircuitSystem : EntitySystem
     #endregion
 }
 
-кінець 23 SharedIntegratedCircuitSystem.cs
+кінець 27 SharedIntegratedCircuitSystem.cs
 
-файл 24 ElectronicAssemblyUiKey.cs
+файл 28 ElectronicAssemblyUiKey.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -2419,9 +2828,9 @@ public enum ElectronicAssemblyUiKey : byte
     Key
 }
 
-кінець 24 ElectronicAssemblyUiKey.cs
+кінець 28 ElectronicAssemblyUiKey.cs
 
-файл 25 CircuitPrinterUiKey.cs
+файл 29 CircuitPrinterUiKey.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -2432,9 +2841,9 @@ public enum CircuitPrinterUiKey : byte
     Key
 }
 
-кінець 25 CircuitPrinterUiKey.cs
+кінець 29 CircuitPrinterUiKey.cs
 
-файл 26 ElectronicAssemblyUiMessages.cs
+файл 30 ElectronicAssemblyUiMessages.cs
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 
@@ -2558,9 +2967,9 @@ public sealed class AssemblyRemoveBatteryMessage : BoundUserInterfaceMessage
 {
 }
 
-кінець 26 ElectronicAssemblyUiMessages.cs
+кінець 30 ElectronicAssemblyUiMessages.cs
 
-файл 27 CircuitPrinterUiMessages.cs
+файл 31 CircuitPrinterUiMessages.cs
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 
@@ -2572,29 +2981,11 @@ namespace Content.Pirate.Shared.IntegratedCircuits.UI;
 [Serializable, NetSerializable]
 public sealed class PrinterRecipeEntry
 {
-    /// <summary>
-    /// Prototype ID of the entity to build.
-    /// </summary>
-    public string PrototypeId { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Display name of the recipe.
-    /// </summary>
+    // ЗМІНЕНО З PrototypeId на RecipeId
+    public string RecipeId { get; set; } = string.Empty; 
     public string Name { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Description of the recipe.
-    /// </summary>
     public string Description { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Material cost to build this recipe (material name -> amount).
-    /// </summary>
     public Dictionary<string, int> Cost { get; set; } = new();
-
-    /// <summary>
-    /// Whether the printer needs upgrades to build this recipe.
-    /// </summary>
     public bool RequiresUpgrade { get; set; }
 }
 
@@ -2676,5 +3067,5 @@ public sealed class CircuitPrinterCategoryMessage : BoundUserInterfaceMessage
     }
 }
 
-кінець 27 CircuitPrinterUiMessages.cs
+кінець 31 CircuitPrinterUiMessages.cs
 

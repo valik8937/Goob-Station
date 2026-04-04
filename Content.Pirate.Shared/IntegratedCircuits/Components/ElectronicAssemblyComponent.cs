@@ -16,6 +16,13 @@ namespace Content.Pirate.Shared.IntegratedCircuits.Components;
 public sealed partial class ElectronicAssemblyComponent : Component
 {
     /// <summary>
+    /// Базова назва спрайту (наприклад "setup_small" або "setup_medium").
+    /// Використовується візуалізатором для генерації назв "-open" та "-color".
+    /// </summary>
+    [DataField]
+    public string BaseState = "setup_small";
+
+    /// <summary>
     /// Maximum total size of all circuits that can fit in this assembly.
     /// </summary>
     [DataField, AutoNetworkedField]

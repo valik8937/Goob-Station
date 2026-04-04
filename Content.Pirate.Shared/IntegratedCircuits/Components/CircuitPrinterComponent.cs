@@ -36,7 +36,9 @@ public sealed partial class CircuitPrinterComponent : Component
     [DataField, AutoNetworkedField]
     public Dictionary<string, int> Materials = new()
     {
-        { "Steel", 0 }
+        { "Steel", 0 },
+        { "Glass", 0 },
+        { "Plastic", 0 }
     };
 
     /// <summary>

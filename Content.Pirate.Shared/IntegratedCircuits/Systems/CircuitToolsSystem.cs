@@ -13,6 +13,7 @@ public sealed class CircuitToolsSystem : EntitySystem
 {
     [Dependency] private readonly SharedIntegratedCircuitSystem _circuits = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
 
     public override void Initialize()
     {
@@ -23,6 +24,7 @@ public sealed class CircuitToolsSystem : EntitySystem
 
         // Debugger: capture ref on AfterInteract (clicking on world entities).
         SubscribeLocalEvent<CircuitDebuggerComponent, AfterInteractEvent>(OnDebuggerAfterInteract);
+        SubscribeLocalEvent<CircuitDebuggerComponent, UseInHandEvent>(OnDebuggerUseInHand);
     }
 
     #region Wirer
@@ -58,6 +60,7 @@ public sealed class CircuitToolsSystem : EntitySystem
                 break;
         }
 
+        _appearance.SetData(ent, WirerVisuals.Mode, comp.Mode);
         Dirty(ent);
         args.Handled = true;
     }
@@ -245,6 +248,31 @@ public sealed class CircuitToolsSystem : EntitySystem
             Loc.GetString("circuit-debugger-ref-stored", ("target", target)),
             ent, args.User);
 
+        args.Handled = true;
+    }
+
+    private void OnDebuggerUseInHand(EntityUid uid, CircuitDebuggerComponent comp, UseInHandEvent args)
+    {
+        if (args.Handled) return;
+
+        // Перемикаємо режими по колу для зручності тестування
+        if (comp.Mode == DebuggerMode.String)
+        {
+            DebuggerSetMode(uid, DebuggerMode.Number, 1f, comp);
+            _popup.PopupEntity("Дебагер: Режим [ЧИСЛО] (значення: 1)", uid, args.User);
+        }
+        else if (comp.Mode == DebuggerMode.Number)
+        {
+            DebuggerSetMode(uid, DebuggerMode.Ref, null, comp);
+            _popup.PopupEntity("Дебагер: Режим [REF] (Клікніть по предмету)", uid, args.User);
+        }
+        else
+        {
+            // Для тесту одразу записуємо туди якийсь текст
+            DebuggerSetMode(uid, DebuggerMode.String, "Привіт світ!", comp);
+            _popup.PopupEntity("Дебагер: Режим [ТЕКСТ] ('Привіт світ!')", uid, args.User);
+        }
+        
         args.Handled = true;
     }
 

@@ -1,5 +1,8 @@
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
+using Robust.Shared.Containers;
+using Robust.Shared.GameObjects;
+using System.Collections.Generic;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.Systems;
 
@@ -10,6 +13,8 @@ namespace Content.Pirate.Shared.IntegratedCircuits.Systems;
 public abstract class SharedElectronicAssemblySystem : EntitySystem
 {
     [Dependency] private readonly SharedIntegratedCircuitSystem _circuits = default!;
+    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     public override void Initialize()
     {
@@ -23,7 +28,6 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
     /// </summary>
     private void OnAssemblyRemoved(Entity<ElectronicAssemblyComponent> ent, ref ComponentRemove args)
     {
-        // Remove all circuits (without requiring the panel to be open).
         var circuits = new List<EntityUid>(ent.Comp.CircuitEntities);
         foreach (var circuitUid in circuits)
         {
@@ -33,9 +37,6 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
 
     #region Capacity
 
-    /// <summary>
-    /// Calculates the total size of all installed circuits.
-    /// </summary>
     public int GetTotalSize(EntityUid uid, ElectronicAssemblyComponent? comp = null)
     {
         if (!Resolve(uid, ref comp, false))
@@ -47,13 +48,9 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
             if (TryComp<IntegratedCircuitComponent>(circuitUid, out var circuit))
                 total += circuit.Size;
         }
-
         return total;
     }
 
-    /// <summary>
-    /// Calculates the total complexity of all installed circuits.
-    /// </summary>
     public int GetTotalComplexity(EntityUid uid, ElectronicAssemblyComponent? comp = null)
     {
         if (!Resolve(uid, ref comp, false))
@@ -65,7 +62,6 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
             if (TryComp<IntegratedCircuitComponent>(circuitUid, out var circuit))
                 total += circuit.Complexity;
         }
-
         return total;
     }
 
@@ -73,12 +69,6 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
 
     #region Add/Remove Circuits
 
-    /// <summary>
-    /// Attempts to add a circuit entity to an assembly.
-    /// Checks that the panel is open, capacity limits are not exceeded,
-    /// and that the assembly supports the circuit's action flags.
-    /// Returns true on success.
-    /// </summary>
     public bool TryAddCircuit(EntityUid assemblyUid, EntityUid circuitUid,
         ElectronicAssemblyComponent? assemblyComp = null,
         IntegratedCircuitComponent? circuitComp = null)
@@ -90,32 +80,24 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
         if (!assemblyComp.Opened)
             return false;
 
-        // Already in an assembly?
         if (circuitComp.AssemblyUid != null)
             return false;
 
-        // Check action flag compatibility — assembly must support all flags the circuit requires.
         if ((circuitComp.ActionFlags & ~assemblyComp.AllowedActionFlags) != CircuitActionFlags.None)
             return false;
 
-        // Check size limits.
         var totalSize = GetTotalSize(assemblyUid, assemblyComp);
         if (totalSize + circuitComp.Size > assemblyComp.MaxComponents)
             return false;
 
-        // Check complexity limits.
         var totalComplexity = GetTotalComplexity(assemblyUid, assemblyComp);
         if (totalComplexity + circuitComp.Complexity > assemblyComp.MaxComplexity)
             return false;
 
-        // Add to assembly.
         AddCircuit(assemblyUid, circuitUid, assemblyComp, circuitComp);
         return true;
     }
 
-    /// <summary>
-    /// Adds a circuit to an assembly without performing any checks.
-    /// </summary>
     public void AddCircuit(EntityUid assemblyUid, EntityUid circuitUid,
         ElectronicAssemblyComponent? assemblyComp = null,
         IntegratedCircuitComponent? circuitComp = null)
@@ -123,6 +105,11 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
         if (!Resolve(assemblyUid, ref assemblyComp, false) ||
             !Resolve(circuitUid, ref circuitComp, false))
             return;
+
+        // ФІЗИЧНО: Створюємо контейнер всередині корпусу і кладемо туди деталь
+        // SS14 автоматично забере предмет з руки гравця!
+        var container = _container.EnsureContainer<Container>(assemblyUid, "circuit_container");
+        _container.Insert(circuitUid, container);
 
         assemblyComp.CircuitEntities.Add(circuitUid);
         circuitComp.AssemblyUid = assemblyUid;
@@ -134,12 +121,6 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
         RaiseLocalEvent(circuitUid, ev);
     }
 
-    /// <summary>
-    /// Attempts to remove a circuit entity from an assembly.
-    /// Checks that the panel is open and the circuit is removable.
-    /// Disconnects all wires from the circuit.
-    /// Returns true on success.
-    /// </summary>
     public bool TryRemoveCircuit(EntityUid assemblyUid, EntityUid circuitUid,
         ElectronicAssemblyComponent? assemblyComp = null,
         IntegratedCircuitComponent? circuitComp = null)
@@ -161,10 +142,6 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
         return true;
     }
 
-    /// <summary>
-    /// Removes a circuit from an assembly without performing any checks.
-    /// Disconnects all wires.
-    /// </summary>
     public void RemoveCircuit(EntityUid assemblyUid, EntityUid circuitUid,
         ElectronicAssemblyComponent? assemblyComp = null,
         IntegratedCircuitComponent? circuitComp = null)
@@ -177,6 +154,11 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
 
         assemblyComp.CircuitEntities.Remove(circuitUid);
         circuitComp.AssemblyUid = null;
+
+        // ФІЗИЧНО: Дістаємо з контейнера і кладемо на координати самого корпусу (на підлогу)
+        var container = _container.EnsureContainer<Container>(assemblyUid, "circuit_container");
+        _container.Remove(circuitUid, container);
+        _transform.SetCoordinates(circuitUid, _transform.GetMoverCoordinates(assemblyUid));
 
         Dirty(assemblyUid, assemblyComp);
         Dirty(circuitUid, circuitComp);
