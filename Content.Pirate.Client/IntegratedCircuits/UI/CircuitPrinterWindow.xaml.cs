@@ -100,7 +100,7 @@ public sealed partial class CircuitPrinterWindow : DefaultWindow
                 Text = $"[{recipe.Name}]",
                 MinSize = new System.Numerics.Vector2(180, 0),
             };
-            var capturedId = recipe.PrototypeId;
+            var capturedId = recipe.RecipeId;
             buildBtn.OnPressed += _ => OnBuildPressed?.Invoke(capturedId);
             row.AddChild(buildBtn);
         }

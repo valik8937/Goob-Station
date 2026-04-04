@@ -1,43 +1,19 @@
+using Content.Pirate.Shared.IntegratedCircuits;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
 using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Content.Pirate.Server.IntegratedCircuits;
 
-/// <summary>
-/// Server-side system for handling Circuit Printer BUI messages.
-/// Manages category switching, recipe building, material deduction, and UI state updates.
-/// </summary>
 public sealed class CircuitPrinterUISystem : EntitySystem
 {
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
-
-    // Hardcoded recipes for now. In a full implementation, this could be driven by a Prototype data definition (e.g., LatheRecipePrototype).
-    // Key: Category Name, Value: List of recipes
-    private readonly Dictionary<string, List<PrinterRecipeEntry>> _recipes = new()
-    {
-        {
-            "Assemblies", new List<PrinterRecipeEntry>
-            {
-                new() { PrototypeId = "ElectronicAssemblySmall", Name = "Small Assembly", Description = "A small case for circuitry.", Cost = new() { { "Steel", 100 } } },
-                new() { PrototypeId = "ElectronicAssemblyMedium", Name = "Medium Assembly", Description = "A medium case for circuitry.", Cost = new() { { "Steel", 250 } } },
-                new() { PrototypeId = "ElectronicAssemblyLarge", Name = "Large Assembly", Description = "A large case for circuitry.", Cost = new() { { "Steel", 500 } } },
-                new() { PrototypeId = "ElectronicAssemblyDrone", Name = "Drone Assembly", Description = "A mobile drone assembly.", Cost = new() { { "Steel", 400 } } },
-                new() { PrototypeId = "ElectronicAssemblyWallmount", Name = "Wall-mounted Assembly", Description = "An assembly that mounts to a wall.", Cost = new() { { "Steel", 200 } } }
-            }
-        },
-        {
-            "Tools", new List<PrinterRecipeEntry>
-            {
-                new() { PrototypeId = "CircuitWirer", Name = "Circuit Wirer", Description = "Tool for wiring pins.", Cost = new() { { "Steel", 50 } } },
-                new() { PrototypeId = "CircuitDebugger", Name = "Circuit Debugger", Description = "Tool for debugging pins.", Cost = new() { { "Steel", 50 } } }
-            }
-        }
-    };
 
     public override void Initialize()
     {
@@ -48,17 +24,41 @@ public sealed class CircuitPrinterUISystem : EntitySystem
         SubscribeLocalEvent<CircuitPrinterComponent, CircuitPrinterBuildMessage>(OnBuild);
     }
 
+    /// <summary>
+    /// Збирає всі існуючі рецепти з YAML файлів і групує їх по категоріям.
+    /// </summary>
+    private Dictionary<string, List<PrinterRecipeEntry>> GetCategoriesAndRecipes()
+    {
+        var dict = new Dictionary<string, List<PrinterRecipeEntry>>();
+
+        foreach (var proto in _prototypeManager.EnumeratePrototypes<CircuitRecipePrototype>())
+        {
+            if (!dict.ContainsKey(proto.Category))
+                dict[proto.Category] = new List<PrinterRecipeEntry>();
+
+            dict[proto.Category].Add(new PrinterRecipeEntry
+            {
+                RecipeId = proto.ID,
+                Name = proto.Name,
+                Description = proto.Description,
+                Cost = new Dictionary<string, int>(proto.Cost),
+                RequiresUpgrade = proto.RequiresUpgrade
+            });
+        }
+
+        return dict;
+    }
+
     private void OnUIOpened(EntityUid uid, CircuitPrinterComponent comp, BoundUIOpenedEvent args)
     {
         if (args.UiKey is not CircuitPrinterUiKey)
             return;
 
-        if (string.IsNullOrEmpty(comp.CurrentCategory) && _recipes.Count > 0)
+        var categories = GetCategoriesAndRecipes();
+
+        if (string.IsNullOrEmpty(comp.CurrentCategory) && categories.Count > 0)
         {
-            // Select first category by default
-            var enumerator = _recipes.Keys.GetEnumerator();
-            if (enumerator.MoveNext())
-                comp.CurrentCategory = enumerator.Current;
+            comp.CurrentCategory = categories.Keys.First();
         }
 
         UpdateUI(uid, comp);
@@ -66,54 +66,48 @@ public sealed class CircuitPrinterUISystem : EntitySystem
 
     private void OnCategoryChanged(EntityUid uid, CircuitPrinterComponent comp, CircuitPrinterCategoryMessage msg)
     {
-        if (!_recipes.ContainsKey(msg.Category))
-            return;
-
         comp.CurrentCategory = msg.Category;
         UpdateUI(uid, comp);
     }
 
     private void OnBuild(EntityUid uid, CircuitPrinterComponent comp, CircuitPrinterBuildMessage msg)
     {
-        // Find recipe
-        PrinterRecipeEntry? recipeToBuild = null;
-        foreach (var category in _recipes.Values)
+        // 1. Шукаємо рецепт в IPrototypeManager за ID, який прислав клієнт
+        if (!_prototypeManager.TryIndex<CircuitRecipePrototype>(msg.PrototypeId, out var recipe))
         {
-            foreach (var recipe in category)
-            {
-                if (recipe.PrototypeId == msg.PrototypeId)
-                {
-                    recipeToBuild = recipe;
-                    break;
-                }
-            }
-            if (recipeToBuild != null) break;
+            Log.Warning($"Спроба крафту неіснуючого рецепту: {msg.PrototypeId}");
+            return;
         }
 
-        if (recipeToBuild == null)
+        // 2. Перевіряємо, чи існує сутність (Result), яку ми збираємося спавнити
+        if (!_prototypeManager.HasIndex<EntityPrototype>(recipe.Result))
+        {
+            Log.Error($"Рецепт {recipe.ID} намагається створити неіснуючу сутність: {recipe.Result}!");
+            return;
+        }
+
+        // 3. Перевірка апгрейдів
+        if (recipe.RequiresUpgrade && !comp.Upgraded)
             return;
 
-        // Check upgrades
-        if (recipeToBuild.RequiresUpgrade && !comp.Upgraded)
-            return;
-
-        // Check materials
-        foreach (var (mat, cost) in recipeToBuild.Cost)
+        // 4. Перевірка наявності матеріалів
+        foreach (var (mat, cost) in recipe.Cost)
         {
             if (!comp.Materials.TryGetValue(mat, out var amount) || amount < cost)
                 return;
         }
 
-        // Deduct materials
-        foreach (var (mat, cost) in recipeToBuild.Cost)
+        // 5. Віднімаємо матеріали
+        foreach (var (mat, cost) in recipe.Cost)
         {
             comp.Materials[mat] -= cost;
         }
 
-        // Spawn item
+        // 6. Спавнимо предмет
         var transform = Transform(uid);
-        Spawn(recipeToBuild.PrototypeId, _transform.GetMapCoordinates(uid, transform));
+        Spawn(recipe.Result, _transform.GetMapCoordinates(uid, transform));
 
+        // Оновлюємо UI (щоб показати нові цифри металу)
         UpdateUI(uid, comp);
     }
 
@@ -130,7 +124,7 @@ public sealed class CircuitPrinterUISystem : EntitySystem
             CanClone = comp.CanClone,
             FastClone = comp.FastClone,
             Cloning = comp.Cloning,
-            Categories = _recipes,
+            Categories = GetCategoriesAndRecipes(), // Відправляємо динамічний список
             CurrentCategory = comp.CurrentCategory ?? string.Empty
         };
 

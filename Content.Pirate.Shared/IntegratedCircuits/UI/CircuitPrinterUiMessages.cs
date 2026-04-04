@@ -9,29 +9,11 @@ namespace Content.Pirate.Shared.IntegratedCircuits.UI;
 [Serializable, NetSerializable]
 public sealed class PrinterRecipeEntry
 {
-    /// <summary>
-    /// Prototype ID of the entity to build.
-    /// </summary>
-    public string PrototypeId { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Display name of the recipe.
-    /// </summary>
+    // ЗМІНЕНО З PrototypeId на RecipeId
+    public string RecipeId { get; set; } = string.Empty; 
     public string Name { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Description of the recipe.
-    /// </summary>
     public string Description { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Material cost to build this recipe (material name -> amount).
-    /// </summary>
     public Dictionary<string, int> Cost { get; set; } = new();
-
-    /// <summary>
-    /// Whether the printer needs upgrades to build this recipe.
-    /// </summary>
     public bool RequiresUpgrade { get; set; }
 }
 
