@@ -82,6 +82,10 @@
     detailColor: "#808080"
     maxComponents: 10
     maxComplexity: 25
+  - type: CircuitPrintable
+    category: "Assemblies"
+    cost:
+      Steel: 100
 
 - type: entity
   parent: BaseElectronicAssembly
@@ -97,6 +101,10 @@
     detailColor: "#808080"
     maxComponents: 25
     maxComplexity: 75
+  - type: CircuitPrintable
+    category: "Assemblies"
+    cost:
+      Steel: 250
 
 - type: entity
   parent: BaseElectronicAssembly
@@ -112,6 +120,10 @@
     detailColor: "#808080"
     maxComponents: 100
     maxComplexity: 300
+  - type: CircuitPrintable
+    category: "Assemblies"
+    cost:
+      Steel: 500
 
 # ==========================================
 # 3. ІНСТРУМЕНТИ
@@ -141,6 +153,10 @@
           bounds: "-0.15,-0.15,0.15,0.15"
         mask:
         - ItemMask
+  - type: CircuitPrintable
+    category: "Tools"
+    cost:
+      Steel: 50
 
 - type: entity
   id: CircuitDebugger
@@ -152,6 +168,13 @@
   - type: Item
     size: Small
   - type: CircuitDebugger
+  - type: UserInterface
+    interfaces:
+      enum.CircuitDebuggerUiKey.Key:
+        type: CircuitDebuggerBoundUI
+  - type: ActivatableUI
+    key: enum.CircuitDebuggerUiKey.Key
+    inHandsOnly: true
   - type: Clickable
   - type: InteractionOutline
   - type: Physics
@@ -164,6 +187,10 @@
           bounds: "-0.15,-0.15,0.15,0.15"
         mask:
         - ItemMask
+  - type: CircuitPrintable
+    category: "Tools"
+    cost:
+      Steel: 50
 
 # ==========================================
 # 4. ПРИНТЕР
@@ -198,51 +225,3 @@
           bounds: "-0.3,-0.3,0.3,0.3"
         mask:
         - ItemMask
-
-# ==========================================
-# 5. РЕЦЕПТИ ДЛЯ ПРИНТЕРА
-# ==========================================
-- type: circuitRecipe
-  id: RecipeAssemblySmall
-  result: ElectronicAssemblySmall
-  name: Small Assembly
-  description: A small case for circuitry.
-  category: Assemblies
-  cost:
-    Steel: 100
-
-- type: circuitRecipe
-  id: RecipeAssemblyMedium
-  result: ElectronicAssemblyMedium
-  name: Medium Assembly
-  description: A medium case for circuitry.
-  category: Assemblies
-  cost:
-    Steel: 250
-
-- type: circuitRecipe
-  id: RecipeAssemblyLarge
-  result: ElectronicAssemblyLarge
-  name: Large Assembly
-  description: A large case for circuitry.
-  category: Assemblies
-  cost:
-    Steel: 500
-
-- type: circuitRecipe
-  id: RecipeWirer
-  result: CircuitWirer
-  name: Circuit Wirer
-  description: Tool for wiring pins.
-  category: Tools
-  cost:
-    Steel: 50
-
-- type: circuitRecipe
-  id: RecipeDebugger
-  result: CircuitDebugger
-  name: Circuit Debugger
-  description: Tool for debugging pins.
-  category: Tools
-  cost:
-    Steel: 50

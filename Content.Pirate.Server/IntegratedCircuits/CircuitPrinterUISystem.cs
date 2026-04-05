@@ -4,6 +4,7 @@ using Content.Pirate.Shared.IntegratedCircuits.UI;
 using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
+using Robust.Shared.GameObjects;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,6 +15,7 @@ public sealed class CircuitPrinterUISystem : EntitySystem
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
+    [Dependency] private readonly IComponentFactory _componentFactory = default!;
 
     public override void Initialize()
     {
@@ -25,24 +27,29 @@ public sealed class CircuitPrinterUISystem : EntitySystem
     }
 
     /// <summary>
-    /// Збирає всі існуючі рецепти з YAML файлів і групує їх по категоріям.
+    /// Перебирає всі Entity у грі. Якщо на них є CircuitPrintableComponent - додає в меню принтера.
     /// </summary>
     private Dictionary<string, List<PrinterRecipeEntry>> GetCategoriesAndRecipes()
     {
         var dict = new Dictionary<string, List<PrinterRecipeEntry>>();
 
-        foreach (var proto in _prototypeManager.EnumeratePrototypes<CircuitRecipePrototype>())
+        // Скануємо всі сутності в грі
+        foreach (var proto in _prototypeManager.EnumeratePrototypes<EntityPrototype>())
         {
-            if (!dict.ContainsKey(proto.Category))
-                dict[proto.Category] = new List<PrinterRecipeEntry>();
+            // Якщо на сутності немає нашого компонента для друку — пропускаємо
+            if (!proto.TryGetComponent<CircuitPrintableComponent>(out var printable, _componentFactory))
+                continue;
 
-            dict[proto.Category].Add(new PrinterRecipeEntry
+            if (!dict.ContainsKey(printable.Category))
+                dict[printable.Category] = new List<PrinterRecipeEntry>();
+
+            dict[printable.Category].Add(new PrinterRecipeEntry
             {
                 RecipeId = proto.ID,
-                Name = proto.Name,
-                Description = proto.Description,
-                Cost = new Dictionary<string, int>(proto.Cost),
-                RequiresUpgrade = proto.RequiresUpgrade
+                Name = proto.Name ?? proto.ID,          // Беремо назву прямо з сутності
+                Description = proto.Description ?? "",  // Беремо опис прямо з сутності
+                Cost = new Dictionary<string, int>(printable.Cost),
+                RequiresUpgrade = printable.RequiresUpgrade
             });
         }
 
@@ -72,44 +79,35 @@ public sealed class CircuitPrinterUISystem : EntitySystem
 
     private void OnBuild(EntityUid uid, CircuitPrinterComponent comp, CircuitPrinterBuildMessage msg)
     {
-        // 1. Шукаємо рецепт в IPrototypeManager за ID, який прислав клієнт
-        if (!_prototypeManager.TryIndex<CircuitRecipePrototype>(msg.PrototypeId, out var recipe))
-        {
-            Log.Warning($"Спроба крафту неіснуючого рецепту: {msg.PrototypeId}");
-            return;
-        }
-
-        // 2. Перевіряємо, чи існує сутність (Result), яку ми збираємося спавнити
-        if (!_prototypeManager.HasIndex<EntityPrototype>(recipe.Result))
-        {
-            Log.Error($"Рецепт {recipe.ID} намагається створити неіснуючу сутність: {recipe.Result}!");
-            return;
-        }
-
-        // 3. Перевірка апгрейдів
-        if (recipe.RequiresUpgrade && !comp.Upgraded)
+        // Шукаємо прототип сутності за ID
+        if (!_prototypeManager.TryIndex<EntityPrototype>(msg.PrototypeId, out var proto))
             return;
 
-        // 4. Перевірка наявності матеріалів
-        foreach (var entry in recipe.Cost)
+        // Перевіряємо, чи її справді можна надрукувати
+        if (!proto.TryGetComponent<CircuitPrintableComponent>(out var printable, _componentFactory))
+            return;
+
+        // Перевірка апгрейдів
+        if (printable.RequiresUpgrade && !comp.Upgraded)
+            return;
+
+        // Перевірка наявності матеріалів
+        foreach (var entry in printable.Cost)
         {
-            var mat = entry.Key;
-            var cost = entry.Value;
-            if (!comp.Materials.TryGetValue(mat, out var amount) || amount < cost)
-                return;
+            if (!comp.Materials.TryGetValue(entry.Key, out var amount) || amount < entry.Value)
+                return; // Не вистачає металу
         }
 
-        // 5. Віднімаємо матеріали
-        foreach (var entry in recipe.Cost)
+        // Віднімаємо матеріали
+        foreach (var entry in printable.Cost)
         {
             comp.Materials[entry.Key] -= entry.Value;
         }
 
-        // 6. Спавнимо предмет
+        // Спавнимо саму сутність
         var transform = Transform(uid);
-        Spawn(recipe.Result, _transform.GetMapCoordinates(uid, transform));
+        Spawn(proto.ID, _transform.GetMapCoordinates(uid, transform));
 
-        // Оновлюємо UI (щоб показати нові цифри металу)
         UpdateUI(uid, comp);
     }
 
@@ -126,7 +124,7 @@ public sealed class CircuitPrinterUISystem : EntitySystem
             CanClone = comp.CanClone,
             FastClone = comp.FastClone,
             Cloning = comp.Cloning,
-            Categories = GetCategoriesAndRecipes(), // Відправляємо динамічний список
+            Categories = GetCategoriesAndRecipes(),
             CurrentCategory = comp.CurrentCategory ?? string.Empty
         };
 

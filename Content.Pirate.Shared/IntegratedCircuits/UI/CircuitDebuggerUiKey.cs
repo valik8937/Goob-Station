@@ -1,0 +1,9 @@
+using Robust.Shared.Serialization;
+
+namespace Content.Pirate.Shared.IntegratedCircuits.UI;
+
+[Serializable, NetSerializable]
+public enum CircuitDebuggerUiKey : byte
+{
+    Key
+}

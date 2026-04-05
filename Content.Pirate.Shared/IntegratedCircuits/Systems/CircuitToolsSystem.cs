@@ -3,6 +3,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
 
+
 namespace Content.Pirate.Shared.IntegratedCircuits.Systems;
 
 /// <summary>
@@ -22,9 +23,6 @@ public sealed class CircuitToolsSystem : EntitySystem
         // Wirer: toggle mode on use-in-hand.
         SubscribeLocalEvent<CircuitWirerComponent, UseInHandEvent>(OnWirerUseInHand);
 
-        // Debugger: capture ref on AfterInteract (clicking on world entities).
-        SubscribeLocalEvent<CircuitDebuggerComponent, AfterInteractEvent>(OnDebuggerAfterInteract);
-        SubscribeLocalEvent<CircuitDebuggerComponent, UseInHandEvent>(OnDebuggerUseInHand);
     }
 
     #region Wirer
@@ -225,56 +223,6 @@ public sealed class CircuitToolsSystem : EntitySystem
         Dirty(debuggerUid, comp);
     }
 
-    /// <summary>
-    /// When the debugger is in Ref mode and the player clicks on an entity,
-    /// store that entity's UID as the debugger's data.
-    /// </summary>
-    private void OnDebuggerAfterInteract(Entity<CircuitDebuggerComponent> ent, ref AfterInteractEvent args)
-    {
-        if (args.Handled)
-            return;
-
-        if (!ent.Comp.AcceptingRefs)
-            return;
-
-        if (args.Target is not { } target)
-            return;
-
-        ent.Comp.StoredData = target;
-        ent.Comp.AcceptingRefs = false;
-        Dirty(ent);
-
-        _popup.PopupEntity(
-            Loc.GetString("circuit-debugger-ref-stored", ("target", target)),
-            ent, args.User);
-
-        args.Handled = true;
-    }
-
-    private void OnDebuggerUseInHand(EntityUid uid, CircuitDebuggerComponent comp, UseInHandEvent args)
-    {
-        if (args.Handled) return;
-
-        // Перемикаємо режими по колу для зручності тестування
-        if (comp.Mode == DebuggerMode.String)
-        {
-            DebuggerSetMode(uid, DebuggerMode.Number, 1f, comp);
-            _popup.PopupEntity("Дебагер: Режим [ЧИСЛО] (значення: 1)", uid, args.User);
-        }
-        else if (comp.Mode == DebuggerMode.Number)
-        {
-            DebuggerSetMode(uid, DebuggerMode.Ref, null, comp);
-            _popup.PopupEntity("Дебагер: Режим [REF] (Клікніть по предмету)", uid, args.User);
-        }
-        else
-        {
-            // Для тесту одразу записуємо туди якийсь текст
-            DebuggerSetMode(uid, DebuggerMode.String, "Привіт світ!", comp);
-            _popup.PopupEntity("Дебагер: Режим [ТЕКСТ] ('Привіт світ!')", uid, args.User);
-        }
-        
-        args.Handled = true;
-    }
 
     #endregion
 }
