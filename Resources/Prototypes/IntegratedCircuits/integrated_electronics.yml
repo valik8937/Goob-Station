@@ -41,6 +41,8 @@
     interfaces:
       enum.ElectronicAssemblyUiKey.Key:
         type: ElectronicAssemblyBoundUI
+      enum.AssemblyInteractUiKey.Key:
+        type: AssemblyInteractBoundUI
 #  - type: ActivatableUI
 #    key: enum.ElectronicAssemblyUiKey.Key
 #    inHandsOnly: false

@@ -628,25 +628,7 @@ public sealed class WirerVisualizerSystem : VisualizerSystem<CircuitWirerCompone
 
 кінець 9 WirerVisualizerSystem.cs
 
-файл 10 ClientElectronicAssemblySystem.cs
-using Content.Pirate.Shared.IntegratedCircuits.Systems;
-
-namespace Content.Pirate.Client.IntegratedCircuits;
-
-/// <summary>
-/// Клієнтська реалізація системи корпусів мікросхем.
-/// Потрібна для того, щоб Shared-логіка (наприклад, блокування UI)
-/// виконувалась на стороні клієнта і вікно не "миготіло".
-/// </summary>
-public sealed class ClientElectronicAssemblySystem : SharedElectronicAssemblySystem
-{
-    // Тут навіть не треба нічого писати.
-    // Завдяки цьому класу рушій завантажить SharedElectronicAssemblySystem на клієнті,
-    // і твій код з OnUIOpenAttempt відпрацює миттєво до відкриття вікна!
-}
-кінець 10 ClientElectronicAssemblySystem.cs
-
-файл 11 ServerElectronicAssemblySystem.cs
+файл 10 ServerElectronicAssemblySystem.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 using Content.Server.Power.Components;
@@ -656,6 +638,8 @@ using Content.Shared.Popups;
 using Content.Shared.Interaction;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
 using Content.Pirate.Shared.IntegratedCircuits;
+using Content.Pirate.Shared.IntegratedCircuits.UI;
+using Robust.Server.GameObjects; // Потрібно для роботи з UI на сервері
 
 namespace Content.Pirate.Server.IntegratedCircuits;
 
@@ -671,6 +655,7 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly ElectronicAssemblyUISystem _ui = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!; // Додано для закриття вікон
 
     private float _accumulatedFrameTime = 0f;
     private const float UpdateInterval = 1.0f; // Оновлюємо енергію РАЗ В СЕКУНДУ, а не 30 разів
@@ -700,8 +685,10 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
         // Підписуємося на завершення смужки прогресу (DoAfter)
         SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyTogglePanelEvent>(OnTogglePanel);
         SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyToggleWeldEvent>(OnToggleWeld);
-        
 
+        // Слухаємо звичайний клік по об'єкту
+        SubscribeLocalEvent<ElectronicAssemblyComponent, ActivateInWorldEvent>(OnActivate);
+        
         // Підписуємося на ініціалізацію для встановлення початкових візуалів
         SubscribeLocalEvent<ElectronicAssemblyComponent, MapInitEvent>(OnMapInit);
     }
@@ -712,14 +699,8 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
         _appearance.SetData(uid, AssemblyVisuals.Color, comp.DetailColor);
     }
 
-    /// <summary>
-    /// Drains idle power from the assembly's battery for all installed circuits
-    /// that have a non-zero idle power draw.
-    /// </summary>
     private void DrainIdlePower(EntityUid assemblyUid, ElectronicAssemblyComponent assembly, float frameTime)
     {
-        // Look for a battery in the assembly — either on the entity itself
-        // or in a "cell_slot" container (insertable power cell).
         if (!_battery.TryGetBatteryComponent(assemblyUid, out var battery, out var batteryUid))
             return;
 
@@ -735,16 +716,10 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
         if (totalIdleDraw <= 0)
             return;
 
-        // Power is in watts, frameTime is in seconds, battery stores joules.
         var energyToUse = totalIdleDraw * frameTime;
         _battery.UseCharge(batteryUid.Value, energyToUse, battery);
     }
 
-    /// <summary>
-    /// Attempts to use a given amount of energy (in joules) from the assembly's battery.
-    /// Finds the battery via cell_slot or directly on the entity.
-    /// Returns true if the battery had sufficient charge and the energy was consumed.
-    /// </summary>
     public bool TryUsePower(EntityUid assemblyUid, float amount)
     {
         if (!_battery.TryGetBatteryComponent(assemblyUid, out var battery, out var batteryUid))
@@ -753,9 +728,6 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
         return _battery.TryUseCharge(batteryUid.Value, amount, battery);
     }
 
-    /// <summary>
-    /// Checks if the assembly has a battery with any remaining charge.
-    /// </summary>
     public bool HasPower(EntityUid assemblyUid)
     {
         if (!_battery.TryGetBatteryComponent(assemblyUid, out var battery, out _))
@@ -764,9 +736,6 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
         return battery.CurrentCharge > 0;
     }
 
-    /// <summary>
-    /// Checks if the assembly has enough charge for the given amount.
-    /// </summary>
     public bool HasEnoughPower(EntityUid assemblyUid, float amount)
     {
         if (!_battery.TryGetBatteryComponent(assemblyUid, out var battery, out _))
@@ -776,7 +745,7 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
     }
 
 
-private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, InteractUsingEvent args)
+    private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, InteractUsingEvent args)
     {
         if (args.Handled)
             return;
@@ -784,14 +753,12 @@ private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, In
         // 1. ПЕРЕВІРЯЄМО ЗВАРКУ
         if (_tool.HasQuality(args.Used, "Welding"))
         {
-            // Логічно, що заварити можна тільки закритий корпус
             if (comp.Opened)
             {
                 _popup.PopupEntity("Спочатку закрийте панель викруткою, щоб заварити корпус!", uid, args.User);
                 return;
             }
 
-            // Запускаємо процес заварювання (триває 2 секунди)
             _tool.UseTool(args.Used, args.User, uid, 2f, "Welding", new AssemblyToggleWeldEvent());
             args.Handled = true;
             return;
@@ -800,14 +767,12 @@ private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, In
         // 2. ПЕРЕВІРЯЄМО ВИКРУТКУ
         if (_tool.HasQuality(args.Used, "Screwing"))
         {
-            // Якщо заварено - викрутка безсила
             if (comp.Welded)
             {
                 _popup.PopupEntity("Корпус міцно заварений! Відкрутити гвинти неможливо.", uid, args.User);
                 return;
             }
 
-            // Запускаємо процес відкручування (триває 1 секунду)
             _tool.UseTool(args.Used, args.User, uid, 1f, "Screwing", new AssemblyTogglePanelEvent());
             args.Handled = true;
             return;
@@ -827,7 +792,6 @@ private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, In
             }
             return;
         }
-
     }
 
     /// <summary>
@@ -838,28 +802,28 @@ private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, In
         if (args.Cancelled || args.Handled)
             return;
 
-        comp.Opened = !comp.Opened; // Міняємо стан на протилежний
+        comp.Opened = !comp.Opened;
         
+        // ПОВІДОМЛЯЄМО КЛІЄНТУ ПРО ЗМІНУ (Синхронізація)
+        Dirty(uid, comp); 
+
         var text = comp.Opened ? "відкрутили гвинти і відкрили" : "закрили і закрутили гвинти";
         _popup.PopupEntity($"Ви {text} технічну панель.", uid, args.User);
 
-        // --- ОНОВЛЕННЯ ГРАФІКИ ---
         _appearance.SetData(uid, AssemblyVisuals.Opened, comp.Opened);
-
-        // Оновлюємо UI, щоб у гравців, які дивляться в інтерфейс, оновився стан
         _ui.UpdateUI(uid, comp);
         args.Handled = true;
     }
 
-    /// <summary>
-    /// Спрацьовує, коли смужка прогресу зварки дійшла до кінця
-    /// </summary>
     private void OnToggleWeld(EntityUid uid, ElectronicAssemblyComponent comp, AssemblyToggleWeldEvent args)
     {
         if (args.Cancelled || args.Handled)
             return;
 
-        comp.Welded = !comp.Welded; // Міняємо стан на протилежний
+        comp.Welded = !comp.Welded;
+        
+        // ПОВІДОМЛЯЄМО КЛІЄНТУ ПРО ЗМІНУ (Синхронізація)
+        Dirty(uid, comp);
 
         var text = comp.Welded ? "наглухо заварили" : "розварили";
         _popup.PopupEntity($"Ви {text} корпус мікросхеми.", uid, args.User);
@@ -867,13 +831,34 @@ private void OnInteractUsing(EntityUid uid, ElectronicAssemblyComponent comp, In
         args.Handled = true;
     }
 
+    private void OnActivate(EntityUid uid, ElectronicAssemblyComponent comp, ActivateInWorldEvent args)
+    {
+        if (args.Handled)
+            return;
 
+        // ПЕРЕВІРКА: Якщо закритий або заварений - нічого не відкриваємо
+        // (Спливаюче повідомлення прибрано за вашим попереднім проханням щодо stealth)
+        if (!comp.Opened)
+        {
+            args.Handled = true;
+            return;
+        }
 
+        if (comp.Welded)
+        {
+            args.Handled = true;
+            return;
+        }
+
+        // Якщо все ок - ВРУЧНУ відкриваємо UI на сервері
+        // Клієнт отримає команду "відкрий вікно" і зробить це без жодних миготінь
+        _uiSystem.OpenUi(uid, ElectronicAssemblyUiKey.Key, args.User);
+        args.Handled = true;
+    }
 }
+кінець 10 ServerElectronicAssemblySystem.cs
 
-кінець 11 ServerElectronicAssemblySystem.cs
-
-файл 12 ServerIntegratedCircuitSystem.cs
+файл 11 ServerIntegratedCircuitSystem.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 
@@ -919,9 +904,9 @@ public sealed class ServerIntegratedCircuitSystem : SharedIntegratedCircuitSyste
     }
 }
 
-кінець 12 ServerIntegratedCircuitSystem.cs
+кінець 11 ServerIntegratedCircuitSystem.cs
 
-файл 13 ElectronicAssemblyUISystem.cs
+файл 12 ElectronicAssemblyUISystem.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -1138,9 +1123,9 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
 }
 
 
-кінець 13 ElectronicAssemblyUISystem.cs
+кінець 12 ElectronicAssemblyUISystem.cs
 
-файл 14 CircuitPrinterUISystem.cs
+файл 13 CircuitPrinterUISystem.cs
 using Content.Pirate.Shared.IntegratedCircuits;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -1274,9 +1259,9 @@ public sealed class CircuitPrinterUISystem : EntitySystem
         _ui.SetUiState(uid, CircuitPrinterUiKey.Key, state);
     }
 }
-кінець 14 CircuitPrinterUISystem.cs
+кінець 13 CircuitPrinterUISystem.cs
 
-файл 15 CircuitPrinterSystem.cs
+файл 14 CircuitPrinterSystem.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
@@ -1379,9 +1364,9 @@ public sealed class CircuitPrinterSystem : EntitySystem
         };
     }
 }
-кінець 15 CircuitPrinterSystem.cs
+кінець 14 CircuitPrinterSystem.cs
 
-файл 16 ServerCircuitContentSystem.cs
+файл 15 ServerCircuitContentSystem.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
@@ -1449,9 +1434,9 @@ public sealed class ServerCircuitContentSystem : EntitySystem
         }
     }
 }
-кінець 16 ServerCircuitContentSystem.cs
+кінець 15 ServerCircuitContentSystem.cs
 
-файл 17 CircuitDebuggerUISystem.cs
+файл 16 CircuitDebuggerUISystem.cs
 using System.Globalization;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -1555,9 +1540,9 @@ public sealed class CircuitDebuggerUISystem : EntitySystem
     }
 }
 
-кінець 17 CircuitDebuggerUISystem.cs
+кінець 16 CircuitDebuggerUISystem.cs
 
-файл 18 CircuitActionFlags.cs
+файл 17 CircuitActionFlags.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -1588,9 +1573,9 @@ public enum CircuitActionFlags : byte
     Movement = 1 << 2,
 }
 
-кінець 18 CircuitActionFlags.cs
+кінець 17 CircuitActionFlags.cs
 
-файл 19 CircuitDebuggerComponent.cs
+файл 18 CircuitDebuggerComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
@@ -1655,9 +1640,9 @@ public sealed partial class CircuitDebuggerComponent : Component
     public bool AcceptingRefs;
 }
 
-кінець 19 CircuitDebuggerComponent.cs
+кінець 18 CircuitDebuggerComponent.cs
 
-файл 20 CircuitWirerComponent.cs
+файл 19 CircuitWirerComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
@@ -1713,9 +1698,9 @@ public sealed partial class CircuitWirerComponent : Component
     public PinAddress? SelectedPin;
 }
 
-кінець 20 CircuitWirerComponent.cs
+кінець 19 CircuitWirerComponent.cs
 
-файл 21 ElectronicAssemblyComponent.cs
+файл 20 ElectronicAssemblyComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
 using Content.Pirate.Shared.IntegratedCircuits;
@@ -1807,9 +1792,9 @@ public sealed partial class ElectronicAssemblyComponent : Component
     public int MaxActivationsPerTick = 100;
 }
 
-кінець 21 ElectronicAssemblyComponent.cs
+кінець 20 ElectronicAssemblyComponent.cs
 
-файл 22 IntegratedCircuitComponent.cs
+файл 21 IntegratedCircuitComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
 using Content.Pirate.Shared.IntegratedCircuits;
@@ -1911,9 +1896,9 @@ public sealed partial class IntegratedCircuitComponent : Component
     public TimeSpan LastActivation = TimeSpan.Zero;
 }
 
-кінець 22 IntegratedCircuitComponent.cs
+кінець 21 IntegratedCircuitComponent.cs
 
-файл 23 CircuitPrinterComponent.cs
+файл 22 CircuitPrinterComponent.cs
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
 
@@ -1977,9 +1962,9 @@ public sealed partial class CircuitPrinterComponent : Component
     public string? CurrentCategory;
 }
 
-кінець 23 CircuitPrinterComponent.cs
+кінець 22 CircuitPrinterComponent.cs
 
-файл 24 CircuitComponents.cs
+файл 23 CircuitComponents.cs
 using Robust.Shared.GameObjects;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.Components;
@@ -1995,9 +1980,9 @@ public sealed partial class CircuitSpeakerComponent : Component
 {
     // Мікросхема-динамік
 }
-кінець 24 CircuitComponents.cs
+кінець 23 CircuitComponents.cs
 
-файл 25 CircuitPrintableComponent.cs
+файл 24 CircuitPrintableComponent.cs
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization.Manager.Attributes;
 using System.Collections.Generic;
@@ -2029,9 +2014,9 @@ public sealed partial class CircuitPrintableComponent : Component
     public bool RequiresUpgrade = false;
 }
 
-кінець 25 CircuitPrintableComponent.cs
+кінець 24 CircuitPrintableComponent.cs
 
-файл 26 IntegratedCircuitEvents.cs
+файл 25 IntegratedCircuitEvents.cs
 using Robust.Shared.Serialization;
 using Content.Shared.DoAfter;
 
@@ -2114,9 +2099,9 @@ public sealed partial class AssemblyTogglePanelEvent : SimpleDoAfterEvent { }
 /// </summary>
 [Serializable, NetSerializable]
 public sealed partial class AssemblyToggleWeldEvent : SimpleDoAfterEvent { }
-кінець 26 IntegratedCircuitEvents.cs
+кінець 25 IntegratedCircuitEvents.cs
 
-файл 27 IntegratedPin.cs
+файл 26 IntegratedPin.cs
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
 
@@ -2165,9 +2150,9 @@ public sealed partial class IntegratedPin
     public List<PinAddress> LinkedPins { get; set; } = new();
 }
 
-кінець 27 IntegratedPin.cs
+кінець 26 IntegratedPin.cs
 
-файл 28 PinAddress.cs
+файл 27 PinAddress.cs
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
 
@@ -2210,9 +2195,9 @@ public sealed partial class PinAddress
     }
 }
 
-кінець 28 PinAddress.cs
+кінець 27 PinAddress.cs
 
-файл 29 PinDataType.cs
+файл 28 PinDataType.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -2276,9 +2261,9 @@ public enum PinDataType : byte
     Char,
 }
 
-кінець 29 PinDataType.cs
+кінець 28 PinDataType.cs
 
-файл 30 PinType.cs
+файл 29 PinType.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -2305,9 +2290,9 @@ public enum PinType : byte
     Activator,
 }
 
-кінець 30 PinType.cs
+кінець 29 PinType.cs
 
-файл 31 CircuitToolsSystem.cs
+файл 30 CircuitToolsSystem.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
@@ -2537,9 +2522,9 @@ public sealed class CircuitToolsSystem : EntitySystem
     #endregion
 }
 
-кінець 31 CircuitToolsSystem.cs
+кінець 30 CircuitToolsSystem.cs
 
-файл 32 SharedElectronicAssemblySystem.cs
+файл 31 SharedElectronicAssemblySystem.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
 using Robust.Shared.Containers;
@@ -2568,7 +2553,8 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
 
     private void OnUIOpenAttempt(EntityUid uid, ElectronicAssemblyComponent comp, Content.Shared.UserInterface.ActivatableUIOpenAttemptEvent args)
     {
-        if (!comp.Opened)
+        // Якщо панель закрита АБО корпус заварений — скасовуємо відкриття
+        if (!comp.Opened || comp.Welded)
         {
             args.Cancel();
         }
@@ -2720,9 +2706,9 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
 
     #endregion
 }
-кінець 32 SharedElectronicAssemblySystem.cs
+кінець 31 SharedElectronicAssemblySystem.cs
 
-файл 33 SharedIntegratedCircuitSystem.cs
+файл 32 SharedIntegratedCircuitSystem.cs
 using System.Linq;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
@@ -3152,9 +3138,9 @@ public abstract class SharedIntegratedCircuitSystem : EntitySystem
     #endregion
 }
 
-кінець 33 SharedIntegratedCircuitSystem.cs
+кінець 32 SharedIntegratedCircuitSystem.cs
 
-файл 34 ElectronicAssemblyUiKey.cs
+файл 33 ElectronicAssemblyUiKey.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -3165,9 +3151,9 @@ public enum ElectronicAssemblyUiKey : byte
     Key
 }
 
-кінець 34 ElectronicAssemblyUiKey.cs
+кінець 33 ElectronicAssemblyUiKey.cs
 
-файл 35 CircuitPrinterUiKey.cs
+файл 34 CircuitPrinterUiKey.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -3178,9 +3164,9 @@ public enum CircuitPrinterUiKey : byte
     Key
 }
 
-кінець 35 CircuitPrinterUiKey.cs
+кінець 34 CircuitPrinterUiKey.cs
 
-файл 36 ElectronicAssemblyUiMessages.cs
+файл 35 ElectronicAssemblyUiMessages.cs
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 using Content.Pirate.Shared.IntegratedCircuits;
@@ -3274,9 +3260,9 @@ public sealed class AssemblyRemoveBatteryMessage : BoundUserInterfaceMessage
 }
 
 
-кінець 36 ElectronicAssemblyUiMessages.cs
+кінець 35 ElectronicAssemblyUiMessages.cs
 
-файл 37 CircuitPrinterUiMessages.cs
+файл 36 CircuitPrinterUiMessages.cs
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 
@@ -3374,9 +3360,9 @@ public sealed class CircuitPrinterCategoryMessage : BoundUserInterfaceMessage
     }
 }
 
-кінець 37 CircuitPrinterUiMessages.cs
+кінець 36 CircuitPrinterUiMessages.cs
 
-файл 38 CircuitDebuggerUiKey.cs
+файл 37 CircuitDebuggerUiKey.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -3387,9 +3373,9 @@ public enum CircuitDebuggerUiKey : byte
     Key
 }
 
-кінець 38 CircuitDebuggerUiKey.cs
+кінець 37 CircuitDebuggerUiKey.cs
 
-файл 39 CircuitDebuggerUiMessages.cs
+файл 38 CircuitDebuggerUiMessages.cs
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Robust.Shared.Serialization;
 
@@ -3424,9 +3410,9 @@ public sealed class DebuggerSetValueMessage : BoundUserInterfaceMessage
     public DebuggerSetValueMessage(string value) => Value = value;
 }
 
-кінець 39 CircuitDebuggerUiMessages.cs
+кінець 38 CircuitDebuggerUiMessages.cs
 
-файл 40 CircuitVisuals.cs
+файл 39 CircuitVisuals.cs
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -3444,5 +3430,5 @@ public enum WirerVisuals : byte
     Mode    // WirerMode: поточний режим паяльника
 }
 
-кінець 40 CircuitVisuals.cs
+кінець 39 CircuitVisuals.cs
 

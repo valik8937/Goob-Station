@@ -42,9 +42,9 @@
     interfaces:
       enum.ElectronicAssemblyUiKey.Key:
         type: ElectronicAssemblyBoundUI
-  - type: ActivatableUI
-    key: enum.ElectronicAssemblyUiKey.Key
-    inHandsOnly: false
+#  - type: ActivatableUI
+#    key: enum.ElectronicAssemblyUiKey.Key
+#    inHandsOnly: false
   - type: Clickable
   - type: InteractionOutline
   - type: Physics
