@@ -91,16 +91,18 @@ public sealed class CircuitPrinterUISystem : EntitySystem
             return;
 
         // 4. Перевірка наявності матеріалів
-        foreach (var (mat, cost) in recipe.Cost)
+        foreach (var entry in recipe.Cost)
         {
+            var mat = entry.Key;
+            var cost = entry.Value;
             if (!comp.Materials.TryGetValue(mat, out var amount) || amount < cost)
                 return;
         }
 
         // 5. Віднімаємо матеріали
-        foreach (var (mat, cost) in recipe.Cost)
+        foreach (var entry in recipe.Cost)
         {
-            comp.Materials[mat] -= cost;
+            comp.Materials[entry.Key] -= entry.Value;
         }
 
         // 6. Спавнимо предмет

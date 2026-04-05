@@ -1,10 +1,12 @@
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
+using Content.Pirate.Shared.IntegratedCircuits;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Shared.UserInterface;
 using Robust.Server.GameObjects;
+using Content.Shared.Popups;
 
 namespace Content.Pirate.Server.IntegratedCircuits;
 
@@ -19,6 +21,9 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly MetaDataSystem _metadata = default!;
     [Dependency] private readonly Content.Shared.Containers.ItemSlots.ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private readonly Content.Shared.Hands.EntitySystems.SharedHandsSystem _hands = default!;
+    [Dependency] private readonly CircuitToolsSystem _tools = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -28,6 +33,7 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
         SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyRemoveCircuitMessage>(OnRemoveCircuit);
         SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyRemoveBatteryMessage>(OnRemoveBattery);
         SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyRenameMessage>(OnRename);
+        SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyPinClickMessage>(OnPinClicked);
 
         // Update BUI state whenever the component changes.
         SubscribeLocalEvent<ElectronicAssemblyComponent, BoundUIOpenedEvent>(OnUIOpened);
@@ -36,6 +42,38 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
     private void OnUIOpened(EntityUid uid, ElectronicAssemblyComponent comp, BoundUIOpenedEvent args)
     {
         UpdateUI(uid, comp);
+    }
+
+    private void OnPinClicked(EntityUid uid, ElectronicAssemblyComponent comp, AssemblyPinClickMessage msg)
+    {
+        var user = msg.Actor;
+        var circuitUid = GetEntity(msg.CircuitEntity);
+
+        if (!comp.CircuitEntities.Contains(circuitUid)) return;
+
+        if (!_hands.TryGetActiveItem(user, out var activeHandItem))
+        {
+            _popup.PopupEntity("Вам потрібен інструмент (Wirer або Debugger) в руці!", uid, user);
+            return;
+        }
+
+        var pinAddress = new PinAddress(circuitUid, msg.PinType, msg.PinIndex);
+
+        if (HasComp<CircuitWirerComponent>(activeHandItem.Value))
+        {
+            _tools.WirerSelectPin(activeHandItem.Value, user, pinAddress);
+            UpdateUI(uid, comp);
+            return;
+        }
+
+        if (HasComp<CircuitDebuggerComponent>(activeHandItem.Value))
+        {
+            _tools.DebuggerWriteToPin(activeHandItem.Value, user, pinAddress);
+            UpdateUI(uid, comp);
+            return;
+        }
+
+        _popup.PopupEntity("Цей інструмент не підходить для пінів.", uid, user);
     }
 
     /// <summary>
@@ -80,6 +118,15 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
         UpdateUI(uid, comp);
     }
 
+    private string FormatPinData(IntegratedPin pin)
+    {
+        if (pin.PinType == PinType.Activator) return "<PULSE>";
+        if (pin.Data == null) return "(null)";
+        if (pin.Data is string s) return $"(\"{s}\")";
+        if (pin.Data is EntityUid ent) return $"({Name(ent)} [Ref])";
+        return $"({pin.Data})";
+    }
+
     /// <summary>
     /// Builds and sends the current assembly state to all BUI subscribers.
     /// </summary>
@@ -94,14 +141,45 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
             if (!TryComp<IntegratedCircuitComponent>(circuitUid, out var circuitComp))
                 continue;
 
-            var name = circuitComp.DisplayName ?? Name(circuitUid);
-
-            circuits.Add(new AssemblyCircuitEntry
+            var entry = new AssemblyCircuitEntry
             {
                 NetEntity = GetNetEntity(circuitUid),
-                Name = name,
+                Name = circuitComp.DisplayName ?? Name(circuitUid),
+                Description = Description(circuitUid),
                 Removable = circuitComp.Removable,
-            });
+                Complexity = circuitComp.Complexity,
+                Size = circuitComp.Size,
+                PowerDrawIdle = circuitComp.PowerDrawIdle,
+                PowerDrawPerUse = circuitComp.PowerDrawPerUse
+            };
+
+            CircuitPinInfo MapPin(IntegratedPin pin)
+            {
+                var info = new CircuitPinInfo
+                {
+                    Name = pin.Name,
+                    PinType = pin.PinType,
+                    DataType = pin.DataType,
+                    DisplayData = FormatPinData(pin),
+                    IsConnected = pin.LinkedPins.Count > 0
+                };
+
+                var connections = new List<string>();
+                foreach(var link in pin.LinkedPins)
+                {
+                    var linkName = Name(link.ComponentUid);
+                    connections.Add(linkName);
+                }
+                info.ConnectedTo = string.Join(", ", connections);
+
+                return info;
+            }
+
+            foreach (var p in circuitComp.InputPins) entry.InputPins.Add(MapPin(p));
+            foreach (var p in circuitComp.OutputPins) entry.OutputPins.Add(MapPin(p));
+            foreach (var p in circuitComp.ActivatorPins) entry.ActivatorPins.Add(MapPin(p));
+
+            circuits.Add(entry);
         }
 
         // Battery info
@@ -134,3 +212,4 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
         _ui.SetUiState(uid, ElectronicAssemblyUiKey.Key, state);
     }
 }
+

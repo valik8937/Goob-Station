@@ -36,6 +36,11 @@ public sealed class ElectronicAssemblyBoundUI : BoundUserInterface
             SendMessage(new AssemblyRemoveBatteryMessage());
         };
 
+        _window.OnPinClicked += (netEntity, pinType, index) =>
+        {
+            SendMessage(new AssemblyPinClickMessage(netEntity, pinType, index));
+        };
+
         if (State != null)
             UpdateState(State);
     }
