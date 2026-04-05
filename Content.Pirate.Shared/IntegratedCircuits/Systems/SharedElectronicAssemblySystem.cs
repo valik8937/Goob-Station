@@ -21,6 +21,16 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<ElectronicAssemblyComponent, ComponentRemove>(OnAssemblyRemoved);
+        SubscribeLocalEvent<ElectronicAssemblyComponent, Content.Shared.UserInterface.ActivatableUIOpenAttemptEvent>(OnUIOpenAttempt);
+    }
+
+    private void OnUIOpenAttempt(EntityUid uid, ElectronicAssemblyComponent comp, Content.Shared.UserInterface.ActivatableUIOpenAttemptEvent args)
+    {
+        // Якщо панель закрита АБО корпус заварений — скасовуємо відкриття
+        if (!comp.Opened || comp.Welded)
+        {
+            args.Cancel();
+        }
     }
 
     /// <summary>

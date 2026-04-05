@@ -1,0 +1,209 @@
+файл 1 ElectronicAssemblyWindow.xaml
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+               Resizable="True"
+               Title="Electronic Assembly"
+               MinSize="850 500">
+    <BoxContainer Orientation="Vertical" Margin="5">
+
+        <!-- Header -->
+        <BoxContainer Orientation="Horizontal" Margin="0 0 0 5">
+            <Label Name="AssemblyNameLabel" Text="Electronic Assembly" StyleClasses="LabelHeading" HorizontalExpand="True" />
+            <LineEdit Name="AssemblyNameEdit" Visible="False" HorizontalExpand="True" />
+            <Button Name="RenameButton" Text="[Rename]" MinSize="80 0" />
+        </BoxContainer>
+        
+        <BoxContainer Orientation="Horizontal">
+            <Label Name="StatsLabel" Text="Space: 0/0 | Complexity: 0/0" HorizontalExpand="True"/>
+            <Label Name="BatteryLabel" Text="Power: No Cell" />
+            <Button Name="RemoveBatteryButton" Text="[Remove]" MinSize="70 0" Visible="False" Margin="10 0 0 0" />
+        </BoxContainer>
+
+        <PanelContainer SetHeight="2" Margin="0 5 0 5">
+            <PanelContainer.PanelOverride><gfx:StyleBoxFlat BackgroundColor="#404046" /></PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Main Split View -->
+        <BoxContainer Orientation="Horizontal" VerticalExpand="True">
+            
+            <!-- LEFT PANEL: Components List -->
+            <BoxContainer Orientation="Vertical" MinSize="250 0" Margin="0 0 5 0">
+                <Label Text="Installed Components:" StyleClasses="LabelHeading" Margin="0 0 0 5"/>
+                <ScrollContainer VerticalExpand="True">
+                    <BoxContainer Name="ComponentsList" Orientation="Vertical" />
+                </ScrollContainer>
+            </BoxContainer>
+
+            <PanelContainer SetWidth="2" Margin="5 0 5 0">
+                <PanelContainer.PanelOverride><gfx:StyleBoxFlat BackgroundColor="#404046" /></PanelContainer.PanelOverride>
+            </PanelContainer>
+
+            <!-- RIGHT PANEL: Circuit Details -->
+            <BoxContainer Orientation="Vertical" HorizontalExpand="True" Name="CircuitDetailsPanel" Visible="False">
+                
+                <!-- Circuit Header -->
+                <BoxContainer Orientation="Horizontal">
+                    <Label Name="DetailNameLabel" Text="Circuit Name" StyleClasses="LabelHeading" HorizontalExpand="True"/>
+                    <Button Name="RemoveCircuitButton" Text="[Eject]" StyleClasses="ButtonCaution" />
+                </BoxContainer>
+                <Label Name="DetailDescLabel" Text="Description..." Modulate="Gray" Margin="0 0 0 10"/>
+
+                <!-- The 3-Column Layout for Pins -->
+                <BoxContainer Orientation="Horizontal" VerticalExpand="True">
+                    <!-- Left: Inputs -->
+                    <ScrollContainer HorizontalExpand="True">
+                        <BoxContainer Orientation="Vertical">
+                            <Label Text="--- Inputs ---" HorizontalAlignment="Center" Modulate="#44AAFF"/>
+                            <BoxContainer Name="InputsContainer" Orientation="Vertical" Margin="5"/>
+                        </BoxContainer>
+                    </ScrollContainer>
+
+                    <!-- Middle: Stats -->
+                    <BoxContainer Orientation="Vertical" MinSize="150 0" Margin="10 0 10 0">
+                        <Label Text="--- Stats ---" HorizontalAlignment="Center" Modulate="Yellow"/>
+                        <Label Name="StatSize" Text="Size: 1"/>
+                        <Label Name="StatComp" Text="Complexity: 1"/>
+                        <Label Name="StatPower" Text="Power (Idle): 0W"/>
+                        <Label Name="StatActive" Text="Power (Act): 0W"/>
+                    </BoxContainer>
+
+                    <!-- Right: Outputs -->
+                    <ScrollContainer HorizontalExpand="True">
+                        <BoxContainer Orientation="Vertical">
+                            <Label Text="--- Outputs ---" HorizontalAlignment="Center" Modulate="#44FF44"/>
+                            <BoxContainer Name="OutputsContainer" Orientation="Vertical" Margin="5"/>
+                        </BoxContainer>
+                    </ScrollContainer>
+                </BoxContainer>
+
+                <!-- Bottom: Activators -->
+                <PanelContainer SetHeight="2" Margin="0 5 0 5"><PanelContainer.PanelOverride><gfx:StyleBoxFlat BackgroundColor="#404046" /></PanelContainer.PanelOverride></PanelContainer>
+                <Label Text="--- Activators ---" HorizontalAlignment="Center" Modulate="#FF4444"/>
+                <ScrollContainer SetHeight="80">
+                    <BoxContainer Name="ActivatorsContainer" Orientation="Vertical" Margin="5"/>
+                </ScrollContainer>
+
+            </BoxContainer>
+            
+            <!-- Placeholder when nothing is selected -->
+            <Label Name="SelectPromptLabel" Text="Select a component from the list." HorizontalExpand="True" VerticalAlignment="Center" HorizontalAlignment="Center" Modulate="Gray"/>
+
+        </BoxContainer>
+    </BoxContainer>
+</DefaultWindow>
+
+кінець 1 ElectronicAssemblyWindow.xaml
+
+файл 2 CircuitPrinterWindow.xaml
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+               Resizable="True"
+               Title="Integrated Circuit Printer">
+    <BoxContainer Orientation="Vertical"
+                  MinSize="800 630"
+                  Margin="5">
+
+        <!-- Title -->
+        <Label Text="Integrated Circuit Printer"
+               StyleClasses="LabelHeading"
+               HorizontalAlignment="Center"
+               Margin="0 0 0 5" />
+
+        <!-- Materials info -->
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 3 0 3">
+            <Label Text="Materials: " />
+            <Label Name="MaterialsLabel"
+                   Text="0/2500 Steel" />
+        </BoxContainer>
+
+        <!-- Upgrade status -->
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 0 0 3">
+            <Label Text="Circuits available: " />
+            <Label Name="UpgradeLabel"
+                   Text="Regular" />
+        </BoxContainer>
+
+        <!-- Separator -->
+        <PanelContainer SetHeight="2"
+                        Margin="0 5 0 5">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#404046" />
+            </PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Category tabs -->
+        <Label Text="Categories:"
+               Margin="0 0 0 3" />
+        <ScrollContainer HScrollEnabled="True"
+                         VScrollEnabled="False"
+                         SetHeight="35"
+                         Margin="0 0 0 3">
+            <BoxContainer Name="CategoriesContainer"
+                          Orientation="Horizontal" />
+        </ScrollContainer>
+
+        <!-- Separator -->
+        <PanelContainer SetHeight="2"
+                        Margin="0 3 0 3">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#404046" />
+            </PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Current category header -->
+        <Label Name="CategoryHeader"
+               Text=""
+               StyleClasses="LabelSubText"
+               HorizontalAlignment="Center"
+               Margin="0 0 0 5" />
+
+        <!-- Recipe list -->
+        <ScrollContainer VerticalExpand="True"
+                         HScrollEnabled="False"
+                         Margin="0 0 0 5">
+            <BoxContainer Name="RecipesList"
+                          Orientation="Vertical" />
+        </ScrollContainer>
+
+    </BoxContainer>
+</DefaultWindow>
+
+кінець 2 CircuitPrinterWindow.xaml
+
+файл 3 CircuitDebuggerWindow.xaml
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               Title="Circuit Debugger"
+               MinSize="300 150">
+    <BoxContainer Orientation="Vertical" Margin="5">
+        
+        <!-- Поточний стан -->
+        <Label Text="Current Memory:" Modulate="LightGray" />
+        <Label Name="CurrentValueLabel" Text="(null)" StyleClasses="LabelHeading" Margin="0 0 0 10"/>
+
+        <Label Text="Select Mode:" />
+        <BoxContainer Orientation="Horizontal" Margin="0 0 0 5">
+            <Button Name="BtnString" Text="String" HorizontalExpand="True" />
+            <Button Name="BtnNumber" Text="Number" HorizontalExpand="True" />
+            <Button Name="BtnRef" Text="Ref" HorizontalExpand="True" />
+            <Button Name="BtnNull" Text="Null" HorizontalExpand="True" />
+        </BoxContainer>
+
+        <!-- Введення даних -->
+        <BoxContainer Name="InputContainer" Orientation="Horizontal" Margin="0 5 0 0">
+            <LineEdit Name="DataInput" PlaceHolder="Enter data..." HorizontalExpand="True" />
+            <Button Name="BtnSave" Text="Save" MinSize="60 0" />
+        </BoxContainer>
+
+        <Label Name="RefPromptLabel" Text="Click on an entity in the world..." 
+               Modulate="Yellow" Visible="False" Margin="0 5 0 0" HorizontalAlignment="Center"/>
+
+    </BoxContainer>
+</DefaultWindow>
+
+кінець 3 CircuitDebuggerWindow.xaml
+

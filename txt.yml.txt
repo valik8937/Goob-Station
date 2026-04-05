@@ -1,3 +1,4 @@
+файл 1 integrated_electronics.yml
 # ==========================================
 # 1. БАЗОВІ СУТНОСТІ (АБСТРАКТНІ)
 # ==========================================
@@ -41,9 +42,9 @@
     interfaces:
       enum.ElectronicAssemblyUiKey.Key:
         type: ElectronicAssemblyBoundUI
-#  - type: ActivatableUI
-#    key: enum.ElectronicAssemblyUiKey.Key
-#    inHandsOnly: false
+  - type: ActivatableUI
+    key: enum.ElectronicAssemblyUiKey.Key
+    inHandsOnly: false
   - type: Clickable
   - type: InteractionOutline
   - type: Physics
@@ -225,3 +226,56 @@
           bounds: "-0.3,-0.3,0.3,0.3"
         mask:
         - ItemMask
+
+кінець 1 integrated_electronics.yml
+
+файл 2 circuits.yml
+# Мікросхема: Кнопка
+- type: entity
+  parent: BaseIntegratedCircuit
+  id: CircuitButton
+  name: "кнопка"
+  description: "Надсилає імпульс, коли гравець використовує закритий корпус в руці."
+  components:
+  - type: Sprite
+    state: button
+  - type: CircuitButton
+  - type: IntegratedCircuit
+    complexity: 1
+    size: 1
+    activatorPins:
+      - name: "Натиснуто (Out)"
+        pinType: Activator
+  - type: CircuitPrintable
+    category: "I/O"
+    cost:
+      Steel: 10
+      Plastic: 5
+ 
+# Мікросхема: Динамік
+- type: entity
+  parent: BaseIntegratedCircuit
+  id: CircuitSpeaker
+  name: "динамік"
+  description: "Відтворює текст із вхідного піна, коли отримує імпульс."
+  components:
+  - type: Sprite
+    state: speaker
+  - type: CircuitSpeaker
+  - type: IntegratedCircuit
+    complexity: 2
+    size: 2
+    powerDrawPerUse: 5 # Споживає 5 Вт енергії при кожному слові
+    inputPins:
+      - name: "Текст"
+        dataType: String
+    activatorPins:
+      - name: "Сказати (In)"
+        pinType: Activator
+  - type: CircuitPrintable
+    category: "I/O"
+    cost:
+      Steel: 20
+      Glass: 5
+кінець 2 circuits.yml
+
