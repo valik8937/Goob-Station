@@ -43,10 +43,10 @@ public sealed partial class CircuitPrinterWindow : DefaultWindow
         }
         MaterialsLabel.Text = materialParts.Count > 0
             ? string.Join("; ", materialParts)
-            : "None";
+            : Loc.GetString("circuit-printer-window-materials-none");
 
         // Upgrade status
-        UpgradeLabel.Text = state.Upgraded ? "Advanced" : "Regular";
+        UpgradeLabel.Text = state.Upgraded ? Loc.GetString("circuit-printer-window-upgraded-advanced") : Loc.GetString("circuit-printer-window-upgraded-regular");
 
         // Category tabs
         CategoriesContainer.RemoveAllChildren();

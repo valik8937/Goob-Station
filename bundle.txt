@@ -1,4 +1,108 @@
-файл 1 ElectronicAssemblyWindow.xaml.cs
+=========================================================
+FILE #1: Content.Pirate.Client/IntegratedCircuits/UI/ElectronicAssemblyWindow.xaml
+=========================================================
+
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+               Resizable="True"
+               Title="{Loc 'electronic-assembly-window-title'}"
+               MinSize="850 500">
+    <BoxContainer Orientation="Vertical" Margin="5">
+
+        <!-- Header -->
+        <BoxContainer Orientation="Horizontal" Margin="0 0 0 5">
+            <Label Name="AssemblyNameLabel" Text="{Loc 'electronic-assembly-window-title'}" StyleClasses="LabelHeading" HorizontalExpand="True" />
+            <LineEdit Name="AssemblyNameEdit" Visible="False" HorizontalExpand="True" />
+            <Button Name="RenameButton" Text="{Loc 'electronic-assembly-window-rename'}" MinSize="80 0" />
+        </BoxContainer>
+        
+        <BoxContainer Orientation="Horizontal">
+            <Label Name="StatsLabel" Text="{Loc 'electronic-assembly-window-stats'}" HorizontalExpand="True"/>
+            <Label Name="BatteryLabel" Text="{Loc 'electronic-assembly-window-power-no-cell'}" />
+            <Button Name="RemoveBatteryButton" Text="{Loc 'electronic-assembly-window-remove-battery'}" MinSize="70 0" Visible="False" Margin="10 0 0 0" />
+        </BoxContainer>
+
+        <PanelContainer SetHeight="2" Margin="0 5 0 5">
+            <PanelContainer.PanelOverride><gfx:StyleBoxFlat BackgroundColor="#404046" /></PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Main Split View -->
+        <BoxContainer Orientation="Horizontal" VerticalExpand="True">
+            
+            <!-- LEFT PANEL: Components List -->
+            <BoxContainer Orientation="Vertical" MinSize="250 0" Margin="0 0 5 0">
+                <Label Text="{Loc 'electronic-assembly-window-components-list'}" StyleClasses="LabelHeading" Margin="0 0 0 5"/>
+                <ScrollContainer VerticalExpand="True">
+                    <BoxContainer Name="ComponentsList" Orientation="Vertical" />
+                </ScrollContainer>
+            </BoxContainer>
+
+            <PanelContainer SetWidth="2" Margin="5 0 5 0">
+                <PanelContainer.PanelOverride><gfx:StyleBoxFlat BackgroundColor="#404046" /></PanelContainer.PanelOverride>
+            </PanelContainer>
+
+            <!-- RIGHT PANEL: Circuit Details -->
+            <BoxContainer Orientation="Vertical" HorizontalExpand="True" Name="CircuitDetailsPanel" Visible="False">
+                
+                <!-- Circuit Header -->
+                <BoxContainer Orientation="Horizontal">
+                    <Label Name="DetailNameLabel" Text="Circuit Name" StyleClasses="LabelHeading" HorizontalExpand="True"/>
+                    <Button Name="RemoveCircuitButton" Text="{Loc 'electronic-assembly-window-eject'}" StyleClasses="ButtonCaution" />
+                </BoxContainer>
+                <Label Name="DetailDescLabel" Text="Description..." Modulate="Gray" Margin="0 0 0 10"/>
+
+                <!-- The 3-Column Layout for Pins -->
+                <BoxContainer Orientation="Horizontal" VerticalExpand="True">
+                    <!-- Left: Inputs -->
+                    <ScrollContainer HorizontalExpand="True">
+                        <BoxContainer Orientation="Vertical">
+                            <Label Text="{Loc 'electronic-assembly-window-inputs'}" HorizontalAlignment="Center" Modulate="#44AAFF"/>
+                            <BoxContainer Name="InputsContainer" Orientation="Vertical" Margin="5"/>
+                        </BoxContainer>
+                    </ScrollContainer>
+
+                    <!-- Middle: Stats -->
+                    <BoxContainer Orientation="Vertical" MinSize="150 0" Margin="10 0 10 0">
+                        <Label Text="{Loc 'electronic-assembly-window-stats-header'}" HorizontalAlignment="Center" Modulate="Yellow"/>
+                        <Label Name="StatSize" Text="Size: 1"/>
+                        <Label Name="StatComp" Text="Complexity: 1"/>
+                        <Label Name="StatPower" Text="Power (Idle): 0W"/>
+                        <Label Name="StatActive" Text="Power (Act): 0W"/>
+                    </BoxContainer>
+
+                    <!-- Right: Outputs -->
+                    <ScrollContainer HorizontalExpand="True">
+                        <BoxContainer Orientation="Vertical">
+                            <Label Text="{Loc 'electronic-assembly-window-outputs'}" HorizontalAlignment="Center" Modulate="#44FF44"/>
+                            <BoxContainer Name="OutputsContainer" Orientation="Vertical" Margin="5"/>
+                        </BoxContainer>
+                    </ScrollContainer>
+                </BoxContainer>
+
+                <!-- Bottom: Activators -->
+                <PanelContainer SetHeight="2" Margin="0 5 0 5"><PanelContainer.PanelOverride><gfx:StyleBoxFlat BackgroundColor="#404046" /></PanelContainer.PanelOverride></PanelContainer>
+                <Label Text="{Loc 'electronic-assembly-window-activators'}" HorizontalAlignment="Center" Modulate="#FF4444"/>
+                <ScrollContainer SetHeight="80">
+                    <BoxContainer Name="ActivatorsContainer" Orientation="Vertical" Margin="5"/>
+                </ScrollContainer>
+
+            </BoxContainer>
+            
+            <!-- Placeholder when nothing is selected -->
+            <Label Name="SelectPromptLabel" Text="{Loc 'electronic-assembly-window-select-prompt'}" HorizontalExpand="True" VerticalAlignment="Center" HorizontalAlignment="Center" Modulate="Gray"/>
+
+        </BoxContainer>
+    </BoxContainer>
+</DefaultWindow>
+
+
+--- END OF FILE #1 ---
+
+=========================================================
+FILE #2: Content.Pirate.Client/IntegratedCircuits/UI/ElectronicAssemblyWindow.xaml.cs
+=========================================================
+
 using System;
 using System.Collections.Generic;
 using Content.Pirate.Shared.IntegratedCircuits;
@@ -35,14 +139,14 @@ public sealed partial class ElectronicAssemblyWindow : DefaultWindow
                 OnRenamePressed?.Invoke(AssemblyNameEdit.Text);
                 AssemblyNameEdit.Visible = false;
                 AssemblyNameLabel.Visible = true;
-                RenameButton.Text = "[Rename]";
+                RenameButton.Text = Loc.GetString("electronic-assembly-window-rename");
             }
             else
             {
                 AssemblyNameEdit.Text = AssemblyNameLabel.Text ?? "";
                 AssemblyNameEdit.Visible = true;
                 AssemblyNameLabel.Visible = false;
-                RenameButton.Text = "[Save]";
+                RenameButton.Text = Loc.GetString("electronic-assembly-window-save");
                 AssemblyNameEdit.GrabKeyboardFocus();
             }
         };
@@ -62,17 +166,17 @@ public sealed partial class ElectronicAssemblyWindow : DefaultWindow
         AssemblyNameLabel.Text = state.AssemblyName;
         Title = state.AssemblyName;
 
-        StatsLabel.Text = $"Space: {state.TotalSize}/{state.MaxSize} | Complexity: {state.TotalComplexity}/{state.MaxComplexity}";
+        StatsLabel.Text = Loc.GetString("electronic-assembly-window-space-stats", ("size", state.TotalSize), ("maxSize", state.MaxSize)) + " | " + Loc.GetString("electronic-assembly-window-complexity-stats", ("complexity", state.TotalComplexity), ("maxComplexity", state.MaxComplexity));
         
         if (state.HasBattery)
         {
-            BatteryLabel.Text = $"Power: {state.BatteryCharge:F0}/{state.BatteryMaxCharge:F0}J";
+            BatteryLabel.Text = Loc.GetString("electronic-assembly-window-power", ("charge", state.BatteryCharge.ToString("F0")), ("max", state.BatteryMaxCharge.ToString("F0")));
             BatteryLabel.StyleClasses.Clear();
             RemoveBatteryButton.Visible = true;
         }
         else
         {
-            BatteryLabel.Text = "Power: No Cell";
+            BatteryLabel.Text = Loc.GetString("electronic-assembly-window-power-no-cell");
             if (!BatteryLabel.StyleClasses.Contains("LabelDanger"))
                 BatteryLabel.StyleClasses.Add("LabelDanger");
             RemoveBatteryButton.Visible = false;
@@ -124,10 +228,10 @@ public sealed partial class ElectronicAssemblyWindow : DefaultWindow
         DetailDescLabel.Text = circuit.Description;
         RemoveCircuitButton.Disabled = !circuit.Removable;
 
-        StatSize.Text = $"Size: {circuit.Size}";
-        StatComp.Text = $"Complexity: {circuit.Complexity}";
-        StatPower.Text = $"Power (Idle): {circuit.PowerDrawIdle}W";
-        StatActive.Text = $"Power (Act): {circuit.PowerDrawPerUse}W";
+        StatSize.Text = Loc.GetString("electronic-assembly-window-stat-size", ("size", circuit.Size));
+        StatComp.Text = Loc.GetString("electronic-assembly-window-stat-complexity", ("complexity", circuit.Complexity));
+        StatPower.Text = Loc.GetString("electronic-assembly-window-stat-power-idle", ("power", circuit.PowerDrawIdle.ToString("F0")));
+        StatActive.Text = Loc.GetString("electronic-assembly-window-stat-power-act", ("power", circuit.PowerDrawPerUse.ToString("F0")));
 
         InputsContainer.RemoveAllChildren();
         OutputsContainer.RemoveAllChildren();
@@ -156,7 +260,7 @@ public sealed partial class ElectronicAssemblyWindow : DefaultWindow
         var btn = new Button
         {
             Text = $"[{pin.DataType}] {pin.Name} : {pin.DisplayData}",
-            ToolTip = "Click with Wirer to connect. Click with Debugger to write data.",
+            ToolTip = Loc.GetString("electronic-assembly-window-pin-tooltip"),
             Modulate = pin.PinType == PinType.Activator ? Robust.Shared.Maths.Color.IndianRed : Robust.Shared.Maths.Color.LightGray
         };
 
@@ -175,9 +279,13 @@ public sealed partial class ElectronicAssemblyWindow : DefaultWindow
     }
 }
 
-кінець 1 ElectronicAssemblyWindow.xaml.cs
 
-файл 2 ElectronicAssemblyBoundUI.cs
+--- END OF FILE #2 ---
+
+=========================================================
+FILE #3: Content.Pirate.Client/IntegratedCircuits/UI/ElectronicAssemblyBoundUI.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.UI;
 using Content.Shared.Input;
 using JetBrains.Annotations;
@@ -234,9 +342,96 @@ public sealed class ElectronicAssemblyBoundUI : BoundUserInterface
     }
 }
 
-кінець 2 ElectronicAssemblyBoundUI.cs
 
-файл 3 CircuitPrinterWindow.xaml.cs
+--- END OF FILE #3 ---
+
+=========================================================
+FILE #4: Content.Pirate.Client/IntegratedCircuits/UI/CircuitPrinterWindow.xaml
+=========================================================
+
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+               Resizable="True"
+               Title="{Loc 'circuit-printer-window-title'}">
+    <BoxContainer Orientation="Vertical"
+                  MinSize="800 630"
+                  Margin="5">
+
+        <!-- Title -->
+        <Label Text="{Loc 'circuit-printer-window-title'}"
+               StyleClasses="LabelHeading"
+               HorizontalAlignment="Center"
+               Margin="0 0 0 5" />
+
+        <!-- Materials info -->
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 3 0 3">
+            <Label Text="{Loc 'circuit-printer-window-materials'}" />
+            <Label Name="MaterialsLabel"
+                   Text="0/2500 Steel" />
+        </BoxContainer>
+
+        <!-- Upgrade status -->
+        <BoxContainer Orientation="Horizontal"
+                      Margin="0 0 0 3">
+            <Label Text="{Loc 'circuit-printer-window-circuits-available'}" />
+            <Label Name="UpgradeLabel"
+                   Text="Regular" />
+        </BoxContainer>
+
+        <!-- Separator -->
+        <PanelContainer SetHeight="2"
+                        Margin="0 5 0 5">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#404046" />
+            </PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Category tabs -->
+        <Label Text="{Loc 'circuit-printer-window-categories'}"
+               Margin="0 0 0 3" />
+        <ScrollContainer HScrollEnabled="True"
+                         VScrollEnabled="False"
+                         SetHeight="35"
+                         Margin="0 0 0 3">
+            <BoxContainer Name="CategoriesContainer"
+                          Orientation="Horizontal" />
+        </ScrollContainer>
+
+        <!-- Separator -->
+        <PanelContainer SetHeight="2"
+                        Margin="0 3 0 3">
+            <PanelContainer.PanelOverride>
+                <gfx:StyleBoxFlat BackgroundColor="#404046" />
+            </PanelContainer.PanelOverride>
+        </PanelContainer>
+
+        <!-- Current category header -->
+        <Label Name="CategoryHeader"
+               Text=""
+               StyleClasses="LabelSubText"
+               HorizontalAlignment="Center"
+               Margin="0 0 0 5" />
+
+        <!-- Recipe list -->
+        <ScrollContainer VerticalExpand="True"
+                         HScrollEnabled="False"
+                         Margin="0 0 0 5">
+            <BoxContainer Name="RecipesList"
+                          Orientation="Vertical" />
+        </ScrollContainer>
+
+    </BoxContainer>
+</DefaultWindow>
+
+
+--- END OF FILE #4 ---
+
+=========================================================
+FILE #5: Content.Pirate.Client/IntegratedCircuits/UI/CircuitPrinterWindow.xaml.cs
+=========================================================
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -282,10 +477,10 @@ public sealed partial class CircuitPrinterWindow : DefaultWindow
         }
         MaterialsLabel.Text = materialParts.Count > 0
             ? string.Join("; ", materialParts)
-            : "None";
+            : Loc.GetString("circuit-printer-window-materials-none");
 
         // Upgrade status
-        UpgradeLabel.Text = state.Upgraded ? "Advanced" : "Regular";
+        UpgradeLabel.Text = state.Upgraded ? Loc.GetString("circuit-printer-window-upgraded-advanced") : Loc.GetString("circuit-printer-window-upgraded-regular");
 
         // Category tabs
         CategoriesContainer.RemoveAllChildren();
@@ -379,9 +574,13 @@ public sealed partial class CircuitPrinterWindow : DefaultWindow
     }
 }
 
-кінець 3 CircuitPrinterWindow.xaml.cs
 
-файл 4 CircuitPrinterBoundUI.cs
+--- END OF FILE #5 ---
+
+=========================================================
+FILE #6: Content.Pirate.Client/IntegratedCircuits/UI/CircuitPrinterBoundUI.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.UI;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
@@ -427,9 +626,50 @@ public sealed class CircuitPrinterBoundUI : BoundUserInterface
     }
 }
 
-кінець 4 CircuitPrinterBoundUI.cs
 
-файл 5 CircuitDebuggerWindow.xaml.cs
+--- END OF FILE #6 ---
+
+=========================================================
+FILE #7: Content.Pirate.Client/IntegratedCircuits/UI/CircuitDebuggerWindow.xaml
+=========================================================
+
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               Title="{Loc 'circuit-debugger-window-title'}"
+               MinSize="300 150">
+    <BoxContainer Orientation="Vertical" Margin="5">
+        
+        <!-- Поточний стан -->
+        <Label Text="{Loc 'circuit-debugger-window-current-memory'}" Modulate="LightGray" />
+        <Label Name="CurrentValueLabel" Text="(null)" StyleClasses="LabelHeading" Margin="0 0 0 10"/>
+
+        <Label Text="{Loc 'circuit-debugger-window-select-mode'}" />
+        <BoxContainer Orientation="Horizontal" Margin="0 0 0 5">
+            <Button Name="BtnString" Text="{Loc 'circuit-debugger-window-mode-string'}" HorizontalExpand="True" />
+            <Button Name="BtnNumber" Text="{Loc 'circuit-debugger-window-mode-number'}" HorizontalExpand="True" />
+            <Button Name="BtnRef" Text="{Loc 'circuit-debugger-window-mode-ref'}" HorizontalExpand="True" />
+            <Button Name="BtnNull" Text="{Loc 'circuit-debugger-window-mode-null'}" HorizontalExpand="True" />
+        </BoxContainer>
+
+        <!-- Введення даних -->
+        <BoxContainer Name="InputContainer" Orientation="Horizontal" Margin="0 5 0 0">
+            <LineEdit Name="DataInput" PlaceHolder="{Loc 'circuit-debugger-window-input-placeholder'}" HorizontalExpand="True" />
+            <Button Name="BtnSave" Text="{Loc 'circuit-debugger-window-save'}" MinSize="60 0" />
+        </BoxContainer>
+
+        <Label Name="RefPromptLabel" Text="{Loc 'circuit-debugger-window-ref-prompt'}" 
+               Modulate="Yellow" Visible="False" Margin="0 5 0 0" HorizontalAlignment="Center"/>
+
+    </BoxContainer>
+</DefaultWindow>
+
+
+--- END OF FILE #7 ---
+
+=========================================================
+FILE #8: Content.Pirate.Client/IntegratedCircuits/UI/CircuitDebuggerWindow.xaml.cs
+=========================================================
+
 using System;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -504,9 +744,13 @@ public sealed partial class CircuitDebuggerWindow : DefaultWindow
     }
 }
 
-кінець 5 CircuitDebuggerWindow.xaml.cs
 
-файл 6 CircuitDebuggerBoundUI.cs
+--- END OF FILE #8 ---
+
+=========================================================
+FILE #9: Content.Pirate.Client/IntegratedCircuits/UI/CircuitDebuggerBoundUI.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.UI;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
@@ -540,9 +784,146 @@ public sealed class CircuitDebuggerBoundUI : BoundUserInterface
     }
 }
 
-кінець 6 CircuitDebuggerBoundUI.cs
 
-файл 7 ClientIntegratedCircuitSystem.cs
+--- END OF FILE #9 ---
+
+=========================================================
+FILE #10: Content.Pirate.Client/IntegratedCircuits/UI/AssemblyInteractWindow.xaml
+=========================================================
+
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               Title="{Loc 'assembly-interact-window-title'}"
+               MinSize="300 400">
+    <BoxContainer Orientation="Vertical" Margin="5">
+        
+        <Label Text="{Loc 'assembly-interact-window-prompt'}" Margin="0 0 0 5"/>
+        
+        <!-- Поле для фільтрації -->
+        <LineEdit Name="FilterEdit" PlaceHolder="{Loc 'assembly-interact-window-search-placeholder'}" Margin="0 0 0 5" />
+
+        <!-- Контейнер для списку -->
+        <ScrollContainer VerticalExpand="True">
+            <BoxContainer Name="OptionsContainer" Orientation="Vertical" />
+        </ScrollContainer>
+        
+    </BoxContainer>
+</DefaultWindow>
+
+
+--- END OF FILE #10 ---
+
+=========================================================
+FILE #11: Content.Pirate.Client/IntegratedCircuits/UI/AssemblyInteractWindow.xaml.cs
+=========================================================
+
+using System;
+using System.Collections.Generic;
+using Content.Pirate.Shared.IntegratedCircuits.UI;
+using Robust.Client.AutoGenerated;
+using Robust.Client.UserInterface.Controls;
+using Robust.Client.UserInterface.CustomControls;
+using Robust.Client.UserInterface.XAML;
+using Robust.Shared.GameObjects;
+
+namespace Content.Pirate.Client.IntegratedCircuits.UI;
+
+[GenerateTypedNameReferences]
+public sealed partial class AssemblyInteractWindow : DefaultWindow
+{
+    public event Action<NetEntity>? OnOptionSelected;
+
+    private List<InteractOption> _currentOptions = new();
+
+    public AssemblyInteractWindow()
+    {
+        RobustXamlLoader.Load(this);
+
+        // Динамічне оновлення списку під час введення тексту
+        FilterEdit.OnTextChanged += _ => FilterList(FilterEdit.Text);
+    }
+
+    public void UpdateState(AssemblyInteractBoundUIState state)
+    {
+        _currentOptions = state.Options;
+        FilterList(FilterEdit.Text);
+    }
+
+    private void FilterList(string filter)
+    {
+        OptionsContainer.RemoveAllChildren();
+
+        foreach (var option in _currentOptions)
+        {
+            // Якщо поле фільтра не порожнє, ігноруємо регістр і перевіряємо, чи збігається текст
+            if (!string.IsNullOrWhiteSpace(filter) && 
+                !option.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var btn = new Button
+            {
+                Text = option.Name,
+                HorizontalAlignment = HAlignment.Stretch,
+                Margin = new Robust.Shared.Maths.Thickness(0, 0, 0, 2)
+            };
+
+            var netEntity = option.CircuitEntity;
+            btn.OnPressed += _ => OnOptionSelected?.Invoke(netEntity);
+            
+            OptionsContainer.AddChild(btn);
+        }
+    }
+}
+
+
+--- END OF FILE #11 ---
+
+=========================================================
+FILE #12: Content.Pirate.Client/IntegratedCircuits/UI/AssemblyInteractBoundUI.cs
+=========================================================
+
+using Content.Pirate.Shared.IntegratedCircuits.UI;
+using Robust.Client.UserInterface;
+using Robust.Shared.GameObjects;
+
+namespace Content.Pirate.Client.IntegratedCircuits.UI;
+
+public sealed class AssemblyInteractBoundUI : BoundUserInterface
+{
+    private AssemblyInteractWindow? _window;
+
+    public AssemblyInteractBoundUI(EntityUid owner, Enum uiKey) : base(owner, uiKey) { }
+
+    protected override void Open()
+    {
+        base.Open();
+        _window = this.CreateWindow<AssemblyInteractWindow>();
+        
+        _window.OnOptionSelected += netEntity =>
+        {
+            SendMessage(new AssemblyInteractSelectMessage(netEntity));
+        };
+
+        if (State != null) UpdateState(State);
+    }
+
+    protected override void UpdateState(BoundUserInterfaceState state)
+    {
+        base.UpdateState(state);
+        if (state is AssemblyInteractBoundUIState castState)
+            _window?.UpdateState(castState);
+    }
+}
+
+
+--- END OF FILE #12 ---
+
+=========================================================
+FILE #13: Content.Pirate.Client/IntegratedCircuits/ClientIntegratedCircuitSystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 
 namespace Content.Pirate.Client.IntegratedCircuits;
@@ -557,9 +938,13 @@ public sealed class ClientIntegratedCircuitSystem : SharedIntegratedCircuitSyste
     // Всі методи з Shared будуть працювати автоматично.
 }
 
-кінець 7 ClientIntegratedCircuitSystem.cs
 
-файл 8 AssemblyVisualizerSystem.cs
+--- END OF FILE #13 ---
+
+=========================================================
+FILE #14: Content.Pirate.Client/IntegratedCircuits/Visualizers/AssemblyVisualizerSystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Robust.Client.GameObjects;
@@ -592,9 +977,13 @@ public sealed class AssemblyVisualizerSystem : VisualizerSystem<ElectronicAssemb
     }
 }
 
-кінець 8 AssemblyVisualizerSystem.cs
 
-файл 9 WirerVisualizerSystem.cs
+--- END OF FILE #14 ---
+
+=========================================================
+FILE #15: Content.Pirate.Client/IntegratedCircuits/Visualizers/WirerVisualizerSystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Robust.Client.GameObjects;
@@ -626,9 +1015,13 @@ public sealed class WirerVisualizerSystem : VisualizerSystem<CircuitWirerCompone
     }
 }
 
-кінець 9 WirerVisualizerSystem.cs
 
-файл 10 ServerElectronicAssemblySystem.cs
+--- END OF FILE #15 ---
+
+=========================================================
+FILE #16: Content.Pirate.Server/IntegratedCircuits/ServerElectronicAssemblySystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 using Content.Server.Power.Components;
@@ -856,9 +1249,13 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
         args.Handled = true;
     }
 }
-кінець 10 ServerElectronicAssemblySystem.cs
 
-файл 11 ServerIntegratedCircuitSystem.cs
+--- END OF FILE #16 ---
+
+=========================================================
+FILE #17: Content.Pirate.Server/IntegratedCircuits/ServerIntegratedCircuitSystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 
@@ -904,9 +1301,13 @@ public sealed class ServerIntegratedCircuitSystem : SharedIntegratedCircuitSyste
     }
 }
 
-кінець 11 ServerIntegratedCircuitSystem.cs
 
-файл 12 ElectronicAssemblyUISystem.cs
+--- END OF FILE #17 ---
+
+=========================================================
+FILE #18: Content.Pirate.Server/IntegratedCircuits/ElectronicAssemblyUISystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -1123,9 +1524,13 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
 }
 
 
-кінець 12 ElectronicAssemblyUISystem.cs
 
-файл 13 CircuitPrinterUISystem.cs
+--- END OF FILE #18 ---
+
+=========================================================
+FILE #19: Content.Pirate.Server/IntegratedCircuits/CircuitPrinterUISystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -1259,9 +1664,13 @@ public sealed class CircuitPrinterUISystem : EntitySystem
         _ui.SetUiState(uid, CircuitPrinterUiKey.Key, state);
     }
 }
-кінець 13 CircuitPrinterUISystem.cs
 
-файл 14 CircuitPrinterSystem.cs
+--- END OF FILE #19 ---
+
+=========================================================
+FILE #20: Content.Pirate.Server/IntegratedCircuits/CircuitPrinterSystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
@@ -1364,15 +1773,21 @@ public sealed class CircuitPrinterSystem : EntitySystem
         };
     }
 }
-кінець 14 CircuitPrinterSystem.cs
 
-файл 15 ServerCircuitContentSystem.cs
+--- END OF FILE #20 ---
+
+=========================================================
+FILE #21: Content.Pirate.Server/IntegratedCircuits/ServerCircuitContentSystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
 using Content.Pirate.Shared.IntegratedCircuits.Systems;
+using Content.Pirate.Shared.IntegratedCircuits.UI;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
 using Robust.Shared.GameObjects;
+using Robust.Server.GameObjects; // Для UserInterfaceSystem
 using Content.Pirate.Shared.IntegratedCircuits;
 
 namespace Content.Pirate.Server.IntegratedCircuits;
@@ -1381,62 +1796,120 @@ public sealed class ServerCircuitContentSystem : EntitySystem
 {
     [Dependency] private readonly SharedIntegratedCircuitSystem _circuits = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        // 1. Коли динамік отримує імпульс (активується)
         SubscribeLocalEvent<CircuitSpeakerComponent, CircuitActivatedEvent>(OnSpeakerActivated);
-
-        // 2. Коли гравець "використовує" зібраний корпус в руці (натискає Z)
+        
+        // Підписуємось на натискання Z на корпусі
         SubscribeLocalEvent<ElectronicAssemblyComponent, UseInHandEvent>(OnAssemblyUsed);
+        
+        // Підписуємось на відповідь з UI (коли гравець вибрав деталь у списку)
+        SubscribeLocalEvent<ElectronicAssemblyComponent, AssemblyInteractSelectMessage>(OnInteractSelect);
+
+        // Підписуємось на саму кнопку (замість хардкоду в UseInHand)
+        SubscribeLocalEvent<CircuitButtonComponent, CircuitManualTriggerEvent>(OnButtonTriggered);
     }
 
     private void OnSpeakerActivated(EntityUid uid, CircuitSpeakerComponent comp, CircuitActivatedEvent args)
     {
-        // Читаємо текст із першого вхідного піна (індекс 0)
         var text = _circuits.ReadPinData(uid, PinType.Input, 0) as string;
-
-        if (string.IsNullOrWhiteSpace(text))
-            return;
-
-        // Шукаємо сутність, яка повинна "говорити" (Корпус або сама мікросхема, якщо вона лежить на підлозі)
+        if (string.IsNullOrWhiteSpace(text)) return;
         var actingEntity = _circuits.GetActingEntity(uid);
-
-        // Виводимо повідомлення над корпусом (поки що через Popup, потім можна через ChatSystem)
         _popup.PopupEntity($"[Динамік]: {text}", actingEntity);
     }
 
+    // ГОЛОВНА ЛОГІКА
     private void OnAssemblyUsed(EntityUid uid, ElectronicAssemblyComponent comp, UseInHandEvent args)
     {
         if (args.Handled || comp.Opened) 
-            return; // Не можна клікати кнопки, поки корпус відкритий
+            return; // Не можна клікати кнопки, поки корпус відкритий викруткою
 
-        bool pressed = false;
-
-        // Шукаємо всі мікросхеми-кнопки всередині корпусу
+        // Збираємо ВСІ інтерактивні мікросхеми в цьому корпусі
+        var interactables = new List<EntityUid>();
         foreach (var circuitUid in comp.CircuitEntities)
         {
-            if (HasComp<CircuitButtonComponent>(circuitUid))
+            if (HasComp<CircuitInteractableComponent>(circuitUid))
             {
-                // Кнопка має вихідний імпульсний пін (Activator, індекс 0). 
-                // Ми "штовхаємо" з нього імпульс далі по дротах.
-                _circuits.PushData(circuitUid, PinType.Activator, 0);
-                pressed = true;
+                interactables.Add(circuitUid);
             }
         }
 
-        if (pressed)
+        if (interactables.Count == 0)
         {
-            _popup.PopupEntity("Ви натиснули на пристрій.", uid, args.User);
+            _popup.PopupEntity("В цьому пристрої немає нічого для натискання.", uid, args.User);
             args.Handled = true;
+            return;
         }
+
+        // ЯКЩО ДЕТАЛЬ ЛИШЕ ОДНА - натискаємо її миттєво
+        if (interactables.Count == 1)
+        {
+            RaiseLocalEvent(interactables[0], new CircuitManualTriggerEvent(args.User));
+            args.Handled = true;
+            return;
+        }
+
+        // ЯКЩО ДЕТАЛЕЙ БІЛЬШЕ НІЖ 1 - формуємо меню
+        var options = new List<InteractOption>();
+        foreach (var circuitUid in interactables)
+        {
+            // Беремо кастомне ім'я, або стандартне, якщо гравець не перейменував
+            var name = Name(circuitUid);
+            if (TryComp<IntegratedCircuitComponent>(circuitUid, out var ic) && !string.IsNullOrEmpty(ic.DisplayName))
+                name = ic.DisplayName;
+
+            options.Add(new InteractOption
+            {
+                CircuitEntity = GetNetEntity(circuitUid),
+                Name = name
+            });
+        }
+
+        // Відправляємо стан і відкриваємо вікно
+        var state = new AssemblyInteractBoundUIState(options);
+        _uiSystem.SetUiState(uid, AssemblyInteractUiKey.Key, state);
+        _uiSystem.OpenUi(uid, AssemblyInteractUiKey.Key, args.User);
+        
+        args.Handled = true;
+    }
+
+    // Обробка вибору гравця з Filtered List Menu
+    private void OnInteractSelect(EntityUid uid, ElectronicAssemblyComponent comp, AssemblyInteractSelectMessage args)
+    {
+        var circuitUid = GetEntity(args.SelectedCircuit);
+
+        // Захист від експлойтів: чи справді мікросхема все ще в цьому корпусі?
+        if (!comp.CircuitEntities.Contains(circuitUid))
+            return;
+
+        // "Натискаємо" вибрану деталь
+        RaiseLocalEvent(circuitUid, new CircuitManualTriggerEvent(args.Actor));
+
+        // Можна закрити UI після вибору, або залишити відкритим для спаму (зазвичай закривають)
+        // _uiSystem.CloseUi(uid, AssemblyInteractUiKey.Key, args.Actor); 
+    }
+
+    // Логіка самої кнопки (спрацьовує коли її вибрали в меню, або якщо вона одна)
+    private void OnButtonTriggered(EntityUid uid, CircuitButtonComponent comp, CircuitManualTriggerEvent args)
+    {
+        // Кнопка просто пускає імпульс з її 0-го активатора
+        _circuits.PushData(uid, PinType.Activator, 0);
+        
+        var actingEntity = _circuits.GetActingEntity(uid);
+        _popup.PopupEntity("Ви натиснули на пристрій.", actingEntity, args.User);
     }
 }
-кінець 15 ServerCircuitContentSystem.cs
 
-файл 16 CircuitDebuggerUISystem.cs
+--- END OF FILE #21 ---
+
+=========================================================
+FILE #22: Content.Pirate.Server/IntegratedCircuits/CircuitDebuggerUISystem.cs
+=========================================================
+
 using System.Globalization;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -1540,9 +2013,13 @@ public sealed class CircuitDebuggerUISystem : EntitySystem
     }
 }
 
-кінець 16 CircuitDebuggerUISystem.cs
 
-файл 17 CircuitActionFlags.cs
+--- END OF FILE #22 ---
+
+=========================================================
+FILE #23: Content.Pirate.Shared/IntegratedCircuits/CircuitActionFlags.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -1573,9 +2050,13 @@ public enum CircuitActionFlags : byte
     Movement = 1 << 2,
 }
 
-кінець 17 CircuitActionFlags.cs
 
-файл 18 CircuitDebuggerComponent.cs
+--- END OF FILE #23 ---
+
+=========================================================
+FILE #24: Content.Pirate.Shared/IntegratedCircuits/Components/CircuitDebuggerComponent.cs
+=========================================================
+
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
@@ -1640,9 +2121,13 @@ public sealed partial class CircuitDebuggerComponent : Component
     public bool AcceptingRefs;
 }
 
-кінець 18 CircuitDebuggerComponent.cs
 
-файл 19 CircuitWirerComponent.cs
+--- END OF FILE #24 ---
+
+=========================================================
+FILE #25: Content.Pirate.Shared/IntegratedCircuits/Components/CircuitWirerComponent.cs
+=========================================================
+
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
@@ -1698,9 +2183,13 @@ public sealed partial class CircuitWirerComponent : Component
     public PinAddress? SelectedPin;
 }
 
-кінець 19 CircuitWirerComponent.cs
 
-файл 20 ElectronicAssemblyComponent.cs
+--- END OF FILE #25 ---
+
+=========================================================
+FILE #26: Content.Pirate.Shared/IntegratedCircuits/Components/ElectronicAssemblyComponent.cs
+=========================================================
+
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
 using Content.Pirate.Shared.IntegratedCircuits;
@@ -1792,9 +2281,13 @@ public sealed partial class ElectronicAssemblyComponent : Component
     public int MaxActivationsPerTick = 100;
 }
 
-кінець 20 ElectronicAssemblyComponent.cs
 
-файл 21 IntegratedCircuitComponent.cs
+--- END OF FILE #26 ---
+
+=========================================================
+FILE #27: Content.Pirate.Shared/IntegratedCircuits/Components/IntegratedCircuitComponent.cs
+=========================================================
+
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
 using Content.Pirate.Shared.IntegratedCircuits;
@@ -1896,9 +2389,13 @@ public sealed partial class IntegratedCircuitComponent : Component
     public TimeSpan LastActivation = TimeSpan.Zero;
 }
 
-кінець 21 IntegratedCircuitComponent.cs
 
-файл 22 CircuitPrinterComponent.cs
+--- END OF FILE #27 ---
+
+=========================================================
+FILE #28: Content.Pirate.Shared/IntegratedCircuits/Components/CircuitPrinterComponent.cs
+=========================================================
+
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.Manager.Attributes;
 
@@ -1962,9 +2459,13 @@ public sealed partial class CircuitPrinterComponent : Component
     public string? CurrentCategory;
 }
 
-кінець 22 CircuitPrinterComponent.cs
 
-файл 23 CircuitComponents.cs
+--- END OF FILE #28 ---
+
+=========================================================
+FILE #29: Content.Pirate.Shared/IntegratedCircuits/Components/CircuitComponents.cs
+=========================================================
+
 using Robust.Shared.GameObjects;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.Components;
@@ -1980,9 +2481,13 @@ public sealed partial class CircuitSpeakerComponent : Component
 {
     // Мікросхема-динамік
 }
-кінець 23 CircuitComponents.cs
 
-файл 24 CircuitPrintableComponent.cs
+--- END OF FILE #29 ---
+
+=========================================================
+FILE #30: Content.Pirate.Shared/IntegratedCircuits/Components/CircuitPrintableComponent.cs
+=========================================================
+
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization.Manager.Attributes;
 using System.Collections.Generic;
@@ -2014,9 +2519,33 @@ public sealed partial class CircuitPrintableComponent : Component
     public bool RequiresUpgrade = false;
 }
 
-кінець 24 CircuitPrintableComponent.cs
 
-файл 25 IntegratedCircuitEvents.cs
+--- END OF FILE #30 ---
+
+=========================================================
+FILE #31: Content.Pirate.Shared/IntegratedCircuits/Components/CircuitInteractableComponent.cs
+=========================================================
+
+using Robust.Shared.GameStates;
+
+namespace Content.Pirate.Shared.IntegratedCircuits.Components;
+
+/// <summary>
+/// Додайте цей компонент до мікросхем (кнопки, перемикачі, клавіатури), 
+/// які гравець може активувати вручну, тримаючи корпус у руках.
+/// </summary>
+[RegisterComponent, NetworkedComponent]
+public sealed partial class CircuitInteractableComponent : Component
+{
+}
+
+
+--- END OF FILE #31 ---
+
+=========================================================
+FILE #32: Content.Pirate.Shared/IntegratedCircuits/Events/IntegratedCircuitEvents.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 using Content.Shared.DoAfter;
 
@@ -2099,9 +2628,37 @@ public sealed partial class AssemblyTogglePanelEvent : SimpleDoAfterEvent { }
 /// </summary>
 [Serializable, NetSerializable]
 public sealed partial class AssemblyToggleWeldEvent : SimpleDoAfterEvent { }
-кінець 25 IntegratedCircuitEvents.cs
 
-файл 26 IntegratedPin.cs
+--- END OF FILE #32 ---
+
+=========================================================
+FILE #33: Content.Pirate.Shared/IntegratedCircuits/Events/CircuitManualTriggerEvent.cs
+=========================================================
+
+using Robust.Shared.GameObjects;
+
+namespace Content.Pirate.Shared.IntegratedCircuits.Events;
+
+/// <summary>
+/// Викликається на мікросхемі, коли гравець вибрав її з меню (або вона активувалася автоматично, бо була одна).
+/// </summary>
+public sealed class CircuitManualTriggerEvent : EntityEventArgs
+{
+    public EntityUid User { get; }
+
+    public CircuitManualTriggerEvent(EntityUid user)
+    {
+        User = user;
+    }
+}
+
+
+--- END OF FILE #33 ---
+
+=========================================================
+FILE #34: Content.Pirate.Shared/IntegratedCircuits/IntegratedPin.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
 
@@ -2150,9 +2707,13 @@ public sealed partial class IntegratedPin
     public List<PinAddress> LinkedPins { get; set; } = new();
 }
 
-кінець 26 IntegratedPin.cs
 
-файл 27 PinAddress.cs
+--- END OF FILE #34 ---
+
+=========================================================
+FILE #35: Content.Pirate.Shared/IntegratedCircuits/PinAddress.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.Manager.Attributes;
 
@@ -2195,9 +2756,13 @@ public sealed partial class PinAddress
     }
 }
 
-кінець 27 PinAddress.cs
 
-файл 28 PinDataType.cs
+--- END OF FILE #35 ---
+
+=========================================================
+FILE #36: Content.Pirate.Shared/IntegratedCircuits/PinDataType.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -2261,9 +2826,13 @@ public enum PinDataType : byte
     Char,
 }
 
-кінець 28 PinDataType.cs
 
-файл 29 PinType.cs
+--- END OF FILE #36 ---
+
+=========================================================
+FILE #37: Content.Pirate.Shared/IntegratedCircuits/PinType.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -2290,9 +2859,13 @@ public enum PinType : byte
     Activator,
 }
 
-кінець 29 PinType.cs
 
-файл 30 CircuitToolsSystem.cs
+--- END OF FILE #37 ---
+
+=========================================================
+FILE #38: Content.Pirate.Shared/IntegratedCircuits/Systems/CircuitToolsSystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
@@ -2522,9 +3095,13 @@ public sealed class CircuitToolsSystem : EntitySystem
     #endregion
 }
 
-кінець 30 CircuitToolsSystem.cs
 
-файл 31 SharedElectronicAssemblySystem.cs
+--- END OF FILE #38 ---
+
+=========================================================
+FILE #39: Content.Pirate.Shared/IntegratedCircuits/Systems/SharedElectronicAssemblySystem.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
 using Robust.Shared.Containers;
@@ -2706,9 +3283,13 @@ public abstract class SharedElectronicAssemblySystem : EntitySystem
 
     #endregion
 }
-кінець 31 SharedElectronicAssemblySystem.cs
 
-файл 32 SharedIntegratedCircuitSystem.cs
+--- END OF FILE #39 ---
+
+=========================================================
+FILE #40: Content.Pirate.Shared/IntegratedCircuits/Systems/SharedIntegratedCircuitSystem.cs
+=========================================================
+
 using System.Linq;
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Content.Pirate.Shared.IntegratedCircuits.Events;
@@ -3138,9 +3719,13 @@ public abstract class SharedIntegratedCircuitSystem : EntitySystem
     #endregion
 }
 
-кінець 32 SharedIntegratedCircuitSystem.cs
 
-файл 33 ElectronicAssemblyUiKey.cs
+--- END OF FILE #40 ---
+
+=========================================================
+FILE #41: Content.Pirate.Shared/IntegratedCircuits/UI/ElectronicAssemblyUiKey.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -3151,9 +3736,13 @@ public enum ElectronicAssemblyUiKey : byte
     Key
 }
 
-кінець 33 ElectronicAssemblyUiKey.cs
 
-файл 34 CircuitPrinterUiKey.cs
+--- END OF FILE #41 ---
+
+=========================================================
+FILE #42: Content.Pirate.Shared/IntegratedCircuits/UI/CircuitPrinterUiKey.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -3164,9 +3753,13 @@ public enum CircuitPrinterUiKey : byte
     Key
 }
 
-кінець 34 CircuitPrinterUiKey.cs
 
-файл 35 ElectronicAssemblyUiMessages.cs
+--- END OF FILE #42 ---
+
+=========================================================
+FILE #43: Content.Pirate.Shared/IntegratedCircuits/UI/ElectronicAssemblyUiMessages.cs
+=========================================================
+
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 using Content.Pirate.Shared.IntegratedCircuits;
@@ -3260,9 +3853,13 @@ public sealed class AssemblyRemoveBatteryMessage : BoundUserInterfaceMessage
 }
 
 
-кінець 35 ElectronicAssemblyUiMessages.cs
 
-файл 36 CircuitPrinterUiMessages.cs
+--- END OF FILE #43 ---
+
+=========================================================
+FILE #44: Content.Pirate.Shared/IntegratedCircuits/UI/CircuitPrinterUiMessages.cs
+=========================================================
+
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 
@@ -3360,9 +3957,13 @@ public sealed class CircuitPrinterCategoryMessage : BoundUserInterfaceMessage
     }
 }
 
-кінець 36 CircuitPrinterUiMessages.cs
 
-файл 37 CircuitDebuggerUiKey.cs
+--- END OF FILE #44 ---
+
+=========================================================
+FILE #45: Content.Pirate.Shared/IntegratedCircuits/UI/CircuitDebuggerUiKey.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits.UI;
@@ -3373,9 +3974,13 @@ public enum CircuitDebuggerUiKey : byte
     Key
 }
 
-кінець 37 CircuitDebuggerUiKey.cs
 
-файл 38 CircuitDebuggerUiMessages.cs
+--- END OF FILE #45 ---
+
+=========================================================
+FILE #46: Content.Pirate.Shared/IntegratedCircuits/UI/CircuitDebuggerUiMessages.cs
+=========================================================
+
 using Content.Pirate.Shared.IntegratedCircuits.Components;
 using Robust.Shared.Serialization;
 
@@ -3410,9 +4015,60 @@ public sealed class DebuggerSetValueMessage : BoundUserInterfaceMessage
     public DebuggerSetValueMessage(string value) => Value = value;
 }
 
-кінець 38 CircuitDebuggerUiMessages.cs
 
-файл 39 CircuitVisuals.cs
+--- END OF FILE #46 ---
+
+=========================================================
+FILE #47: Content.Pirate.Shared/IntegratedCircuits/UI/AssemblyInteractUiMessages.cs
+=========================================================
+
+using Robust.Shared.GameObjects;
+using Robust.Shared.Serialization;
+
+namespace Content.Pirate.Shared.IntegratedCircuits.UI;
+
+[Serializable, NetSerializable]
+public enum AssemblyInteractUiKey : byte
+{
+    Key
+}
+
+[Serializable, NetSerializable]
+public sealed class InteractOption
+{
+    public NetEntity CircuitEntity;
+    public string Name = string.Empty;
+}
+
+[Serializable, NetSerializable]
+public sealed class AssemblyInteractBoundUIState : BoundUserInterfaceState
+{
+    public List<InteractOption> Options { get; }
+
+    public AssemblyInteractBoundUIState(List<InteractOption> options)
+    {
+        Options = options;
+    }
+}
+
+[Serializable, NetSerializable]
+public sealed class AssemblyInteractSelectMessage : BoundUserInterfaceMessage
+{
+    public NetEntity SelectedCircuit { get; }
+
+    public AssemblyInteractSelectMessage(NetEntity selectedCircuit)
+    {
+        SelectedCircuit = selectedCircuit;
+    }
+}
+
+
+--- END OF FILE #47 ---
+
+=========================================================
+FILE #48: Content.Pirate.Shared/IntegratedCircuits/CircuitVisuals.cs
+=========================================================
+
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.IntegratedCircuits;
@@ -3430,5 +4086,1588 @@ public enum WirerVisuals : byte
     Mode    // WirerMode: поточний режим паяльника
 }
 
-кінець 39 CircuitVisuals.cs
+
+--- END OF FILE #48 ---
+
+=========================================================
+FILE #49: Resources/Prototypes/IntegratedCircuits/integrated_electronics.yml
+=========================================================
+
+# ==========================================
+# 1. БАЗОВІ СУТНОСТІ (АБСТРАКТНІ)
+# ==========================================
+- type: entity
+  id: BaseIntegratedCircuit
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_components.rsi
+    state: template
+  - type: Item
+    size: Tiny
+  - type: IntegratedCircuit
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.15,-0.15,0.15,0.15"
+        mask:
+        - ItemMask
+
+- type: entity
+  id: BaseElectronicAssembly
+  abstract: true
+  components:
+  - type: Appearance
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_setups.rsi
+    layers:
+    - state: setup_small
+    - state: setup_small-color
+  - type: Item
+  - type: ElectronicAssembly
+  - type: UserInterface
+    interfaces:
+      enum.ElectronicAssemblyUiKey.Key:
+        type: ElectronicAssemblyBoundUI
+      enum.AssemblyInteractUiKey.Key:
+        type: AssemblyInteractBoundUI
+#  - type: ActivatableUI
+#    key: enum.ElectronicAssemblyUiKey.Key
+#    inHandsOnly: false
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.25,-0.25,0.25,0.25"
+        mask:
+        - ItemMask
+  - type: ItemSlots
+    slots:
+      battery_slot:
+        name: Power Cell
+        whitelist:
+          components: [ Battery ]
+  - type: PowerCellSlot
+    cellSlotId: battery_slot
+
+# ==========================================
+# 2. КОРПУСИ (СПАВНЯТЬСЯ У СВІТІ)
+# ==========================================
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblySmall
+  components:
+  - type: Sprite
+    state: setup_small
+  - type: Item
+    size: Small
+  - type: ElectronicAssembly
+    baseState: setup_small
+    detailColor: "#808080"
+    maxComponents: 10
+    maxComplexity: 25
+  - type: CircuitPrintable
+    category: "Assemblies"
+    cost:
+      Steel: 100
+
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblyMedium
+  components:
+  - type: Sprite
+    state: setup_medium
+  - type: Item
+    size: Normal
+  - type: ElectronicAssembly
+    baseState: setup_medium
+    detailColor: "#808080"
+    maxComponents: 25
+    maxComplexity: 75
+  - type: CircuitPrintable
+    category: "Assemblies"
+    cost:
+      Steel: 250
+
+- type: entity
+  parent: BaseElectronicAssembly
+  id: ElectronicAssemblyLarge
+  components:
+  - type: Sprite
+    state: setup_large
+  - type: Item
+    size: Large
+  - type: ElectronicAssembly
+    baseState: setup_large
+    detailColor: "#808080"
+    maxComponents: 100
+    maxComplexity: 300
+  - type: CircuitPrintable
+    category: "Assemblies"
+    cost:
+      Steel: 500
+
+# ==========================================
+# 3. ІНСТРУМЕНТИ
+# ==========================================
+- type: entity
+  id: CircuitWirer
+  components:
+  - type: Appearance
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_tools.rsi
+    layers:
+    - state: wirer-wire
+  - type: Item
+    size: Small
+  - type: CircuitWirer
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.15,-0.15,0.15,0.15"
+        mask:
+        - ItemMask
+  - type: CircuitPrintable
+    category: "Tools"
+    cost:
+      Steel: 50
+
+- type: entity
+  id: CircuitDebugger
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_tools.rsi
+    state: debugger
+  - type: Item
+    size: Small
+  - type: CircuitDebugger
+  - type: UserInterface
+    interfaces:
+      enum.CircuitDebuggerUiKey.Key:
+        type: CircuitDebuggerBoundUI
+  - type: ActivatableUI
+    key: enum.CircuitDebuggerUiKey.Key
+    inHandsOnly: true
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.15,-0.15,0.15,0.15"
+        mask:
+        - ItemMask
+  - type: CircuitPrintable
+    category: "Tools"
+    cost:
+      Steel: 50
+
+# ==========================================
+# 4. ПРИНТЕР
+# ==========================================
+- type: entity
+  id: IntegratedCircuitPrinter
+  components:
+  - type: Sprite
+    sprite: Objects/Devices/IntegratedCircuits/electronic_tools.rsi
+    state: circuit_printer
+  - type: Item
+    size: Large
+  - type: CircuitPrinter
+    materialMax: 2500
+  - type: UserInterface
+    interfaces:
+      enum.CircuitPrinterUiKey.Key:
+        type: CircuitPrinterBoundUI
+  - type: ActivatableUI
+    key: enum.CircuitPrinterUiKey.Key
+    inHandsOnly: false
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Physics
+    bodyType: Dynamic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeAabb
+          bounds: "-0.3,-0.3,0.3,0.3"
+        mask:
+        - ItemMask
+
+
+--- END OF FILE #49 ---
+
+=========================================================
+FILE #50: Resources/Prototypes/IntegratedCircuits/circuits.yml
+=========================================================
+
+# Мікросхема: Кнопка
+- type: entity
+  parent: BaseIntegratedCircuit
+  id: CircuitButton
+  components:
+  - type: Sprite
+    state: button
+  - type: CircuitButton
+  - type: CircuitInteractable
+  - type: IntegratedCircuit
+    complexity: 1
+    size: 1
+    activatorPins:
+      - name: "Натиснуто (Out)"
+        pinType: Activator
+  - type: CircuitPrintable
+    category: "I/O"
+    cost:
+      Steel: 10
+      Plastic: 5
+ 
+# Мікросхема: Динамік
+- type: entity
+  parent: BaseIntegratedCircuit
+  id: CircuitSpeaker
+  components:
+  - type: Sprite
+    state: speaker
+  - type: CircuitSpeaker
+  - type: IntegratedCircuit
+    complexity: 2
+    size: 2
+    powerDrawPerUse: 5 # Споживає 5 Вт енергії при кожному слові
+    inputPins:
+      - name: "Текст"
+        dataType: String
+    activatorPins:
+      - name: "Сказати (In)"
+        pinType: Activator
+  - type: CircuitPrintable
+    category: "I/O"
+    cost:
+      Steel: 20
+      Glass: 5
+
+
+--- END OF FILE #50 ---
+
+=========================================================
+FILE #51: Resources/Textures/Objects/Devices/IntegratedCircuits/electronic_components.rsi/meta.json
+=========================================================
+
+{
+  "version": 1,
+  "license": null,
+  "copyright": null,
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "template"
+    },
+    {
+      "name": "addition"
+    },
+    {
+      "name": "subtraction"
+    },
+    {
+      "name": "multiplication"
+    },
+    {
+      "name": "division"
+    },
+    {
+      "name": "exponent"
+    },
+    {
+      "name": "sign"
+    },
+    {
+      "name": "modulo"
+    },
+    {
+      "name": "square_root"
+    },
+    {
+      "name": "sine"
+    },
+    {
+      "name": "cosine"
+    },
+    {
+      "name": "tangent"
+    },
+    {
+      "name": "cosecant"
+    },
+    {
+      "name": "cotangent"
+    },
+    {
+      "name": "secant"
+    },
+    {
+      "name": "round"
+    },
+    {
+      "name": "absolute"
+    },
+    {
+      "name": "average"
+    },
+    {
+      "name": "pi"
+    },
+    {
+      "name": "random"
+    },
+    {
+      "name": "memory"
+    },
+    {
+      "name": "memory4"
+    },
+    {
+      "name": "memory8"
+    },
+    {
+      "name": "memory16"
+    },
+    {
+      "name": "equal"
+    },
+    {
+      "name": "not_equal"
+    },
+    {
+      "name": "less_than"
+    },
+    {
+      "name": "greater_than"
+    },
+    {
+      "name": "less_than_or_equal"
+    },
+    {
+      "name": "greater_than_or_equal"
+    },
+    {
+      "name": "not"
+    },
+    {
+      "name": "and"
+    },
+    {
+      "name": "nand"
+    },
+    {
+      "name": "xor"
+    },
+    {
+      "name": "or"
+    },
+    {
+      "name": "sr_nor"
+    },
+    {
+      "name": "jklatch"
+    },
+    {
+      "name": "gated_d"
+    },
+    {
+      "name": "button"
+    },
+    {
+      "name": "toggle_button"
+    },
+    {
+      "name": "numberpad"
+    },
+    {
+      "name": "textpad"
+    },
+    {
+      "name": "colorpad"
+    },
+    {
+      "name": "listpad"
+    },
+    {
+      "name": "card_reader"
+    },
+    {
+      "name": "led"
+    },
+    {
+      "name": "screen"
+    },
+    {
+      "name": "screen_medium"
+    },
+    {
+      "name": "screen_large"
+    },
+    {
+      "name": "internalbm"
+    },
+    {
+      "name": "gps",
+      "delays": [
+        [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "recorder",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "medscan"
+    },
+    {
+      "name": "medscan_adv",
+      "delays": [
+        [
+          0.5,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "signal",
+      "delays": [
+        [
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "signal_advanced",
+      "delays": [
+        [
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "speaker"
+    },
+    {
+      "name": "locomotion",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "locomotion_simple",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "video_camera"
+    },
+    {
+      "name": "mux2"
+    },
+    {
+      "name": "mux4"
+    },
+    {
+      "name": "mux8"
+    },
+    {
+      "name": "mux16"
+    },
+    {
+      "name": "dmux2"
+    },
+    {
+      "name": "dmux4"
+    },
+    {
+      "name": "dmux8"
+    },
+    {
+      "name": "dmux16"
+    },
+    {
+      "name": "split"
+    },
+    {
+      "name": "join"
+    },
+    {
+      "name": "constr"
+    },
+    {
+      "name": "constr8"
+    },
+    {
+      "name": "deconstr"
+    },
+    {
+      "name": "deconstr8"
+    },
+    {
+      "name": "tick-f",
+      "delays": [
+        [
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "tick-m",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "tick-s",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "clock",
+      "delays": [
+        [
+          1.5,
+          1.5,
+          1.5,
+          1.5
+        ]
+      ]
+    },
+    {
+      "name": "delay",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "delay-50",
+      "delays": [
+        [
+          0.83000004,
+          0.83000004,
+          0.83000004,
+          0.83000004,
+          0.83000004,
+          0.83000004
+        ]
+      ]
+    },
+    {
+      "name": "delay-20",
+      "delays": [
+        [
+          0.32999998,
+          0.32999998,
+          0.32999998,
+          0.32999998,
+          0.32999998,
+          0.32999998
+        ]
+      ]
+    },
+    {
+      "name": "delay-10",
+      "delays": [
+        [
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16,
+          0.16
+        ]
+      ]
+    },
+    {
+      "name": "delay-5",
+      "delays": [
+        [
+          0.083,
+          0.083,
+          0.083,
+          0.083,
+          0.083,
+          0.083
+        ]
+      ]
+    },
+    {
+      "name": "delay-1",
+      "delays": [
+        [
+          0.015999999,
+          0.015999999,
+          0.015999999,
+          0.015999999,
+          0.015999999,
+          0.015999999
+        ]
+      ]
+    },
+    {
+      "name": "tile"
+    },
+    {
+      "name": "uppercase"
+    },
+    {
+      "name": "lowercase"
+    },
+    {
+      "name": "num-string"
+    },
+    {
+      "name": "string-num"
+    },
+    {
+      "name": "hsv-hex"
+    },
+    {
+      "name": "rgb-hex"
+    },
+    {
+      "name": "ref-string"
+    },
+    {
+      "name": "ascii-string"
+    },
+    {
+      "name": "string-ascii"
+    },
+    {
+      "name": "light"
+    },
+    {
+      "name": "light_adv"
+    },
+    {
+      "name": "reagent_pump"
+    },
+    {
+      "name": "reagent_filter"
+    },
+    {
+      "name": "injector"
+    },
+    {
+      "name": "reagent_storage"
+    },
+    {
+      "name": "reagent_storage_big"
+    },
+    {
+      "name": "reagent_storage_cryo",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "reagent_scan"
+    },
+    {
+      "name": "smoke",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "chemical_cell"
+    },
+    {
+      "name": "solar_cell"
+    },
+    {
+      "name": "power_transmitter"
+    },
+    {
+      "name": "power_relay"
+    },
+    {
+      "name": "filter_mob"
+    },
+    {
+      "name": "filter_humanoid"
+    },
+    {
+      "name": "filter_obj"
+    },
+    {
+      "name": "filter_item"
+    },
+    {
+      "name": "filter_machinery"
+    },
+    {
+      "name": "filter_structure"
+    },
+    {
+      "name": "filter_custom"
+    },
+    {
+      "name": "sensor_accelerometer"
+    },
+    {
+      "name": "sensor_ir"
+    },
+    {
+      "name": "sensor_proxy"
+    },
+    {
+      "name": "ai"
+    },
+    {
+      "name": "grenade"
+    },
+    {
+      "name": "bluespace",
+      "delays": [
+        [
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "pressure_plate"
+    },
+    {
+      "name": "externalbm"
+    },
+    {
+      "name": "shocker"
+    },
+    {
+      "name": "grabber"
+    },
+    {
+      "name": "manipulator"
+    },
+    {
+      "name": "plant_m"
+    },
+    {
+      "name": "manip_base"
+    },
+    {
+      "name": "reagent_heater"
+    },
+    {
+      "name": "pull_claw"
+    },
+    {
+      "name": "signalsc",
+      "delays": [
+        [
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "blender"
+    },
+    {
+      "name": "wire_node"
+    },
+    {
+      "name": "reagent_funnel"
+    },
+    {
+      "name": "anchoring_bolts"
+    },
+    {
+      "name": "hatch_lock"
+    },
+    {
+      "name": "reagent_cooler"
+    },
+    {
+      "name": "interactor"
+    }
+  ]
+}
+
+--- END OF FILE #51 ---
+
+=========================================================
+FILE #52: Resources/Textures/Objects/Devices/IntegratedCircuits/electronic_setups.rsi/meta.json
+=========================================================
+
+{
+  "version": 1,
+  "license": null,
+  "copyright": null,
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "setup_small"
+    },
+    {
+      "name": "setup_small-color"
+    },
+    {
+      "name": "setup_small-open"
+    },
+    {
+      "name": "setup_small-open-color"
+    },
+    {
+      "name": "setup_small_calc"
+    },
+    {
+      "name": "setup_small_calc-color"
+    },
+    {
+      "name": "setup_small_calc-open"
+    },
+    {
+      "name": "setup_small_calc-open-color"
+    },
+    {
+      "name": "setup_small_clam"
+    },
+    {
+      "name": "setup_small_clam-color"
+    },
+    {
+      "name": "setup_small_clam-open"
+    },
+    {
+      "name": "setup_small_clam-open-color"
+    },
+    {
+      "name": "setup_small_simple"
+    },
+    {
+      "name": "setup_small_simple-color"
+    },
+    {
+      "name": "setup_small_simple-open"
+    },
+    {
+      "name": "setup_small_simple-open-color"
+    },
+    {
+      "name": "setup_small_hook"
+    },
+    {
+      "name": "setup_small_hook-color"
+    },
+    {
+      "name": "setup_small_hook-open"
+    },
+    {
+      "name": "setup_small_hook-open-color"
+    },
+    {
+      "name": "setup_small_pda"
+    },
+    {
+      "name": "setup_small_pda-color"
+    },
+    {
+      "name": "setup_small_pda-open"
+    },
+    {
+      "name": "setup_small_pda-open-color"
+    },
+    {
+      "name": "setup_medium",
+      "delays": [
+        [
+          1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "setup_medium-color"
+    },
+    {
+      "name": "setup_medium-open"
+    },
+    {
+      "name": "setup_medium-open-color"
+    },
+    {
+      "name": "setup_medium_box"
+    },
+    {
+      "name": "setup_medium_box-color"
+    },
+    {
+      "name": "setup_medium_box-open"
+    },
+    {
+      "name": "setup_medium_box-open-color"
+    },
+    {
+      "name": "setup_medium_clam"
+    },
+    {
+      "name": "setup_medium_clam-color"
+    },
+    {
+      "name": "setup_medium_clam-open"
+    },
+    {
+      "name": "setup_medium_clam-open-color"
+    },
+    {
+      "name": "setup_medium_med",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "setup_medium_med-color"
+    },
+    {
+      "name": "setup_medium_med-open"
+    },
+    {
+      "name": "setup_medium_med-open-color"
+    },
+    {
+      "name": "setup_medium_gun"
+    },
+    {
+      "name": "setup_medium_gun-color"
+    },
+    {
+      "name": "setup_medium_gun-open"
+    },
+    {
+      "name": "setup_medium_gun-open-color"
+    },
+    {
+      "name": "setup_medium_radio"
+    },
+    {
+      "name": "setup_medium_radio-color"
+    },
+    {
+      "name": "setup_medium_radio-open"
+    },
+    {
+      "name": "setup_medium_radio-open-color"
+    },
+    {
+      "name": "setup_large",
+      "delays": [
+        [
+          0.5,
+          0.4,
+          0.3,
+          0.2,
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "setup_large-color"
+    },
+    {
+      "name": "setup_large-open"
+    },
+    {
+      "name": "setup_large-open-color"
+    },
+    {
+      "name": "setup_large_scope",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "setup_large_scope-color"
+    },
+    {
+      "name": "setup_large_scope-open"
+    },
+    {
+      "name": "setup_large_scope-open-color"
+    },
+    {
+      "name": "setup_large_terminal"
+    },
+    {
+      "name": "setup_large_terminal-color"
+    },
+    {
+      "name": "setup_large_terminal-open"
+    },
+    {
+      "name": "setup_large_terminal-open-color"
+    },
+    {
+      "name": "setup_large_arm"
+    },
+    {
+      "name": "setup_large_arm-color"
+    },
+    {
+      "name": "setup_large_arm-open"
+    },
+    {
+      "name": "setup_large_arm-open-color"
+    },
+    {
+      "name": "setup_large_tall"
+    },
+    {
+      "name": "setup_large_tall-color"
+    },
+    {
+      "name": "setup_large_tall-open"
+    },
+    {
+      "name": "setup_large_tall-open-color"
+    },
+    {
+      "name": "setup_large_industrial"
+    },
+    {
+      "name": "setup_large_industrial-color"
+    },
+    {
+      "name": "setup_large_industrial-open"
+    },
+    {
+      "name": "setup_large_industrial-open-color"
+    },
+    {
+      "name": "setup_drone",
+      "_TODO_ORIGINAL_DIRECTIONS": "Was 4 dirs with delays [[0.1,1,0.1,0.1]x4] + duplicate entry with [[0.1,0.1]x4]. Need to fix PNG sprite sheet to restore 4-dir animation."
+    },
+    {
+      "name": "setup_drone-color",
+      "directions": 4
+    },
+
+    {
+      "name": "setup_drone-open",
+      "directions": 4
+    },
+    {
+      "name": "setup_drone-open-color",
+      "directions": 4
+    },
+    {
+      "name": "setup_drone_arms",
+      "directions": 4
+    },
+    {
+      "name": "setup_drone_arms-color",
+      "directions": 4
+    },
+    {
+      "name": "setup_drone_arms-open",
+      "directions": 4
+    },
+    {
+      "name": "setup_drone_arms-open-color",
+      "directions": 4
+    },
+    {
+      "name": "setup_drone_secbot"
+    },
+    {
+      "name": "setup_drone_secbot-color"
+    },
+    {
+      "name": "setup_drone_secbot-open"
+    },
+    {
+      "name": "setup_drone_secbot-open-color"
+    },
+    {
+      "name": "setup_drone_medbot"
+    },
+    {
+      "name": "setup_drone_medbot-color"
+    },
+    {
+      "name": "setup_drone_medbot-open"
+    },
+    {
+      "name": "setup_drone_medbot-open-color"
+    },
+    {
+      "name": "setup_drone_genbot"
+    },
+    {
+      "name": "setup_drone_genbot-color"
+    },
+    {
+      "name": "setup_drone_genbot-open"
+    },
+    {
+      "name": "setup_drone_genbot-open-color"
+    },
+    {
+      "name": "setup_drone_android",
+      "directions": 4
+    },
+    {
+      "name": "setup_drone_android-color",
+      "directions": 4
+    },
+    {
+      "name": "setup_drone_android-open",
+      "directions": 4
+    },
+    {
+      "name": "setup_drone_android-open-color",
+      "directions": 4
+    },
+    {
+      "name": "setup_wallmount_small"
+    },
+    {
+      "name": "setup_wallmount_small-color"
+    },
+    {
+      "name": "setup_wallmount_small-open"
+    },
+    {
+      "name": "setup_wallmount_small-open-color"
+    },
+    {
+      "name": "setup_wallmount_medium"
+    },
+    {
+      "name": "setup_wallmount_medium-color"
+    },
+    {
+      "name": "setup_wallmount_medium-open"
+    },
+    {
+      "name": "setup_wallmount_medium-open-color"
+    },
+    {
+      "name": "setup_wallmount_large"
+    },
+    {
+      "name": "setup_wallmount_large-color"
+    },
+    {
+      "name": "setup_wallmount_large-open"
+    },
+    {
+      "name": "setup_wallmount_large-open-color"
+    },
+    {
+      "name": "setup_stationary",
+      "delays": [
+        [
+          0.2,
+          0.2,
+          0.2,
+          0.2
+        ]
+      ]
+    },
+    {
+      "name": "setup_stationary-open"
+    },
+    {
+      "name": "setup_implant",
+      "delays": [
+        [
+          1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "setup_implant-open"
+    },
+    {
+      "name": "setup_device"
+    },
+    {
+      "name": "setup_device-open"
+    },
+    {
+      "name": "setup_augment"
+    },
+    {
+      "name": "setup_augment-color"
+    },
+    {
+      "name": "setup_augment-open"
+    },
+    {
+      "name": "setup_augment-open-color"
+    }
+  ]
+}
+
+--- END OF FILE #52 ---
+
+=========================================================
+FILE #53: Resources/Textures/Objects/Devices/IntegratedCircuits/electronic_tools.rsi/meta.json
+=========================================================
+
+{
+  "version": 1,
+  "license": null,
+  "copyright": null,
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "circuit_printer",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "upgrade_disk",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "upgrade_disk_clone",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "analyzer",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "debugger",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "wirer-wire",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "wirer-unwire",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "wirer-wiring",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "wirer-unwiring",
+      "delays": [
+        [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ]
+      ]
+    },
+    {
+      "name": "detailer"
+    },
+    {
+      "name": "detailer-color"
+    }
+  ]
+}
+
+--- END OF FILE #53 ---
+
+=========================================================
+FILE #54: Resources/Locale/uk-UA/_Pirate/integrated_circuits.ftl
+=========================================================
+
+# UI Electronic Assembly
+electronic-assembly-window-title = Електронна Плата
+electronic-assembly-window-rename = [Перейменувати]
+electronic-assembly-window-save = [Зберегти]
+electronic-assembly-window-remove-battery = [Дістати]
+electronic-assembly-window-power = Живлення: {$charge}/{$max}Дж
+electronic-assembly-window-power-no-cell = Живлення: Немає Батареї
+electronic-assembly-window-stats = Місце: {$size}/{$maxSize} | Складність: {$complexity}/{$maxComplexity}
+electronic-assembly-window-space-stats = Місце: {$size}/{$maxSize}
+electronic-assembly-window-complexity-stats = Складність: {$complexity}/{$maxComplexity}
+
+electronic-assembly-window-components-list = Встановлені Компоненти:
+electronic-assembly-window-eject = [Витягти]
+electronic-assembly-window-inputs = --- Входи ---
+electronic-assembly-window-stats-header = --- Статистика ---
+electronic-assembly-window-outputs = --- Виходи ---
+electronic-assembly-window-activators = --- Активатори ---
+electronic-assembly-window-select-prompt = Виберіть компонент зі списку.
+electronic-assembly-window-stat-size = Розмір: {$size}
+electronic-assembly-window-stat-complexity = Складність: {$complexity}
+electronic-assembly-window-stat-power-idle = Живлення (Очік.): {$power}Вт
+electronic-assembly-window-stat-power-act = Живлення (Акт.): {$power}Вт
+electronic-assembly-window-pin-tooltip = Натисніть З'єднувачем щоб підключити. Натисніть Дебагером щоб вписати дані.
+
+# UI Circuit Printer
+circuit-printer-window-title = Принтер Інтегральних Схем
+circuit-printer-window-materials = Матеріали: 
+circuit-printer-window-materials-none = Жодних
+circuit-printer-window-circuits-available = Доступні схеми: 
+circuit-printer-window-upgraded-regular = Звичайні
+circuit-printer-window-upgraded-advanced = Удосконалені
+circuit-printer-window-categories = Категорії:
+
+# UI Circuit Debugger
+circuit-debugger-window-title = Дебагер Схем
+circuit-debugger-window-current-memory = Поточна пам'ять:
+circuit-debugger-window-select-mode = Виберіть режим:
+circuit-debugger-window-mode-string = Рядок
+circuit-debugger-window-mode-number = Число
+circuit-debugger-window-mode-ref = Посилання
+circuit-debugger-window-mode-null = Null
+circuit-debugger-window-save = Зберегти
+circuit-debugger-window-ref-prompt = Натисніть на об'єкт у світі...
+circuit-debugger-window-input-placeholder = Введіть дані...
+
+# UI Assembly Interact
+assembly-interact-window-title = Вибір Інтерфейсу
+assembly-interact-window-prompt = Виберіть компонент для взаємодії:
+assembly-interact-window-search-placeholder = Пошук...
+
+# Tools System
+circuit-wirer-cancel-wire = Ви скасували підключення.
+circuit-wirer-cancel-unwire = Ви скасували відключення.
+circuit-wirer-select-wire = Ви вибрали пін. Натисніть на інший пін щоб їх підключити.
+circuit-wirer-same-pin = Ви не можете підключити пін до самого себе.
+circuit-wirer-connected = Піни успішно підключені.
+circuit-wirer-connect-failed = Не вдалося підключити вибрані піни.
+circuit-wirer-select-unwire = Ви вибрали пін. Натисніть на інший пін щоб відключити їх.
+circuit-wirer-disconnected = Піни успішно від'єднано.
+circuit-wirer-disconnect-failed = Не вдалося від'єднати вибрані піни.
+
+circuit-debugger-pulse = Ви надіслали імпульс до цього піна активатора.
+circuit-debugger-write-success = Ви вписали дані до цього піна.
+circuit-debugger-write-failed = Не вдалося вписати дані до цього піна.
+
+# Entities - Integrated Electronics
+ent-BaseIntegratedCircuit = інтегральна схема
+ent-BaseElectronicAssembly = електронна плата
+ent-ElectronicAssemblySmall = мала електронна плата
+ent-ElectronicAssemblyMedium = середня електронна плата
+ent-ElectronicAssemblyLarge = велика електронна плата
+
+ent-CircuitWirer = з'єднувач схем
+    .desc = Інструмент для з'єднання пінів інтегральних схем.
+
+ent-CircuitDebugger = дебагер схем
+    .desc = Дозволяє перевіряти або вписувати дані в піни схем.
+
+ent-IntegratedCircuitPrinter = принтер інтегральних схем
+    .desc = Друкує різноманітні інтегральні схеми та електронні компоненти.
+
+# Entities - Circuits
+ent-CircuitButton = кнопка
+    .desc = Надсилає імпульс, коли гравець використовує закритий корпус в руці.
+
+ent-CircuitSpeaker = динамік
+    .desc = Відтворює текст із вхідного піна, коли отримує імпульс.
+
+
+--- END OF FILE #54 ---
 

@@ -1,28 +1,28 @@
 <DefaultWindow xmlns="https://spacestation14.io"
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-               Title="Circuit Debugger"
+               Title="{Loc 'circuit-debugger-window-title'}"
                MinSize="300 150">
     <BoxContainer Orientation="Vertical" Margin="5">
         
         <!-- Поточний стан -->
-        <Label Text="Current Memory:" Modulate="LightGray" />
+        <Label Text="{Loc 'circuit-debugger-window-current-memory'}" Modulate="LightGray" />
         <Label Name="CurrentValueLabel" Text="(null)" StyleClasses="LabelHeading" Margin="0 0 0 10"/>
 
-        <Label Text="Select Mode:" />
+        <Label Text="{Loc 'circuit-debugger-window-select-mode'}" />
         <BoxContainer Orientation="Horizontal" Margin="0 0 0 5">
-            <Button Name="BtnString" Text="String" HorizontalExpand="True" />
-            <Button Name="BtnNumber" Text="Number" HorizontalExpand="True" />
-            <Button Name="BtnRef" Text="Ref" HorizontalExpand="True" />
-            <Button Name="BtnNull" Text="Null" HorizontalExpand="True" />
+            <Button Name="BtnString" Text="{Loc 'circuit-debugger-window-mode-string'}" HorizontalExpand="True" />
+            <Button Name="BtnNumber" Text="{Loc 'circuit-debugger-window-mode-number'}" HorizontalExpand="True" />
+            <Button Name="BtnRef" Text="{Loc 'circuit-debugger-window-mode-ref'}" HorizontalExpand="True" />
+            <Button Name="BtnNull" Text="{Loc 'circuit-debugger-window-mode-null'}" HorizontalExpand="True" />
         </BoxContainer>
 
         <!-- Введення даних -->
         <BoxContainer Name="InputContainer" Orientation="Horizontal" Margin="0 5 0 0">
-            <LineEdit Name="DataInput" PlaceHolder="Enter data..." HorizontalExpand="True" />
-            <Button Name="BtnSave" Text="Save" MinSize="60 0" />
+            <LineEdit Name="DataInput" PlaceHolder="{Loc 'circuit-debugger-window-input-placeholder'}" HorizontalExpand="True" />
+            <Button Name="BtnSave" Text="{Loc 'circuit-debugger-window-save'}" MinSize="60 0" />
         </BoxContainer>
 
-        <Label Name="RefPromptLabel" Text="Click on an entity in the world..." 
+        <Label Name="RefPromptLabel" Text="{Loc 'circuit-debugger-window-ref-prompt'}" 
                Modulate="Yellow" Visible="False" Margin="0 5 0 0" HorizontalAlignment="Center"/>
 
     </BoxContainer>

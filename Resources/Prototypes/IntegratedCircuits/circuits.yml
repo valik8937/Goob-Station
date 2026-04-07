@@ -2,8 +2,6 @@
 - type: entity
   parent: BaseIntegratedCircuit
   id: CircuitButton
-  name: "кнопка"
-  description: "Надсилає імпульс, коли гравець використовує закритий корпус в руці."
   components:
   - type: Sprite
     state: button
@@ -25,8 +23,6 @@
 - type: entity
   parent: BaseIntegratedCircuit
   id: CircuitSpeaker
-  name: "динамік"
-  description: "Відтворює текст із вхідного піна, коли отримує імпульс."
   components:
   - type: Sprite
     state: speaker

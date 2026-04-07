@@ -34,14 +34,14 @@ public sealed partial class ElectronicAssemblyWindow : DefaultWindow
                 OnRenamePressed?.Invoke(AssemblyNameEdit.Text);
                 AssemblyNameEdit.Visible = false;
                 AssemblyNameLabel.Visible = true;
-                RenameButton.Text = "[Rename]";
+                RenameButton.Text = Loc.GetString("electronic-assembly-window-rename");
             }
             else
             {
                 AssemblyNameEdit.Text = AssemblyNameLabel.Text ?? "";
                 AssemblyNameEdit.Visible = true;
                 AssemblyNameLabel.Visible = false;
-                RenameButton.Text = "[Save]";
+                RenameButton.Text = Loc.GetString("electronic-assembly-window-save");
                 AssemblyNameEdit.GrabKeyboardFocus();
             }
         };
@@ -61,17 +61,17 @@ public sealed partial class ElectronicAssemblyWindow : DefaultWindow
         AssemblyNameLabel.Text = state.AssemblyName;
         Title = state.AssemblyName;
 
-        StatsLabel.Text = $"Space: {state.TotalSize}/{state.MaxSize} | Complexity: {state.TotalComplexity}/{state.MaxComplexity}";
+        StatsLabel.Text = Loc.GetString("electronic-assembly-window-space-stats", ("size", state.TotalSize), ("maxSize", state.MaxSize)) + " | " + Loc.GetString("electronic-assembly-window-complexity-stats", ("complexity", state.TotalComplexity), ("maxComplexity", state.MaxComplexity));
         
         if (state.HasBattery)
         {
-            BatteryLabel.Text = $"Power: {state.BatteryCharge:F0}/{state.BatteryMaxCharge:F0}J";
+            BatteryLabel.Text = Loc.GetString("electronic-assembly-window-power", ("charge", state.BatteryCharge.ToString("F0")), ("max", state.BatteryMaxCharge.ToString("F0")));
             BatteryLabel.StyleClasses.Clear();
             RemoveBatteryButton.Visible = true;
         }
         else
         {
-            BatteryLabel.Text = "Power: No Cell";
+            BatteryLabel.Text = Loc.GetString("electronic-assembly-window-power-no-cell");
             if (!BatteryLabel.StyleClasses.Contains("LabelDanger"))
                 BatteryLabel.StyleClasses.Add("LabelDanger");
             RemoveBatteryButton.Visible = false;
@@ -123,10 +123,10 @@ public sealed partial class ElectronicAssemblyWindow : DefaultWindow
         DetailDescLabel.Text = circuit.Description;
         RemoveCircuitButton.Disabled = !circuit.Removable;
 
-        StatSize.Text = $"Size: {circuit.Size}";
-        StatComp.Text = $"Complexity: {circuit.Complexity}";
-        StatPower.Text = $"Power (Idle): {circuit.PowerDrawIdle}W";
-        StatActive.Text = $"Power (Act): {circuit.PowerDrawPerUse}W";
+        StatSize.Text = Loc.GetString("electronic-assembly-window-stat-size", ("size", circuit.Size));
+        StatComp.Text = Loc.GetString("electronic-assembly-window-stat-complexity", ("complexity", circuit.Complexity));
+        StatPower.Text = Loc.GetString("electronic-assembly-window-stat-power-idle", ("power", circuit.PowerDrawIdle.ToString("F0")));
+        StatActive.Text = Loc.GetString("electronic-assembly-window-stat-power-act", ("power", circuit.PowerDrawPerUse.ToString("F0")));
 
         InputsContainer.RemoveAllChildren();
         OutputsContainer.RemoveAllChildren();
@@ -155,7 +155,7 @@ public sealed partial class ElectronicAssemblyWindow : DefaultWindow
         var btn = new Button
         {
             Text = $"[{pin.DataType}] {pin.Name} : {pin.DisplayData}",
-            ToolTip = "Click with Wirer to connect. Click with Debugger to write data.",
+            ToolTip = Loc.GetString("electronic-assembly-window-pin-tooltip"),
             Modulate = pin.PinType == PinType.Activator ? Robust.Shared.Maths.Color.IndianRed : Robust.Shared.Maths.Color.LightGray
         };
 

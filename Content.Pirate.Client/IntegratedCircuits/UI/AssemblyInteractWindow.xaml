@@ -1,13 +1,13 @@
 <DefaultWindow xmlns="https://spacestation14.io"
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-               Title="Select Interface"
+               Title="{Loc 'assembly-interact-window-title'}"
                MinSize="300 400">
     <BoxContainer Orientation="Vertical" Margin="5">
         
-        <Label Text="Select a component to interact with:" Margin="0 0 0 5"/>
+        <Label Text="{Loc 'assembly-interact-window-prompt'}" Margin="0 0 0 5"/>
         
         <!-- Поле для фільтрації -->
-        <LineEdit Name="FilterEdit" PlaceHolder="Search..." Margin="0 0 0 5" />
+        <LineEdit Name="FilterEdit" PlaceHolder="{Loc 'assembly-interact-window-search-placeholder'}" Margin="0 0 0 5" />
 
         <!-- Контейнер для списку -->
         <ScrollContainer VerticalExpand="True">

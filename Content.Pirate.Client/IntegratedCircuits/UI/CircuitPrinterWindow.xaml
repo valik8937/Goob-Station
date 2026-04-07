@@ -2,13 +2,13 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                Resizable="True"
-               Title="Integrated Circuit Printer">
+               Title="{Loc 'circuit-printer-window-title'}">
     <BoxContainer Orientation="Vertical"
                   MinSize="800 630"
                   Margin="5">
 
         <!-- Title -->
-        <Label Text="Integrated Circuit Printer"
+        <Label Text="{Loc 'circuit-printer-window-title'}"
                StyleClasses="LabelHeading"
                HorizontalAlignment="Center"
                Margin="0 0 0 5" />
@@ -16,7 +16,7 @@
         <!-- Materials info -->
         <BoxContainer Orientation="Horizontal"
                       Margin="0 3 0 3">
-            <Label Text="Materials: " />
+            <Label Text="{Loc 'circuit-printer-window-materials'}" />
             <Label Name="MaterialsLabel"
                    Text="0/2500 Steel" />
         </BoxContainer>
@@ -24,7 +24,7 @@
         <!-- Upgrade status -->
         <BoxContainer Orientation="Horizontal"
                       Margin="0 0 0 3">
-            <Label Text="Circuits available: " />
+            <Label Text="{Loc 'circuit-printer-window-circuits-available'}" />
             <Label Name="UpgradeLabel"
                    Text="Regular" />
         </BoxContainer>
@@ -38,7 +38,7 @@
         </PanelContainer>
 
         <!-- Category tabs -->
-        <Label Text="Categories:"
+        <Label Text="{Loc 'circuit-printer-window-categories'}"
                Margin="0 0 0 3" />
         <ScrollContainer HScrollEnabled="True"
                          VScrollEnabled="False"

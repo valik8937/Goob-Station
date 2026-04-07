@@ -2,21 +2,21 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                Resizable="True"
-               Title="Electronic Assembly"
+               Title="{Loc 'electronic-assembly-window-title'}"
                MinSize="850 500">
     <BoxContainer Orientation="Vertical" Margin="5">
 
         <!-- Header -->
         <BoxContainer Orientation="Horizontal" Margin="0 0 0 5">
-            <Label Name="AssemblyNameLabel" Text="Electronic Assembly" StyleClasses="LabelHeading" HorizontalExpand="True" />
+            <Label Name="AssemblyNameLabel" Text="{Loc 'electronic-assembly-window-title'}" StyleClasses="LabelHeading" HorizontalExpand="True" />
             <LineEdit Name="AssemblyNameEdit" Visible="False" HorizontalExpand="True" />
-            <Button Name="RenameButton" Text="[Rename]" MinSize="80 0" />
+            <Button Name="RenameButton" Text="{Loc 'electronic-assembly-window-rename'}" MinSize="80 0" />
         </BoxContainer>
         
         <BoxContainer Orientation="Horizontal">
-            <Label Name="StatsLabel" Text="Space: 0/0 | Complexity: 0/0" HorizontalExpand="True"/>
-            <Label Name="BatteryLabel" Text="Power: No Cell" />
-            <Button Name="RemoveBatteryButton" Text="[Remove]" MinSize="70 0" Visible="False" Margin="10 0 0 0" />
+            <Label Name="StatsLabel" Text="{Loc 'electronic-assembly-window-stats'}" HorizontalExpand="True"/>
+            <Label Name="BatteryLabel" Text="{Loc 'electronic-assembly-window-power-no-cell'}" />
+            <Button Name="RemoveBatteryButton" Text="{Loc 'electronic-assembly-window-remove-battery'}" MinSize="70 0" Visible="False" Margin="10 0 0 0" />
         </BoxContainer>
 
         <PanelContainer SetHeight="2" Margin="0 5 0 5">
@@ -28,7 +28,7 @@
             
             <!-- LEFT PANEL: Components List -->
             <BoxContainer Orientation="Vertical" MinSize="250 0" Margin="0 0 5 0">
-                <Label Text="Installed Components:" StyleClasses="LabelHeading" Margin="0 0 0 5"/>
+                <Label Text="{Loc 'electronic-assembly-window-components-list'}" StyleClasses="LabelHeading" Margin="0 0 0 5"/>
                 <ScrollContainer VerticalExpand="True">
                     <BoxContainer Name="ComponentsList" Orientation="Vertical" />
                 </ScrollContainer>
@@ -44,7 +44,7 @@
                 <!-- Circuit Header -->
                 <BoxContainer Orientation="Horizontal">
                     <Label Name="DetailNameLabel" Text="Circuit Name" StyleClasses="LabelHeading" HorizontalExpand="True"/>
-                    <Button Name="RemoveCircuitButton" Text="[Eject]" StyleClasses="ButtonCaution" />
+                    <Button Name="RemoveCircuitButton" Text="{Loc 'electronic-assembly-window-eject'}" StyleClasses="ButtonCaution" />
                 </BoxContainer>
                 <Label Name="DetailDescLabel" Text="Description..." Modulate="Gray" Margin="0 0 0 10"/>
 
@@ -53,14 +53,14 @@
                     <!-- Left: Inputs -->
                     <ScrollContainer HorizontalExpand="True">
                         <BoxContainer Orientation="Vertical">
-                            <Label Text="--- Inputs ---" HorizontalAlignment="Center" Modulate="#44AAFF"/>
+                            <Label Text="{Loc 'electronic-assembly-window-inputs'}" HorizontalAlignment="Center" Modulate="#44AAFF"/>
                             <BoxContainer Name="InputsContainer" Orientation="Vertical" Margin="5"/>
                         </BoxContainer>
                     </ScrollContainer>
 
                     <!-- Middle: Stats -->
                     <BoxContainer Orientation="Vertical" MinSize="150 0" Margin="10 0 10 0">
-                        <Label Text="--- Stats ---" HorizontalAlignment="Center" Modulate="Yellow"/>
+                        <Label Text="{Loc 'electronic-assembly-window-stats-header'}" HorizontalAlignment="Center" Modulate="Yellow"/>
                         <Label Name="StatSize" Text="Size: 1"/>
                         <Label Name="StatComp" Text="Complexity: 1"/>
                         <Label Name="StatPower" Text="Power (Idle): 0W"/>
@@ -70,7 +70,7 @@
                     <!-- Right: Outputs -->
                     <ScrollContainer HorizontalExpand="True">
                         <BoxContainer Orientation="Vertical">
-                            <Label Text="--- Outputs ---" HorizontalAlignment="Center" Modulate="#44FF44"/>
+                            <Label Text="{Loc 'electronic-assembly-window-outputs'}" HorizontalAlignment="Center" Modulate="#44FF44"/>
                             <BoxContainer Name="OutputsContainer" Orientation="Vertical" Margin="5"/>
                         </BoxContainer>
                     </ScrollContainer>
@@ -78,7 +78,7 @@
 
                 <!-- Bottom: Activators -->
                 <PanelContainer SetHeight="2" Margin="0 5 0 5"><PanelContainer.PanelOverride><gfx:StyleBoxFlat BackgroundColor="#404046" /></PanelContainer.PanelOverride></PanelContainer>
-                <Label Text="--- Activators ---" HorizontalAlignment="Center" Modulate="#FF4444"/>
+                <Label Text="{Loc 'electronic-assembly-window-activators'}" HorizontalAlignment="Center" Modulate="#FF4444"/>
                 <ScrollContainer SetHeight="80">
                     <BoxContainer Name="ActivatorsContainer" Orientation="Vertical" Margin="5"/>
                 </ScrollContainer>
@@ -86,7 +86,7 @@
             </BoxContainer>
             
             <!-- Placeholder when nothing is selected -->
-            <Label Name="SelectPromptLabel" Text="Select a component from the list." HorizontalExpand="True" VerticalAlignment="Center" HorizontalAlignment="Center" Modulate="Gray"/>
+            <Label Name="SelectPromptLabel" Text="{Loc 'electronic-assembly-window-select-prompt'}" HorizontalExpand="True" VerticalAlignment="Center" HorizontalAlignment="Center" Modulate="Gray"/>
 
         </BoxContainer>
     </BoxContainer>
