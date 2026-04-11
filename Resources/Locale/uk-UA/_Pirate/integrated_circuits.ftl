@@ -65,10 +65,15 @@ circuit-debugger-write-failed = Не вдалося вписати дані до
 
 # Entities - Integrated Electronics
 ent-BaseIntegratedCircuit = інтегральна схема
+    .desc = Базова мікросхема.
 ent-BaseElectronicAssembly = електронна плата
+    .desc = Базовий корпус для схем.
 ent-ElectronicAssemblySmall = мала електронна плата
+    .desc = Компактний корпус для простих мікросхем.
 ent-ElectronicAssemblyMedium = середня електронна плата
+    .desc = Стандартний корпус для мікросхем середньої складності.
 ent-ElectronicAssemblyLarge = велика електронна плата
+    .desc = Великий корпус, здатний вмістити безліч мікросхем.
 
 ent-CircuitWirer = з'єднувач схем
     .desc = Інструмент для з'єднання пінів інтегральних схем.

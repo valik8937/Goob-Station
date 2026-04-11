@@ -25,6 +25,7 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
     [Dependency] private readonly ElectronicAssemblyUISystem _ui = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!; // Додано для закриття вікон
+    [Dependency] private readonly Content.Shared.Containers.ItemSlots.ItemSlotsSystem _itemSlots = default!;
 
     private float _accumulatedFrameTime = 0f;
     private const float UpdateInterval = 1.0f; // Оновлюємо енергію РАЗ В СЕКУНДУ, а не 30 разів
@@ -66,11 +67,27 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
     {
         _appearance.SetData(uid, AssemblyVisuals.Opened, comp.Opened);
         _appearance.SetData(uid, AssemblyVisuals.Color, comp.DetailColor);
+
+        // Блокуємо слот батареї, якщо корпус з'являється у світі закритим
+        _itemSlots.SetLock(uid, "battery_slot", !comp.Opened);
+    }
+
+    private bool TryGetAssemblyBattery(EntityUid assemblyUid, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out Content.Server.Power.Components.BatteryComponent? battery, out EntityUid batteryUid)
+    {
+        battery = null;
+        batteryUid = default;
+        var inserted = _itemSlots.GetItemOrNull(assemblyUid, "battery_slot");
+        if (inserted != null && _battery.TryGetBatteryComponent(inserted.Value, out battery, out _))
+        {
+            batteryUid = inserted.Value;
+            return true;
+        }
+        return false;
     }
 
     private void DrainIdlePower(EntityUid assemblyUid, ElectronicAssemblyComponent assembly, float frameTime)
     {
-        if (!_battery.TryGetBatteryComponent(assemblyUid, out var battery, out var batteryUid))
+        if (!TryGetAssemblyBattery(assemblyUid, out var battery, out var batteryUid))
             return;
 
         var totalIdleDraw = 0f;
@@ -86,20 +103,20 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
             return;
 
         var energyToUse = totalIdleDraw * frameTime;
-        _battery.UseCharge(batteryUid.Value, energyToUse, battery);
+        _battery.UseCharge(batteryUid, energyToUse, battery);
     }
 
     public bool TryUsePower(EntityUid assemblyUid, float amount)
     {
-        if (!_battery.TryGetBatteryComponent(assemblyUid, out var battery, out var batteryUid))
+        if (!TryGetAssemblyBattery(assemblyUid, out var battery, out var batteryUid))
             return false;
 
-        return _battery.TryUseCharge(batteryUid.Value, amount, battery);
+        return _battery.TryUseCharge(batteryUid, amount, battery);
     }
 
     public bool HasPower(EntityUid assemblyUid)
     {
-        if (!_battery.TryGetBatteryComponent(assemblyUid, out var battery, out _))
+        if (!TryGetAssemblyBattery(assemblyUid, out var battery, out _))
             return false;
 
         return battery.CurrentCharge > 0;
@@ -107,7 +124,7 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
 
     public bool HasEnoughPower(EntityUid assemblyUid, float amount)
     {
-        if (!_battery.TryGetBatteryComponent(assemblyUid, out var battery, out _))
+        if (!TryGetAssemblyBattery(assemblyUid, out var battery, out _))
             return false;
 
         return battery.CurrentCharge >= amount;
@@ -173,6 +190,9 @@ public sealed class ServerElectronicAssemblySystem : SharedElectronicAssemblySys
 
         comp.Opened = !comp.Opened;
         
+        // Блокуємо слот, якщо закрито. Розблоковуємо, якщо відкрито.
+        _itemSlots.SetLock(uid, "battery_slot", !comp.Opened);
+
         // ПОВІДОМЛЯЄМО КЛІЄНТУ ПРО ЗМІНУ (Синхронізація)
         Dirty(uid, comp); 
 

@@ -97,6 +97,13 @@ public sealed class ElectronicAssemblyUISystem : EntitySystem
     {
         var user = msg.Actor;
 
+        // Якщо панель закрита - відмовляємо у витягуванні через інтерфейс
+        if (!comp.Opened)
+        {
+            _popup.PopupEntity("Панель закрита! Спочатку відкрутіть гвинти.", uid, user);
+            return;
+        }
+
         if (_itemSlots.TryGetSlot(uid, "battery_slot", out var slot))
         {
             _itemSlots.TryEjectToHands(uid, slot, user);

@@ -143,6 +143,7 @@ public sealed class CircuitToolsSystem : EntitySystem
             }
         }
 
+        _appearance.SetData(wirerUid, WirerVisuals.Mode, comp.Mode);
         Dirty(wirerUid, comp);
     }
 

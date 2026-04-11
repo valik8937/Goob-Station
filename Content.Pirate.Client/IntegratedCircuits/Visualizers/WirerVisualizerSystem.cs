@@ -15,7 +15,6 @@ public sealed class WirerVisualizerSystem : VisualizerSystem<CircuitWirerCompone
         if (!AppearanceSystem.TryGetData(uid, WirerVisuals.Mode, out WirerMode mode, args.Component))
             return;
 
-        // Змінюємо текстуру залежно від режиму
         var state = mode switch
         {
             WirerMode.Wire => "wirer-wire",

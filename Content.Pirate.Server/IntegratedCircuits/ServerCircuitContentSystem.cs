@@ -15,6 +15,7 @@ public sealed class ServerCircuitContentSystem : EntitySystem
     [Dependency] private readonly SharedIntegratedCircuitSystem _circuits = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
+    [Dependency] private readonly Content.Server.Chat.Systems.ChatSystem _chatSystem = default!;
 
     public override void Initialize()
     {
@@ -37,7 +38,7 @@ public sealed class ServerCircuitContentSystem : EntitySystem
         var text = _circuits.ReadPinData(uid, PinType.Input, 0) as string;
         if (string.IsNullOrWhiteSpace(text)) return;
         var actingEntity = _circuits.GetActingEntity(uid);
-        _popup.PopupEntity($"[Динамік]: {text}", actingEntity);
+        _chatSystem.TrySendInGameICMessage(actingEntity, text, Content.Shared.Chat.InGameICChatType.Speak, hideChat: false, ignoreActionBlocker: true, nameOverride: $"[Динамік] {Name(actingEntity)}");
     }
 
     // ГОЛОВНА ЛОГІКА

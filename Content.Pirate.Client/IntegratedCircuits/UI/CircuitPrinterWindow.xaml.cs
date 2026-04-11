@@ -116,10 +116,11 @@ public sealed partial class CircuitPrinterWindow : DefaultWindow
             row.AddChild(disabledLabel);
         }
 
-        // Description
+        // Description (Ховаємо двокрапку, якщо опис порожній)
+        var descText = string.IsNullOrWhiteSpace(recipe.Description) ? "" : $": {recipe.Description}";
         var descLabel = new Label
         {
-            Text = $": {recipe.Description}",
+            Text = descText,
             HorizontalExpand = true,
         };
         row.AddChild(descLabel);
